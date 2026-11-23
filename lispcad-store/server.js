@@ -31,8 +31,16 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/files", express.static(path.join(__dirname, "files")));
 
-// Helper đọc/ghi Database JSON
-function readDb() {
+// Helper đọc/ghi Database JSON & Đồng bộ Đám mây MongoDB Atlas Vĩnh Viễn
+const { MongoClient } = require("mongodb");
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://toduykhanh977_db_user:2odZaj6HuCQI7PzQ@cluster0.vg5hm2a.mongodb.net/lispcad?retryWrites=true&w=majority";
+
+let mongoClient = null;
+let mongoDb = null;
+let storeCollection = null;
+let dbCache = null;
+
+function readDbFromFile() {
   try {
     const raw = fs.readFileSync(DB_PATH, "utf8");
     return JSON.parse(raw);
@@ -40,21 +48,73 @@ function readDb() {
     return {
       adminPassword: "admin",
       paymentSettings: {
-        mode: "auto_confirm",
+        mode: "strict",
         bankName: "MBBank",
-        accountNumber: "9999999999",
-        accountHolder: "NGUYEN VAN A",
+        accountNumber: "0329778016",
+        accountHolder: "TO DUY KHANH",
         qrImageUrl: "",
         transferSyntax: "LISPCAD"
       },
       products: [],
+      documents: [],
+      courses: [],
       orders: []
     };
   }
 }
 
+async function initMongo() {
+  try {
+    mongoClient = new MongoClient(MONGODB_URI, { serverSelectionTimeoutMS: 8000 });
+    await mongoClient.connect();
+    mongoDb = mongoClient.db("lispcad");
+    storeCollection = mongoDb.collection("store_state");
+    console.log("🚀 [MongoDB Atlas] Kết nối đám mây thành công!");
+
+    // Đồng bộ dữ liệu mới nhất từ MongoDB Atlas về bộ nhớ cache
+    const cloudData = await storeCollection.findOne({ _id: "main_db" });
+    if (cloudData) {
+      delete cloudData._id;
+      dbCache = cloudData;
+      try {
+        fs.writeFileSync(DB_PATH, JSON.stringify(cloudData, null, 2), "utf8");
+      } catch (e) {}
+      console.log(`📦 [MongoDB Atlas] Đã nạp ${dbCache.products?.length || 0} sản phẩm và ${dbCache.documents?.length || 0} tài liệu từ đám mây!`);
+    } else {
+      const local = readDbFromFile();
+      await storeCollection.replaceOne({ _id: "main_db" }, { ...local, _id: "main_db" }, { upsert: true });
+      dbCache = local;
+      console.log("📦 [MongoDB Atlas] Đã khởi tạo dữ liệu ban đầu lên đám mây!");
+    }
+  } catch (err) {
+    console.warn("⚠️ [MongoDB Atlas] Chưa kết nối được đám mây, sử dụng file db.json dự phòng:", err.message);
+  }
+}
+
+// Khởi chạy kết nối ngay khi nạp file
+initMongo();
+
+function readDb() {
+  if (dbCache) {
+    return JSON.parse(JSON.stringify(dbCache));
+  }
+  return readDbFromFile();
+}
+
 function writeDb(data) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), "utf8");
+  dbCache = JSON.parse(JSON.stringify(data));
+  // 1. Ghi vào file local làm dự phòng
+  try {
+    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), "utf8");
+  } catch (e) {
+    console.error("Lỗi ghi file local:", e);
+  }
+  // 2. Tự động lưu vĩnh viễn lên đám mây MongoDB Atlas
+  if (storeCollection) {
+    storeCollection.replaceOne({ _id: "main_db" }, { ...data, _id: "main_db" }, { upsert: true })
+      .then(() => console.log("☁️ [MongoDB Atlas] ĐÃ LƯU VĨNH VIỄN LÊN ĐÁM MÂY THÀNH CÔNG!"))
+      .catch(err => console.error("❌ [MongoDB Atlas] Lỗi lưu đám mây:", err.message));
+  }
 }
 
 // Middleware xác thực Admin
