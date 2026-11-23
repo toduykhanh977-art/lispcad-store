@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang Quản Trị - Bán LispCAD</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-container {
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 24px;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--card-bg);
+      color: var(--accent-cyan);
+      border-color: var(--card-border);
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .admin-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--card-border);
+      font-size: 0.95rem;
+    }
+    th {
+      color: var(--text-muted);
+      font-weight: 600;
+      background: #0d1117;
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .btn-success { background: #2ea043; color: #fff; }
+    .btn-danger { background: #da3633; color: #fff; }
+    .btn-secondary { background: #30363d; color: #fff; }
+    .btn-primary { background: var(--accent-gradient); color: #fff; }
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .status-paid { background: rgba(46, 160, 67, 0.2); color: #3fb950; }
+    .status-pending { background: rgba(210, 153, 34, 0.2); color: #d29922; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    .preview-box {
+      border: 2px dashed var(--card-border);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      margin-top: 10px;
+      background: #0d1117;
+    }
+    .preview-box img {
+      max-width: 220px;
+      max-height: 220px;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <!-- MÀN HÌNH ĐĂNG NHẬP ADMIN -->
+    <div id="login-modal" class="admin-card" style="max-width: 420px; margin: 80px auto;">
+      <h2 style="text-align: center; margin-bottom: 20px; color: var(--accent-cyan);">🔐 Đăng Nhập Quản Trị</h2>
+      <div class="form-group">
+        <label for="admin-pass">Mật khẩu Admin</label>
+        <input type="password" id="admin-pass" placeholder="Nhập mật khẩu (Mặc định: admin)" required>
+      </div>
+      <button class="btn-buy" style="margin-top: 15px;" onclick="handleLogin()">Đăng Nhập</button>
+      <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 15px;">
+        Mật khẩu mặc định là: <code style="color: var(--accent-cyan);">admin</code>
+      </p>
+    </div>
+
+    <!-- MÀN HÌNH BẢNG ĐIỀU KHIỂN (SAU KHI ĐĂNG NHẬP) -->
+    <div id="dashboard" style="display: none;">
+      <div class="admin-header">
+        <div>
+          <h2>🛠️ Quản Trị Website LispCAD</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Tùy chỉnh mã QR ngân hàng, sản phẩm Lisp, giá bán và kiểm tra đơn hàng</p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <a href="/" target="_blank" class="btn-sm btn-secondary" style="text-decoration: none; padding: 10px 14px;">🌐 Xem Trang Bán</a>
+          <button class="btn-sm btn-danger" onclick="handleLogout()">Đăng Xuất</button>
+        </div>
+      </div>
+
+      <!-- Menu Tabs -->
+      <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-payment')">💳 Cài Đặt Mã QR & Ngân Hàng</button>
+        <button class="tab-btn" onclick="switchTab('tab-products')">📦 Quản Lý LispCAD & Giá Bán</button>
+        <button class="tab-btn" onclick="switchTab('tab-orders')">📑 Danh Sách Đơn Hàng</button>
+        <button class="tab-btn" onclick="switchTab('tab-password')">🔒 Đổi Mật Khẩu</button>
+      </div>
+
+      <!-- TAB 1: CÀI ĐẶT THANH TOÁN & MÃ QR -->
+      <div id="tab-payment" class="panel active">
+        <div class="admin-card">
+          <h3 style="margin-bottom: 16px; color: var(--accent-cyan);">1. Thiết lập hình thức thanh toán & Mã QR</h3>
+          
+          <form id="form-payment" onsubmit="savePaymentSettings(event)">
+            <div class="form-group">
+              <label><strong>Chế độ mở khóa file sau thanh toán:</strong></label>
+              <div style="margin: 10px 0; background: #0d1117; padding: 15px; border-radius: 8px; border: 1px solid var(--card-border);">
+                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer;">
+                  <input type="radio" name="payMode" value="auto_confirm" checked>
+                  <span><strong>Tự động cho tải file ngay</strong> khi khách bấm "Tôi đã chuyển khoản" (Khuyên dùng: bạn không cần trực máy).</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                  <input type="radio" name="payMode" value="manual">
+                  <span><strong>Duyệt đơn thủ công</strong> (Khách chờ bạn bấm "Duyệt đơn" trong bảng này rồi mới tải được).</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div>
+                <div class="form-group">
+                  <label for="bankName">Tên Ngân Hàng</label>
+                  <input type="text" id="bankName" placeholder="VD: MBBank, Techcombank, Vietcombank, ACB..." required>
+                </div>
+
+                <div class="form-group">
+                  <label for="accountNumber">Số Tài Khoản Ngân Hàng</label>
+                  <input type="text" id="accountNumber" placeholder="Nhập số tài khoản nhận tiền" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="accountHolder">Tên Chủ Tài Khoản (Không dấu)</label>
+                  <input type="text" id="accountHolder" placeholder="VD: NGUYEN VAN A" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="transferSyntax">Tiền tố cú pháp chuyển khoản</label>
+                  <input type="text" id="transferSyntax" placeholder="Mặc định: LISPCAD">
+                </div>
+              </div>
+
+              <div>
+                <div class="form-group">
+                  <label for="qrImage">Tải lên ảnh Mã QR Ngân hàng của bạn (Nếu có ảnh chụp)</label>
+                  <input type="file" id="qrImage" accept="image/*" onchange="previewQr(this)">
+                </div>
+
+                <div class="preview-box">
+                  <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 8px;">Mã QR đang hiển thị trên web:</p>
+                  <img id="qr-preview" src="" alt="Mã QR" style="display: none;">
+                  <span id="qr-empty-text" style="color: var(--text-muted); font-size: 0.85rem;">Hệ thống sẽ tự tạo mã VietQR chuẩn theo STK & Ngân hàng ở trên.</span>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-buy" style="max-width: 250px; margin-top: 20px;">Lưu Cài Đặt</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB 2: QUẢN LÝ LISPCAD & GIÁ BÁN -->
+      <div id="tab-products" class="panel">
+        <div class="admin-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="color: var(--accent-cyan);">2. Danh Sách Các Bộ LispCAD Đang Bán</h3>
+            <button class="btn-sm btn-primary" onclick="openProductModal()">+ Thêm Sản Phẩm Mới</button>
+          </div>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tên Sản Phẩm LispCAD</th>
+                  <th>Giá Bán</th>
+                  <th>Lệnh Hỗ Trợ</th>
+                  <th>File / Link Tải</th>
+                  <th>Trạng Thái</th>
+                  <th>Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="products-table-body">
+                <!-- Danh sách sản phẩm được load động -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: DANH SÁCH ĐƠN HÀNG -->
+      <div id="tab-orders" class="panel">
+        <div class="admin-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="color: var(--accent-cyan);">3. Danh Sách Đơn Hàng Khách Mua</h3>
+            <button class="btn-sm btn-secondary" onclick="loadDashboardData()">🔄 Làm Mới</button>
+          </div>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mã Đơn</th>
+                  <th>Khách Hàng</th>
+                  <th>Số Điện Thoại</th>
+                  <th>Sản Phẩm</th>
+                  <th>Số Tiền</th>
+                  <th>Thời Gian</th>
+                  <th>Trạng Thái</th>
+                  <th>Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-body">
+                <!-- Danh sách đơn hàng -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: ĐỔI MẬT KHẨU ADMIN -->
+      <div id="tab-password" class="panel">
+        <div class="admin-card" style="max-width: 480px;">
+          <h3 style="margin-bottom: 16px; color: var(--accent-cyan);">4. Đổi Mật Khẩu Admin</h3>
+          <form onsubmit="changePassword(event)">
+            <div class="form-group">
+              <label for="newPass">Mật khẩu mới</label>
+              <input type="password" id="newPass" placeholder="Nhập mật khẩu mới" required>
+            </div>
+            <button type="submit" class="btn-buy" style="margin-top: 15px;">Cập Nhật Mật Khẩu</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL THÊM / SỬA SẢN PHẨM -->
+  <div id="product-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto; padding: 20px;">
+    <div class="admin-card" style="max-width: 600px; margin: 40px auto; background: var(--card-bg);">
+      <h3 id="modal-title" style="margin-bottom: 20px; color: var(--accent-cyan);">Thêm Sản Phẩm LispCAD</h3>
+      <form id="form-product" onsubmit="saveProduct(event)">
+        <input type="hidden" id="prod-id">
+
+        <div class="form-group">
+          <label for="prod-name">Tên Bộ LispCAD</label>
+          <input type="text" id="prod-name" placeholder="VD: Bộ LispCAD Tự Động Hóa Bản Vẽ" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="prod-price">Giá Bán (VNĐ)</label>
+            <input type="number" id="prod-price" placeholder="99000" required>
+          </div>
+          <div class="form-group">
+            <label for="prod-oldprice">Giá Gốc Hiển Thị Gạch Ngang (VNĐ)</label>
+            <input type="number" id="prod-oldprice" placeholder="199000">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="prod-commands">Các Lệnh CAD Nổi Bật (Ngăn cách dấu phẩy)</label>
+          <input type="text" id="prod-commands" placeholder="VD: TL (Tính tổng dài), STT (Đánh số), DTL (Tính diện tích)">
+        </div>
+
+        <div class="form-group">
+          <label for="prod-desc">Mô Tả Ngắn</label>
+          <input type="text" id="prod-desc" placeholder="Tóm tắt ngắn về bộ Lisp này" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 8px;">
+        </div>
+
+        <div class="form-group">
+          <label for="prod-instructions">📖 Hướng Dẫn Sử Dụng (Khách sẽ đọc trước khi mua)</label>
+          <textarea id="prod-instructions" rows="5" placeholder="Ghi rõ các bước thực hiện:&#10;Bước 1: Nạp lisp bằng lệnh APPLOAD...&#10;Bước 2: Gõ lệnh TL để...&#10;Bước 3: Gõ lệnh STT để..." style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 8px; font-family: inherit; line-height: 1.5;"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="prod-videourl">🎥 Link Video Hướng Dẫn Sử Dụng (YouTube)</label>
+          <input type="url" id="prod-videourl" placeholder="VD: https://www.youtube.com/watch?v=... hoặc https://youtu.be/..." style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 8px;">
+          <small style="color: var(--text-muted); display: block; margin-top: 4px;">Video sẽ được nhúng phát trực tiếp trên trang chủ để khách xem trước khi bấm mua.</small>
+        </div>
+
+        <div class="form-group">
+          <label><strong>Hình thức cấp file cho khách:</strong></label>
+          <div style="margin: 8px 0;">
+            <label style="margin-right: 20px; cursor: pointer;">
+              <input type="radio" name="downloadType" value="local" checked onchange="toggleDownloadType()"> Tải file (.lsp / .zip) từ máy lên
+            </label>
+            <label style="cursor: pointer;">
+              <input type="radio" name="downloadType" value="link" onchange="toggleDownloadType()"> Dán link Google Drive / OneDrive
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group" id="group-file-upload">
+          <label for="prod-file">Chọn file LispCAD từ máy tính (.lsp hoặc .zip)</label>
+          <input type="file" id="prod-file" accept=".lsp,.zip,.rar">
+          <small id="current-file-label" style="color: var(--text-muted); display: block; margin-top: 4px;"></small>
+        </div>
+
+        <div class="form-group" id="group-file-link" style="display: none;">
+          <label for="prod-link">Dán Đường Link Tải (Google Drive / Dropbox)</label>
+          <input type="url" id="prod-link" placeholder="https://drive.google.com/file/d/...">
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+          <label style="cursor: pointer;">
+            <input type="checkbox" id="prod-active" checked> <strong>Hiển thị bán trên trang chủ</strong>
+          </label>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <button type="button" class="btn-sm btn-secondary" onclick="closeProductModal()">Hủy Bỏ</button>
+          <button type="submit" class="btn-sm btn-primary" style="padding: 10px 20px;">Lưu Sản Phẩm</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let globalData = null;
+
+    // Chuyển Tab
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // Đăng nhập
+    async function handleLogin() {
+      const pass = document.getElementById('admin-pass').value;
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pass })
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('login-modal').style.display = 'none';
+          document.getElementById('dashboard').style.display = 'block';
+          loadDashboardData();
+        } else {
+          alert(data.error || 'Mật khẩu không đúng!');
+        }
+      } catch (e) {
+        alert('Lỗi kết nối máy chủ');
+      }
+    }
+
+    // Đăng xuất
+    async function handleLogout() {
+      await fetch('/api/admin/logout', { method: 'POST' });
+      location.reload();
+    }
+
+    // Đổi mật khẩu
+    async function changePassword(e) {
+      e.preventDefault();
+      const newPassword = document.getElementById('newPass').value;
+      const res = await fetch('/api/admin/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newPassword })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Đã đổi mật khẩu thành công!');
+        document.getElementById('newPass').value = '';
+      } else {
+        alert(data.error || 'Có lỗi xảy ra');
+      }
+    }
+
+    // Tải dữ liệu Dashboard
+    async function loadDashboardData() {
+      try {
+        const res = await fetch('/api/admin/data');
+        if (res.status === 401) {
+          document.getElementById('login-modal').style.display = 'block';
+          document.getElementById('dashboard').style.display = 'none';
+          return;
+        }
+        globalData = await res.json();
+        renderPaymentSettings(globalData.paymentSettings);
+        renderProducts(globalData.products);
+        renderOrders(globalData.orders);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Hiển thị Cài đặt Thanh toán
+    function renderPaymentSettings(settings) {
+      if (!settings) return;
+      document.getElementById('bankName').value = settings.bankName || '';
+      document.getElementById('accountNumber').value = settings.accountNumber || '';
+      document.getElementById('accountHolder').value = settings.accountHolder || '';
+      document.getElementById('transferSyntax').value = settings.transferSyntax || 'LISPCAD';
+
+      const modeRadio = document.querySelector(`input[name="payMode"][value="${settings.mode || 'auto_confirm'}"]`);
+      if (modeRadio) modeRadio.checked = true;
+
+      const qrPreview = document.getElementById('qr-preview');
+      const emptyText = document.getElementById('qr-empty-text');
+      if (settings.qrImageUrl) {
+        qrPreview.src = settings.qrImageUrl;
+        qrPreview.style.display = 'inline-block';
+        emptyText.style.display = 'none';
+      } else {
+        qrPreview.style.display = 'none';
+        emptyText.style.display = 'inline-block';
+      }
+    }
+
+    // Preview ảnh QR khi chọn file
+    function previewQr(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const qrPreview = document.getElementById('qr-preview');
+          qrPreview.src = e.target.result;
+          qrPreview.style.display = 'inline-block';
+          document.getElementById('qr-empty-text').style.display = 'none';
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    // Lưu Cài đặt Thanh toán
+    async function savePaymentSettings(e) {
+      e.preventDefault();
+      const form = new FormData();
+      form.append('mode', document.querySelector('input[name="payMode"]:checked').value);
+      form.append('bankName', document.getElementById('bankName').value);
+      form.append('accountNumber', document.getElementById('accountNumber').value);
+      form.append('accountHolder', document.getElementById('accountHolder').value);
+      form.append('transferSyntax', document.getElementById('transferSyntax').value);
+
+      const qrFileInput = document.getElementById('qrImage');
+      if (qrFileInput.files[0]) {
+        form.append('qrImage', qrFileInput.files[0]);
+      }
+
+      const res = await fetch('/api/admin/payment', {
+        method: 'POST',
+        body: form
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Đã lưu thông tin thanh toán & mã QR thành công!');
+        loadDashboardData();
+      }
+    }
+
+    // Hiển thị Sản phẩm
+    function renderProducts(products) {
+      const tbody = document.getElementById('products-table-body');
+      tbody.innerHTML = '';
+      if (!products || products.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Chưa có sản phẩm LispCAD nào. Bấm nút "+ Thêm Sản Phẩm Mới".</td></tr>';
+        return;
+      }
+      products.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${p.name}</strong></td>
+          <td style="color: #00e676; font-weight: 700;">${Number(p.price).toLocaleString()} đ</td>
+          <td><code style="color: var(--accent-cyan);">${p.commands || 'N/A'}</code></td>
+          <td>${p.downloadType === 'link' ? '<a href="' + p.downloadUrl + '" target="_blank" style="color: var(--accent-cyan);">Đường link</a>' : 'File nội bộ'}</td>
+          <td>${p.isActive ? '<span class="status-badge status-paid">Đang bán</span>' : '<span class="status-badge status-pending">Đã ẩn</span>'}</td>
+          <td>
+            <button class="btn-sm btn-secondary" onclick='editProduct(${JSON.stringify(p)})'>Sửa</button>
+            <button class="btn-sm btn-danger" onclick="deleteProduct('${p.id}')">Xóa</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Modal Sản phẩm
+    function openProductModal() {
+      document.getElementById('modal-title').innerText = 'Thêm Sản Phẩm LispCAD Mới';
+      document.getElementById('prod-id').value = '';
+      document.getElementById('prod-name').value = '';
+      document.getElementById('prod-price').value = 99000;
+      document.getElementById('prod-oldprice').value = 199000;
+      document.getElementById('prod-commands').value = 'TL, STT, DTL';
+      document.getElementById('prod-desc').value = '';
+      document.getElementById('prod-instructions').value = '';
+      document.getElementById('prod-videourl').value = '';
+      document.getElementById('prod-file').value = '';
+      document.getElementById('prod-link').value = '';
+      document.getElementById('current-file-label').innerText = '';
+      document.getElementById('prod-active').checked = true;
+      document.querySelector('input[name="downloadType"][value="local"]').checked = true;
+      toggleDownloadType();
+      document.getElementById('product-modal').style.display = 'block';
+    }
+
+    function editProduct(p) {
+      document.getElementById('modal-title').innerText = 'Chỉnh Sửa Bộ LispCAD';
+      document.getElementById('prod-id').value = p.id;
+      document.getElementById('prod-name').value = p.name;
+      document.getElementById('prod-price').value = p.price;
+      document.getElementById('prod-oldprice').value = p.oldPrice || '';
+      document.getElementById('prod-commands').value = p.commands || '';
+      document.getElementById('prod-desc').value = p.description || '';
+      document.getElementById('prod-instructions').value = p.instructions || '';
+      document.getElementById('prod-videourl').value = p.videoUrl || '';
+      document.getElementById('prod-active').checked = p.isActive;
+
+      if (p.downloadType === 'link') {
+        document.querySelector('input[name="downloadType"][value="link"]').checked = true;
+        document.getElementById('prod-link').value = p.downloadUrl || '';
+      } else {
+        document.querySelector('input[name="downloadType"][value="local"]').checked = true;
+        document.getElementById('current-file-label').innerText = 'File hiện tại: ' + (p.downloadUrl || 'Mặc định');
+      }
+      toggleDownloadType();
+      document.getElementById('product-modal').style.display = 'block';
+    }
+
+    function closeProductModal() {
+      document.getElementById('product-modal').style.display = 'none';
+    }
+
+    function toggleDownloadType() {
+      const type = document.querySelector('input[name="downloadType"]:checked').value;
+      if (type === 'link') {
+        document.getElementById('group-file-upload').style.display = 'none';
+        document.getElementById('group-file-link').style.display = 'block';
+      } else {
+        document.getElementById('group-file-upload').style.display = 'block';
+        document.getElementById('group-file-link').style.display = 'none';
+      }
+    }
+
+    async function saveProduct(e) {
+      e.preventDefault();
+      const form = new FormData();
+      form.append('id', document.getElementById('prod-id').value);
+      form.append('name', document.getElementById('prod-name').value);
+      form.append('price', document.getElementById('prod-price').value);
+      form.append('oldPrice', document.getElementById('prod-oldprice').value);
+      form.append('commands', document.getElementById('prod-commands').value);
+      form.append('description', document.getElementById('prod-desc').value);
+      form.append('instructions', document.getElementById('prod-instructions').value);
+      form.append('videoUrl', document.getElementById('prod-videourl').value);
+      form.append('isActive', document.getElementById('prod-active').checked);
+
+      const downloadType = document.querySelector('input[name="downloadType"]:checked').value;
+      form.append('downloadType', downloadType);
+      if (downloadType === 'link') {
+        form.append('downloadUrl', document.getElementById('prod-link').value);
+      } else {
+        const fileInput = document.getElementById('prod-file');
+        if (fileInput.files[0]) {
+          form.append('lispFile', fileInput.files[0]);
+        }
+      }
+
+      const res = await fetch('/api/admin/product', {
+        method: 'POST',
+        body: form
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Đã lưu sản phẩm LispCAD thành công!');
+        closeProductModal();
+        loadDashboardData();
+      }
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa bộ Lisp này không?')) return;
+      const res = await fetch('/api/admin/product/' + id, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) loadDashboardData();
+    }
+
+    // Hiển thị Đơn hàng
+    function renderOrders(orders) {
+      const tbody = document.getElementById('orders-table-body');
+      tbody.innerHTML = '';
+      if (!orders || orders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Chưa có đơn hàng nào được tạo.</td></tr>';
+        return;
+      }
+      orders.forEach(o => {
+        const isPaid = o.status === 'PAID';
+        const dateStr = new Date(o.createdAt).toLocaleString('vi-VN');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>#${o.orderCode}</strong></td>
+          <td>${o.customerName}</td>
+          <td><a href="tel:${o.customerPhone}" style="color: var(--accent-cyan);">${o.customerPhone || 'N/A'}</a></td>
+          <td>${o.productName}</td>
+          <td style="color: #00e676; font-weight: 700;">${Number(o.amount).toLocaleString()} đ</td>
+          <td style="font-size: 0.85rem; color: var(--text-muted);">${dateStr}</td>
+          <td>${isPaid ? '<span class="status-badge status-paid">Đã thanh toán</span>' : '<span class="status-badge status-pending">Chờ xác nhận</span>'}</td>
+          <td>
+            ${!isPaid ? `<button class="btn-sm btn-success" onclick="approveOrder('${o.orderCode}')">Duyệt Đơn</button>` : ''}
+            <button class="btn-sm btn-danger" onclick="deleteOrder('${o.orderCode}')">Xóa</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function approveOrder(orderCode) {
+      if (!confirm('Xác nhận khách đã chuyển khoản đơn hàng #' + orderCode + '?')) return;
+      const res = await fetch('/api/admin/order/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderCode })
+      });
+      const data = await res.json();
+      if (data.success) loadDashboardData();
+    }
+
+    async function deleteOrder(orderCode) {
+      if (!confirm('Xác nhận xóa đơn #' + orderCode + '?')) return;
+      const res = await fetch('/api/admin/order/' + orderCode, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) loadDashboardData();
+    }
+
+    // Tự động kiểm tra phiên đăng nhập ban đầu
+    loadDashboardData();
+  </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+{
+  "adminPassword": "admin",
+  "paymentSettings": {
+    "mode": "auto_confirm",
+    "qrType": "dynamic",
+    "bankName": "MBBank",
+    "accountNumber": "0329778016",
+    "accountHolder": "TO DUY KHANH",
+    "qrImageUrl": "/uploads/qr-default.png",
+    "transferSyntax": "LISPCAD",
+    "note": "Khách quét mã sẽ tự động có số tiền và nội dung chuyển khoản."
+  },
+  "products": [
+    {
+      "id": "prod_1",
+      "name": "Bộ LispCAD Pro Tự Động Hóa Bản Vẽ",
+      "price": 59000,
+      "oldPrice": 129000,
+      "description": "Tổng hợp các công cụ AutoLisp mạnh mẽ nhất giúp kỹ sư tiết kiệm 80% thời gian bóc tách khối lượng và trình bày bản vẽ.",
+      "commands": "TL, STT, DTL",
+      "instructions": "Bước 1: Tải file Lisp về máy tính sau khi mua.\nBước 2: Trong AutoCAD, gõ lệnh APPLOAD (hoặc phím tắt AP) rồi nhấn Enter.\nBước 3: Chọn file Lisp vừa tải về và bấm 'Load' (bấm 'Contents' để lisp tự khởi động cùng CAD).\nBước 4: Sử dụng các lệnh:\n  - Gõ lệnh 'TL': Chọn các nét vẽ (Line, Pline, Arc) để tính tổng chiều dài tức thì.\n  - Gõ lệnh 'STT': Nhấp chuột đến đâu đánh số thứ tự tăng dần 1, 2, 3... đến đó.\n  - Gõ lệnh 'DTL': Click chuột vào miền kín để tính diện tích cả mét vuông (m²) và mm².",
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "downloadType": "local",
+      "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
+      "isActive": true,
+      "createdAt": "2026-11-23T11:00:00.000Z"
+    }
+  ],
+  "orders": [
+    {
+      "orderCode": "CAD795142",
+      "productId": "prod_1",
+      "productName": "Bộ LispCAD Pro Tự Động Hóa Bản Vẽ",
+      "amount": 59000,
+      "customerName": "Khach Thu",
+      "customerPhone": "",
+      "status": "PAID",
+      "createdAt": "2026-11-23T02:46:40.331Z"
+    },
+    {
+      "orderCode": "CAD794351",
+      "productId": "prod_1",
+      "productName": "Bộ LispCAD Pro Tự Động Hóa Bản Vẽ",
+      "amount": 59000,
+      "customerName": "ÁDS",
+      "customerPhone": "0329778016",
+      "status": "PENDING",
+      "createdAt": "2026-11-23T02:41:26.851Z"
+    },
+    {
+      "orderCode": "CAD459946",
+      "productId": "prod_1",
+      "productName": "Bộ LispCAD Pro Tự Động Hóa Bản Vẽ",
+      "amount": 59000,
+      "customerName": "ÁDS",
+      "customerPhone": "0329778016",
+      "status": "PAID",
+      "createdAt": "2026-11-23T02:41:07.730Z"
+    },
+    {
+      "orderCode": "CAD986693",
+      "productId": "prod_1",
+      "productName": "Bộ LispCAD Pro Tự Động Hóa Bản Vẽ",
+      "amount": 59000,
+      "customerName": "Test",
+      "customerPhone": "0912345678",
+      "status": "PAID",
+      "createdAt": "2026-11-23T02:39:01.887Z"
+    }
+  ]
+}

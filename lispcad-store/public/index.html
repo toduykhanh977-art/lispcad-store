@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cửa Hàng LispCAD Tự Động Hóa - Bản Quyền Trọn Đời</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Styling cho giao diện sản phẩm theo thứ tự yêu cầu */
+    .product-showcase {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 36px;
+      margin-bottom: 48px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    
+    .product-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    
+    .product-badge-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--card-border);
+      margin: 28px 0;
+    }
+
+    .section-label {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Khối Hướng Dẫn Sử Dụng */
+    .instruction-box {
+      background: #0d1117;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      white-space: pre-line;
+      line-height: 1.8;
+      color: #e6edf3;
+      font-size: 1rem;
+    }
+
+    /* Khối Video Hướng Dẫn */
+    .video-wrapper {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 ratio */
+      height: 0;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      background: #000;
+      margin-top: 10px;
+    }
+
+    .video-wrapper iframe, .video-wrapper video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* Khối Mua Hàng */
+    .buy-action-box {
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.08) 0%, rgba(58, 123, 213, 0.08) 100%);
+      border: 1px solid rgba(0, 210, 255, 0.3);
+      border-radius: 14px;
+      padding: 28px;
+      text-align: center;
+      margin-top: 32px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+      position: relative;
+    }
+    .close-modal {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .copy-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: var(--accent-cyan);
+      font-size: 0.8rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .bank-info-table {
+      width: 100%;
+      margin: 16px 0;
+      background: #0d1117;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+    }
+    .bank-info-table td {
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .bank-info-table td:first-child {
+      color: var(--text-muted);
+      width: 38%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        📐 CAD Toolbox Store
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <span class="badge">⚡ Tải Tự Động 24/7</span>
+        <a href="admin.html" style="color: var(--text-muted); font-size: 0.85rem; text-decoration: none; padding: 4px 10px; border: 1px solid var(--card-border); border-radius: 6px;">🔐 Quản Trị</a>
+      </div>
+    </header>
+
+    <div id="products-container">
+      <!-- Toàn bộ sản phẩm sẽ render theo thứ tự: Tên -> Hướng Dẫn -> Video -> Nút Mua -->
+      <div style="text-align: center; color: var(--text-muted); padding: 60px;">
+        <div class="spinner"></div>
+        <p style="margin-top: 12px;">Đang tải thông tin LispCAD...</p>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2026 CAD Toolbox Store. Hỗ trợ kỹ thuật nạp Lisp trọn đời qua Zalo.</p>
+      <p style="margin-top: 8px;">
+        <a href="admin.html" style="color: var(--text-muted); font-size: 0.8rem; text-decoration: underline;">Đăng nhập quản trị viên</a>
+      </p>
+    </footer>
+  </div>
+
+  <!-- POPUP THANH TOÁN KHI BẤM NÚT MUA -->
+  <div class="modal-overlay" id="checkout-modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeCheckout()">&times;</span>
+      
+      <!-- BƯỚC 1: NHẬP THÔNG TIN KHÁCH HÀNG -->
+      <div id="step-info">
+        <h3 id="modal-prod-title" style="color: var(--accent-cyan); margin-bottom: 6px;">Mua LispCAD</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;" id="modal-prod-price">Giá: 99.000 đ</p>
+
+        <form id="order-form" onsubmit="handleCreateOrder(event)">
+          <div class="form-group">
+            <label for="custName">Họ và tên của bạn</label>
+            <input type="text" id="custName" placeholder="Nguyễn Văn A" required>
+          </div>
+          <div class="form-group">
+            <label for="custPhone">Số điện thoại (Nhận file & hỗ trợ qua Zalo)</label>
+            <input type="tel" id="custPhone" placeholder="0912345678" required>
+          </div>
+          <button type="submit" class="btn-buy" id="btn-create-order">
+            Tạo Mã Mua & Quét Mã Ngân Hàng
+          </button>
+        </form>
+      </div>
+
+      <!-- BƯỚC 2: HIỂN THỊ MÃ MUA RIÊNG BIỆT VÀ MÃ QR TỰ ĐỘNG DUYỆT -->
+      <div id="step-qr" style="display: none; text-align: center;">
+        <div style="background: rgba(0, 230, 118, 0.1); border: 1px solid #00e676; border-radius: 8px; padding: 10px; margin-bottom: 14px;">
+          <span style="font-size: 0.85rem; color: #00e676;">🔑 MÃ MUA RIÊNG CỦA BẠN:</span><br>
+          <strong id="display-order-code" style="font-size: 1.4rem; color: #fff; letter-spacing: 1px;">CAD-123456</strong>
+        </div>
+
+        <p style="color: var(--accent-cyan); font-size: 0.85rem; font-weight: 600;">
+          📲 Mở app ngân hàng quét mã bên dưới (Tự động có sẵn Số tiền & Nội dung CK):
+        </p>
+
+        <div style="background: #fff; padding: 12px; border-radius: 12px; display: inline-block; margin: 12px 0; border: 2px solid var(--accent-cyan); box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);">
+          <img id="qr-image-display" src="" alt="Mã QR VietQR" style="width: 230px; height: 230px; object-fit: contain; display: block;">
+        </div>
+
+        <table class="bank-info-table">
+          <tr>
+            <td>Ngân hàng:</td>
+            <td><strong id="display-bank">MBBank</strong></td>
+          </tr>
+          <tr>
+            <td>Số tài khoản:</td>
+            <td>
+              <strong id="display-acc" style="color: var(--accent-cyan);"></strong>
+              <span class="copy-badge" onclick="copyText('display-acc')">📋 Sao chép</span>
+            </td>
+          </tr>
+          <tr>
+            <td>Chủ tài khoản:</td>
+            <td><strong id="display-name"></strong></td>
+          </tr>
+          <tr>
+            <td>Số tiền cần chuyển:</td>
+            <td><strong id="display-amount" style="color: #00e676; font-size: 1.2rem;"></strong></td>
+          </tr>
+          <tr>
+            <td>Nội dung chuyển khoản:</td>
+            <td>
+              <strong id="display-syntax" style="color: #ffb74d;"></strong>
+              <span class="copy-badge" onclick="copyText('display-syntax')">📋 Sao chép</span>
+            </td>
+          </tr>
+        </table>
+
+        <!-- KHUNG TRẠNG THÁI: ĐANG CHỜ CHUYỂN KHOẢN (TỰ ĐỘNG NHẬN DIỆN TIỀN) -->
+        <div class="waiting-box" id="waiting-status-box">
+          <div class="waiting-header">
+            <span class="pulse-indicator" id="pulse-dot"></span>
+            <span id="waiting-title">ĐANG CHỜ BẠN CHUYỂN KHOẢN...</span>
+          </div>
+          <p id="waiting-desc" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; line-height: 1.5;">
+            Hệ thống đang tự động kiểm tra giao dịch tài khoản MBBank.<br>
+            Ngay khi tiền vào tài khoản, màn hình này sẽ <strong>tự động mở file tải về</strong> cho bạn ngay lập tức!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentStore = null;
+    let selectedProduct = null;
+    let currentOrder = null;
+    let pollInterval = null;
+
+    // Helper chuyển đổi URL YouTube thông thường thành dạng Embed
+    function getYouTubeEmbedUrl(url) {
+      if (!url) return null;
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[2].length === 11) ? `https://www.youtube.com/embed/${match[2]}` : url;
+    }
+
+    // Tải danh sách sản phẩm từ backend
+    async function loadStore() {
+      try {
+        const res = await fetch('/api/public/store');
+        currentStore = await res.json();
+        renderProducts(currentStore.products);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Render sản phẩm theo đúng thứ tự: 1. TÊN LISP -> 2. HƯỚNG DẪN -> 3. VIDEO -> 4. BẤM MUA
+    function renderProducts(products) {
+      const container = document.getElementById('products-container');
+      container.innerHTML = '';
+
+      if (!products || products.length === 0) {
+        container.innerHTML = `
+          <div class="product-showcase" style="text-align: center;">
+            <p style="color: var(--text-muted);">Chưa có sản phẩm LispCAD nào.</p>
+            <p style="margin-top: 10px;"><a href="admin.html" style="color: var(--accent-cyan);">Vào trang Quản trị để thêm LispCAD</a></p>
+          </div>
+        `;
+        return;
+      }
+
+      products.forEach((p, index) => {
+        const embedUrl = getYouTubeEmbedUrl(p.videoUrl);
+        const card = document.createElement('div');
+        card.className = 'product-showcase';
+        card.innerHTML = `
+          <!-- 1. ĐẦU TIÊN LÀ TÊN LISP -->
+          <div class="product-badge-bar">
+            <span class="badge">Sản phẩm #${index + 1}</span>
+            ${p.commands ? `<span class="command-tag">Lệnh CAD: ${p.commands}</span>` : ''}
+          </div>
+          <h2 class="product-title">${p.name}</h2>
+          ${p.description ? `<p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 24px;">${p.description}</p>` : ''}
+
+          <hr class="section-divider">
+
+          <!-- 2. TIẾP THEO LÀ HƯỚNG DẪN SỬ DỤNG -->
+          <div class="section-label">📖 Hướng Dẫn Sử Dụng Chi Tiết:</div>
+          <div class="instruction-box">${p.instructions || 'Chưa có văn bản hướng dẫn sử dụng. Bạn có thể cập nhật trong trang Quản trị.'}</div>
+
+          <!-- 3. TIẾP THEO LÀ VIDEO HƯỚNG DẪN SỬ DỤNG -->
+          ${embedUrl ? `
+            <div style="margin-top: 28px;">
+              <div class="section-label">🎥 Video Hướng Dẫn Thao Tác Trực Tiếp:</div>
+              <div class="video-wrapper">
+                <iframe src="${embedUrl}" title="Video hướng dẫn sử dụng ${p.name}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              </div>
+            </div>
+          ` : ''}
+
+          <hr class="section-divider">
+
+          <!-- 4. TIẾP THEO LÀ KHỐI GIÁ VÀ BẤM VÀO MUA -->
+          <div class="buy-action-box">
+            <div style="margin-bottom: 16px;">
+              ${p.oldPrice ? `<span class="old-price" style="font-size: 1.1rem; margin-right: 10px;">${Number(p.oldPrice).toLocaleString()} đ</span>` : ''}
+              <span style="font-size: 2.2rem; font-weight: 800; color: #00e676;">${Number(p.price).toLocaleString()} đ</span>
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Sở hữu vĩnh viễn • Tải file tự động ngay sau khi thanh toán</p>
+            </div>
+            
+            <button class="btn-buy" style="max-width: 380px; margin: 0 auto; font-size: 1.25rem;" onclick="openCheckout('${p.id}')">
+              👉 BẤM VÀO ĐÂY ĐỂ MUA NGAY
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Mở popup khi khách bấm "MUA NGAY"
+    function openCheckout(productId) {
+      selectedProduct = currentStore.products.find(p => p.id === productId);
+      if (!selectedProduct) return;
+
+      document.getElementById('modal-prod-title').innerText = selectedProduct.name;
+      document.getElementById('modal-prod-price').innerText = 'Giá thanh toán: ' + Number(selectedProduct.price).toLocaleString() + ' đ';
+
+      document.getElementById('step-info').style.display = 'block';
+      document.getElementById('step-qr').style.display = 'none';
+      document.getElementById('checkout-modal').style.display = 'flex';
+    }
+
+    function closeCheckout() {
+      if (pollInterval) clearInterval(pollInterval);
+      document.getElementById('checkout-modal').style.display = 'none';
+    }
+
+    // Tạo đơn hàng: SINH MÃ MUA DUY NHẤT CHO TỪNG TÀI KHOẢN/KHÁCH HÀNG
+    async function handleCreateOrder(e) {
+      e.preventDefault();
+      const custName = document.getElementById('custName').value.trim();
+      const custPhone = document.getElementById('custPhone').value.trim();
+
+      const btn = document.getElementById('btn-create-order');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Đang cấp mã mua riêng...';
+
+      try {
+        const res = await fetch('/api/public/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId: selectedProduct.id,
+            customerName: custName,
+            customerPhone: custPhone
+          })
+        });
+
+        currentOrder = await res.json();
+        if (currentOrder.success) {
+          document.getElementById('step-info').style.display = 'none';
+          document.getElementById('step-qr').style.display = 'block';
+
+          // Hiển thị MÃ MUA RIÊNG BIỆT
+          document.getElementById('display-order-code').innerText = currentOrder.orderCode;
+          document.getElementById('qr-image-display').src = currentOrder.qrUrl;
+          document.getElementById('display-bank').innerText = currentOrder.bankName;
+          document.getElementById('display-acc').innerText = currentOrder.accountNumber;
+          document.getElementById('display-name').innerText = currentOrder.accountHolder;
+          document.getElementById('display-amount').innerText = Number(currentOrder.amount).toLocaleString() + ' đ';
+          document.getElementById('display-syntax').innerText = currentOrder.transferContent;
+
+          // Bắt đầu lắng nghe tự động: Khi tiền vào là tự động nhảy sang trang tải file
+          startAutoCheckingPayment(currentOrder.orderCode);
+        } else {
+          alert(currentOrder.error || 'Có lỗi xảy ra');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Tạo Mã Mua & Quét Mã Ngân Hàng';
+      }
+    }
+
+    // Tự động kiểm tra liên tục mỗi 2 giây: Nếu tiền đã vào -> TỰ ĐỘNG CHUYỂN SANG TRANG TẢI
+    function startAutoCheckingPayment(orderCode) {
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/public/check-order/${orderCode}`);
+          const data = await res.json();
+          if (data.isPaid) {
+            clearInterval(pollInterval);
+            const box = document.getElementById('waiting-status-box');
+            if (box) box.classList.add('paid');
+            document.getElementById('waiting-title').innerText = '✓ ĐÃ NHẬN TIỀN THÀNH CÔNG!';
+            document.getElementById('waiting-desc').innerHTML = '<strong style="color: #00e676; font-size: 1rem;">Giao dịch hoàn tất! Đang tự động mở file tải về cho bạn...</strong>';
+            setTimeout(() => {
+              window.location.href = `/success.html?orderCode=${orderCode}`;
+            }, 1000);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }, 2000);
+    }
+
+    // Khách chủ động bấm nút xác nhận
+    async function handleConfirmPaid() {
+      const btn = document.getElementById('btn-confirm-paid');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Đang mở file tải...';
+
+      if (pollInterval) clearInterval(pollInterval);
+
+      try {
+        const res = await fetch('/api/public/confirm-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderCode: currentOrder.orderCode })
+        });
+        const data = await res.json();
+
+        if (data.status === 'PAID') {
+          window.location.href = `/success.html?orderCode=${currentOrder.orderCode}`;
+        } else {
+          alert('Cảm ơn bạn! Đơn hàng #' + currentOrder.orderCode + ' đã được ghi nhận.');
+          window.location.href = `/success.html?orderCode=${currentOrder.orderCode}`;
+        }
+      } catch (err) {
+        alert('Có lỗi xảy ra khi xác nhận');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '✓ Tôi Đã Chuyển Khoản (Bấm để Tải File Ngay)';
+      }
+    }
+
+    function copyText(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Đã sao chép: ' + text);
+    }
+
+    // Khởi động tải dữ liệu
+    loadStore();
+  </script>
+</body>
+</html>

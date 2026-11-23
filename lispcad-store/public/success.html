@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thanh Toán Thành Công - Tải LispCAD</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="success-card">
+      <div id="loading-state">
+        <div class="spinner" style="width: 40px; height: 40px; margin: 20px auto;"></div>
+        <h2>Đang kiểm tra giao dịch...</h2>
+        <p style="color: var(--text-muted); margin-top: 8px;">Vui lòng đợi giây lát trong khi hệ thống xác nhận thanh toán.</p>
+      </div>
+
+      <div id="success-state" style="display: none;">
+        <div class="success-icon">✓</div>
+        <h2 style="color: #fff; margin-bottom: 8px;">Thanh Toán Thành Công!</h2>
+        <p style="color: var(--text-muted); margin-bottom: 6px;">
+          Sản phẩm: <strong id="product-name-text" style="color: #fff;"></strong>
+        </p>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">
+          Mã đơn hàng: <strong id="order-code-text" style="color: var(--accent-cyan);"></strong>
+        </p>
+
+        <a id="download-btn" href="#" class="btn-buy" style="text-decoration: none; max-width: 420px; margin: 0 auto 20px auto; background: linear-gradient(135deg, #00e676 0%, #1de9b6 100%);">
+          📥 Bấm Vào Đây Để Tải File LispCAD Về Máy
+        </a>
+        <p id="auto-download-note" style="font-size: 0.85rem; color: #00e676;">
+          ⚡ Quá trình tải xuống sẽ tự động bắt đầu sau vài giây...
+        </p>
+
+        <div class="guide-box">
+          <h4>💡 Hướng Dẫn Nạp Lisp Vào AutoCAD (1 Phút):</h4>
+          <ol>
+            <li>Mở phần mềm <strong>AutoCAD</strong>.</li>
+            <li>Gõ lệnh <code>APPLOAD</code> (hoặc gõ tắt <code>AP</code>) trên bàn phím rồi nhấn <strong>Enter</strong>.</li>
+            <li>Chọn file Lisp vừa tải về, sau đó bấm <strong>Load</strong>.</li>
+            <li><em>(Mẹo quan trọng)</em>: Để Lisp tự nạp mỗi khi mở CAD, bấm vào nút <strong>Contents...</strong> ở mục <strong>Startup Suite</strong> (hình chiếc cặp) và thêm file Lisp vào.</li>
+          </ol>
+        </div>
+
+        <a href="index.html" style="color: var(--text-muted); font-size: 0.9rem; text-decoration: underline;">
+          ← Quay lại trang chủ
+        </a>
+      </div>
+
+      <div id="pending-state" style="display: none;">
+        <div style="font-size: 3rem; margin-bottom: 16px;">⏳</div>
+        <h2 style="color: #ffb74d;">Đang Chờ Xác Nhận Thanh Toán</h2>
+        <p style="color: var(--text-muted); margin: 16px 0;">
+          Đơn hàng <strong id="pending-order-code" style="color: var(--accent-cyan);"></strong> đã được ghi nhận.<br>
+          Admin đang kiểm tra giao dịch và sẽ duyệt đơn cho bạn trong giây lát. Vui lòng giữ nguyên trang này hoặc tải lại sau 1-2 phút.
+        </p>
+        <button class="btn-sm btn-secondary" onclick="location.reload()" style="padding: 10px 20px; margin-top: 10px;">
+          🔄 Tải Lại Trang Để Kiểm Tra
+        </button>
+      </div>
+
+      <div id="error-state" style="display: none;">
+        <div style="font-size: 3rem; margin-bottom: 16px;">⚠️</div>
+        <h2 style="color: #ff5252;">Không Tìm Thấy Đơn Hàng</h2>
+        <p id="error-msg" style="color: var(--text-muted); margin: 16px 0;">Không tìm thấy thông tin đơn hàng này.</p>
+        <a href="index.html" class="btn-buy" style="text-decoration: none; max-width: 260px; margin: 0 auto;">
+          Quay lại trang chủ
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderCode = urlParams.get('orderCode');
+
+    const loadingState = document.getElementById('loading-state');
+    const successState = document.getElementById('success-state');
+    const pendingState = document.getElementById('pending-state');
+    const errorState = document.getElementById('error-state');
+
+    const orderCodeText = document.getElementById('order-code-text');
+    const productNameText = document.getElementById('product-name-text');
+    const downloadBtn = document.getElementById('download-btn');
+    const errorMsg = document.getElementById('error-msg');
+
+    if (!orderCode) {
+      loadingState.style.display = 'none';
+      errorState.style.display = 'block';
+      errorMsg.innerText = 'Thiếu mã đơn hàng trong liên kết.';
+    } else {
+      orderCodeText.innerText = '#' + orderCode;
+      checkOrderStatus(orderCode);
+    }
+
+    async function checkOrderStatus(code) {
+      try {
+        const res = await fetch(`/api/public/check-order/${code}`);
+        const data = await res.json();
+
+        loadingState.style.display = 'none';
+
+        if (data.isPaid) {
+          successState.style.display = 'block';
+          productNameText.innerText = data.productName || 'LispCAD';
+
+          const downloadUrl = `/download/${code}`;
+          downloadBtn.href = downloadUrl;
+
+          // Tự động tải file sau 1.5 giây
+          setTimeout(() => {
+            window.location.href = downloadUrl;
+          }, 1500);
+        } else if (data.status === 'PENDING_CONFIRMATION' || data.status === 'PENDING') {
+          pendingState.style.display = 'block';
+          document.getElementById('pending-order-code').innerText = '#' + code;
+        } else {
+          errorState.style.display = 'block';
+          errorMsg.innerText = 'Đơn hàng chưa hoàn tất thanh toán.';
+        }
+      } catch (err) {
+        loadingState.style.display = 'none';
+        errorState.style.display = 'block';
+        errorMsg.innerText = 'Có lỗi khi kiểm tra đơn hàng.';
+      }
+    }
+  </script>
+</body>
+</html>
