@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phòng học AutoCAD 2D - Tin Học Click vn</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/learn.css">
+</head>
+<body class="lms-body" style="padding-bottom: 90px;">
+
+  <!-- TOP HEADER PHÒNG HỌC (NHƯ ẢNH 2 MOCKUP) -->
+  <header class="lms-navbar">
+    <div class="lms-nav-left">
+      <a href="/course.html" class="btn-back-circle" title="Về danh sách bài học">‹</a>
+      <div>
+        <div style="font-size: 0.72rem; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;" id="lesson-header-course">AUTOCAD 2D CƠ BẢN</div>
+        <div style="font-size: 1.05rem; font-weight: 800; color: #ffffff;" id="lesson-header-title">Đang tải bài học...</div>
+      </div>
+    </div>
+
+    <div>
+      <span class="badge-status-pill open" id="badge-lesson-lock">ĐANG MỞ</span>
+    </div>
+  </header>
+
+  <main class="player-page-container">
+    <!-- KHUNG VIDEO PLAYER BÀI GIẢNG -->
+    <div class="player-video-viewport" id="video-viewport">
+      <!-- Khung Khóa Bài Giảng (Nếu chưa mua) -->
+      <div class="locked-paywall-overlay" id="locked-paywall" style="display: none;">
+        <div class="locked-icon-bubble">🔒</div>
+        <h2 class="locked-paywall-title">Bài học này đã bị khóa</h2>
+        <p class="locked-paywall-desc">
+          Nội dung video hướng dẫn chuyên sâu và bài tập thực hành dành riêng cho học viên Khóa học AutoCAD 2D. Hãy đăng ký ngay để mở khóa trọn bộ 19 bài học vĩnh viễn!
+        </p>
+        <button class="btn-enroll-now" onclick="openEnrollFromPlayer()" style="font-size: 1rem; padding: 12px 24px;">
+          <span>🛒</span> Mở Khóa Toàn Bộ Bài Học (299.000 đ)
+        </button>
+      </div>
+
+      <!-- Iframe Video hoặc HTML5 Video -->
+      <iframe id="video-iframe" src="" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+      <video id="video-native" src="" controls style="display: none;"></video>
+    </div>
+
+    <!-- 2 TABS: NỘI DUNG BÀI HỌC & TÀI LIỆU BÀI TẬP -->
+    <div class="lms-tabs-nav">
+      <button class="lms-tab-btn active" id="tab-btn-content" onclick="switchPlayerTab('content')">
+        Nội dung bài học
+      </button>
+      <button class="lms-tab-btn" id="tab-btn-resources" onclick="switchPlayerTab('resources')">
+        Tài liệu & Bài tập
+      </button>
+    </div>
+
+    <!-- TAB 1: NỘI DUNG BÀI HỌC -->
+    <div class="lms-tab-panel active" id="panel-content">
+      <!-- Box 1: Giới thiệu bài học -->
+      <div class="lms-info-card">
+        <div class="lms-card-label">GIỚI THIỆU BÀI HỌC</div>
+        <div class="lms-card-text" id="lesson-desc-text">
+          Đang tải nội dung...
+        </div>
+      </div>
+
+      <!-- Box 2: Nội dung chính -->
+      <div class="lms-info-card" id="box-summary" style="display: none;">
+        <div class="lms-card-label" style="color: #cbd5e1;">NỘI DUNG CHÍNH:</div>
+        <ul class="lms-bullets-list" id="lesson-summary-list">
+          <!-- Render các ý chính 1, 2, 3... -->
+        </ul>
+      </div>
+
+      <!-- Box 3: Ghi chú quan trọng & Phím tắt -->
+      <div class="lms-info-card" id="box-keynotes" style="display: none; background: #0c1a2e; border-color: #1e3a8a;">
+        <div class="lms-card-label" style="color: #60a5fa;">💡 LỆNH TRỌNG TÂM & MẸO THAO TÁC:</div>
+        <ul class="lms-bullets-list" id="lesson-keynotes-list">
+          <!-- Render các mẹo CAD -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- TAB 2: TÀI LIỆU & BÀI TẬP -->
+    <div class="lms-tab-panel" id="panel-resources">
+      <div class="lms-info-card">
+        <div class="lms-card-label">TÀI LIỆU & FILE BÀI TẬP ĐÍNH KÈM</div>
+        <p class="lms-card-text" style="margin-bottom: 16px;">
+          Tải file đề bài PDF và file bản vẽ AutoCAD (.DWG) mẫu để thực hành làm bài tập trực tiếp:
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; background: #1e293b; padding: 14px 18px; border-radius: 12px; border: 1px solid #334155;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 1.5rem;">📄</span>
+              <div>
+                <div style="font-weight: 700; color: #ffffff;">Đề bài tập thực hành (.PDF)</div>
+                <div style="font-size: 0.8rem; color: #94a3b8;">Xem thông số kích thước và yêu cầu đề bài</div>
+              </div>
+            </div>
+            <a id="btn-download-pdf" href="#" target="_blank" class="btn-sm btn-primary" style="text-decoration: none; padding: 8px 14px; border-radius: 8px; font-weight: 700;">
+              ⬇ Tải File PDF
+            </a>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; background: #1e293b; padding: 14px 18px; border-radius: 12px; border: 1px solid #334155;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 1.5rem;">📐</span>
+              <div>
+                <div style="font-weight: 700; color: #ffffff;">File bản vẽ mẫu thực hành (.DWG)</div>
+                <div style="font-size: 0.8rem; color: #94a3b8;">Bản vẽ khung tên, layer và nét vẽ mẫu</div>
+              </div>
+            </div>
+            <a id="btn-download-dwg" href="#" target="_blank" class="btn-sm btn-secondary" style="text-decoration: none; padding: 8px 14px; border-radius: 8px; font-weight: 700;">
+              ⬇ Tải File DWG
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- THANH ĐIỀU HƯỚNG CỐ ĐỊNH CHÂN TRANG (NHƯ ẢNH 2 MOCKUP) -->
+  <footer class="lms-bottom-bar">
+    <div class="lms-bottom-container">
+      <button class="btn-bottom-quiz" onclick="openQuizModal()" id="btn-quiz-trigger">
+        <span>❓</span> Làm trắc nghiệm
+      </button>
+
+      <button class="btn-bottom-next" onclick="goToNextLesson()" id="btn-next-lesson">
+        <span>Tiếp theo: Bài tập</span>
+        <span>→</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- MODAL TRẮC NGHIỆM TƯƠNG TÁC -->
+  <div class="quiz-modal-overlay" id="quiz-modal">
+    <div class="quiz-modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <span style="font-size: 0.82rem; font-weight: 800; color: #38bdf8;" id="quiz-progress-text">CÂU HỎI 1 / 1</span>
+        <span class="close-modal-x" onclick="closeQuizModal()" style="color: #94a3b8; font-size: 1.5rem; cursor: pointer;">&times;</span>
+      </div>
+
+      <h3 style="font-size: 1.15rem; font-weight: 800; line-height: 1.4; margin-bottom: 20px;" id="quiz-question-title">
+        Câu hỏi trắc nghiệm
+      </h3>
+
+      <div id="quiz-options-container">
+        <!-- Render các nút A, B, C, D -->
+      </div>
+
+      <div id="quiz-explanation-box" style="display: none; background: #0c1a2e; border: 1px solid #1e3a8a; border-radius: 12px; padding: 14px; margin-top: 16px;">
+        <div style="font-weight: 800; font-size: 0.85rem; color: #60a5fa; margin-bottom: 4px;">💡 LỜI GIẢI THÍCH:</div>
+        <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;" id="quiz-explanation-text"></p>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+        <button id="btn-quiz-next" onclick="nextQuizQuestion()" style="background: #2563eb; color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; display: none;">
+          Câu tiếp theo →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentLessonId = urlParams.get('lesson') || 'lesson-2d-1';
+
+    let lessonData = null;
+    let allLessonsList = [];
+    let currentQuizIndex = 0;
+    let selectedQuizAnswer = null;
+
+    async function loadLessonRoom() {
+      try {
+        // Tải danh sách tất cả bài để biết bài kế tiếp
+        const listRes = await fetch('/api/course/lessons');
+        const listData = await listRes.json();
+        allLessonsList = listData.lessons || [];
+
+        // Tải bài học hiện tại
+        const res = await fetch(`/api/course/lesson/${currentLessonId}`);
+        lessonData = await res.json();
+
+        renderLessonPage(lessonData);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderLessonPage(lesson) {
+      document.getElementById('lesson-header-title').innerText = lesson.title;
+      document.getElementById('lesson-desc-text').innerText = lesson.description || 'Chưa có giới thiệu.';
+
+      const badge = document.getElementById('badge-lesson-lock');
+      if (lesson.isLocked && !lesson.canAccess) {
+        badge.className = 'badge-status-pill locked';
+        badge.innerText = 'ĐÃ KHÓA';
+        document.getElementById('locked-paywall').style.display = 'flex';
+        document.getElementById('video-iframe').style.display = 'none';
+        document.getElementById('video-native').style.display = 'none';
+      } else {
+        badge.className = 'badge-status-pill open';
+        badge.innerText = lesson.isLocked ? 'ĐÃ MỞ KHÓA' : 'ĐANG MỞ';
+        document.getElementById('locked-paywall').style.display = 'none';
+
+        // Render video
+        const iframe = document.getElementById('video-iframe');
+        const nativeVid = document.getElementById('video-native');
+
+        let embedUrl = lesson.videoUrl || '';
+        if (embedUrl.includes('youtube.com') || embedUrl.includes('youtu.be')) {
+          const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+          const match = embedUrl.match(regExp);
+          if (match && match[1]) embedUrl = `https://www.youtube.com/embed/${match[1]}?autoplay=1&rel=0`;
+          iframe.src = embedUrl;
+          iframe.style.display = 'block';
+          nativeVid.style.display = 'none';
+        } else if (embedUrl.includes('mediadelivery') || embedUrl.includes('bunny')) {
+          iframe.src = embedUrl;
+          iframe.style.display = 'block';
+          nativeVid.style.display = 'none';
+        } else if (embedUrl.endsWith('.mp4') || embedUrl.includes('w3schools')) {
+          nativeVid.src = embedUrl;
+          nativeVid.style.display = 'block';
+          iframe.style.display = 'none';
+        } else {
+          iframe.src = 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+          iframe.style.display = 'block';
+          nativeVid.style.display = 'none';
+        }
+      }
+
+      // Render tóm tắt nội dung chính
+      if (lesson.summary && lesson.summary.length > 0) {
+        const sumList = document.getElementById('lesson-summary-list');
+        sumList.innerHTML = '';
+        lesson.summary.forEach((item, idx) => {
+          const li = document.createElement('li');
+          li.className = 'lms-bullet-item';
+          li.innerHTML = `
+            <div class="lms-bullet-number">${idx + 1}</div>
+            <div style="flex: 1; margin-top: 2px;">${item}</div>
+          `;
+          sumList.appendChild(li);
+        });
+        document.getElementById('box-summary').style.display = 'block';
+      }
+
+      // Render ghi chú & phím tắt
+      if (lesson.keyNotes && lesson.keyNotes.length > 0) {
+        const keyList = document.getElementById('lesson-keynotes-list');
+        keyList.innerHTML = '';
+        lesson.keyNotes.forEach((item) => {
+          const li = document.createElement('li');
+          li.className = 'lms-bullet-item';
+          li.innerHTML = `
+            <div style="color: #60a5fa; font-size: 1.1rem;">•</div>
+            <div style="flex: 1;">${item}</div>
+          `;
+          keyList.appendChild(li);
+        });
+        document.getElementById('box-keynotes').style.display = 'block';
+      }
+
+      // File tài liệu & bài tập
+      const pdfBtn = document.getElementById('btn-download-pdf');
+      if (lesson.pdfUrl) {
+        pdfBtn.href = lesson.pdfUrl;
+      } else {
+        pdfBtn.onclick = (e) => { e.preventDefault(); alert('Đang cập nhật file đề bài tập...'); };
+      }
+
+      const dwgBtn = document.getElementById('btn-download-dwg');
+      if (lesson.dwgUrl) {
+        dwgBtn.href = lesson.dwgUrl;
+      } else {
+        dwgBtn.onclick = (e) => { e.preventDefault(); alert('Đang cập nhật file bản vẽ DWG mẫu...'); };
+      }
+
+      // Nút bài tiếp theo
+      const currentIndex = allLessonsList.findIndex(l => l.id === currentLessonId);
+      if (currentIndex < allLessonsList.length - 1) {
+        const next = allLessonsList[currentIndex + 1];
+        document.getElementById('btn-next-lesson').innerHTML = `
+          <span>Tiếp theo: ${next.title.slice(0, 25)}...</span> <span>→</span>
+        `;
+      } else {
+        document.getElementById('btn-next-lesson').innerHTML = `
+          <span>Đã hoàn thành giáo trình</span> <span>✓</span>
+        `;
+      }
+    }
+
+    function switchPlayerTab(tab) {
+      if (tab === 'content') {
+        document.getElementById('tab-btn-content').classList.add('active');
+        document.getElementById('tab-btn-resources').classList.remove('active');
+        document.getElementById('panel-content').classList.add('active');
+        document.getElementById('panel-resources').classList.remove('active');
+      } else {
+        document.getElementById('tab-btn-content').classList.remove('active');
+        document.getElementById('tab-btn-resources').classList.add('active');
+        document.getElementById('panel-content').classList.remove('active');
+        document.getElementById('panel-resources').classList.add('active');
+      }
+    }
+
+    function goToNextLesson() {
+      const currentIndex = allLessonsList.findIndex(l => l.id === currentLessonId);
+      if (currentIndex > -1 && currentIndex < allLessonsList.length - 1) {
+        const next = allLessonsList[currentIndex + 1];
+        window.location.href = `/learn.html?lesson=${next.id}`;
+      } else {
+        alert('Bạn đã hoàn thành bài học cuối cùng của khóa học!');
+      }
+    }
+
+    function openEnrollFromPlayer() {
+      window.location.href = '/course.html';
+    }
+
+    // ==========================================
+    // MODAL TRẮC NGHIỆM
+    // ==========================================
+    function openQuizModal() {
+      if (!lessonData || !lessonData.quiz || lessonData.quiz.length === 0) {
+        alert('Bài học này chưa có câu hỏi trắc nghiệm.');
+        return;
+      }
+      currentQuizIndex = 0;
+      selectedQuizAnswer = null;
+      renderCurrentQuiz();
+      document.getElementById('quiz-modal').style.display = 'flex';
+    }
+
+    function closeQuizModal() {
+      document.getElementById('quiz-modal').style.display = 'none';
+    }
+
+    function renderCurrentQuiz() {
+      const quizzes = lessonData.quiz;
+      const q = quizzes[currentQuizIndex];
+      selectedQuizAnswer = null;
+
+      document.getElementById('quiz-progress-text').innerText = `CÂU HỎI ${currentQuizIndex + 1} / ${quizzes.length}`;
+      document.getElementById('quiz-question-title').innerText = q.question;
+      document.getElementById('quiz-explanation-box').style.display = 'none';
+      document.getElementById('btn-quiz-next').style.display = 'none';
+
+      const container = document.getElementById('quiz-options-container');
+      container.innerHTML = '';
+
+      q.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option-btn';
+        btn.innerHTML = `
+          <div class="quiz-key-badge">${opt.key}</div>
+          <div style="flex: 1;">${opt.text}</div>
+        `;
+        btn.onclick = () => handleSelectOption(opt.key, q);
+        container.appendChild(btn);
+      });
+    }
+
+    function handleSelectOption(key, q) {
+      if (selectedQuizAnswer !== null) return;
+      selectedQuizAnswer = key;
+
+      const buttons = document.querySelectorAll('.quiz-option-btn');
+      q.options.forEach((opt, idx) => {
+        if (opt.key === q.correctAnswer) {
+          buttons[idx].classList.add('correct');
+        } else if (opt.key === key) {
+          buttons[idx].classList.add('wrong');
+        }
+      });
+
+      if (q.explanation) {
+        document.getElementById('quiz-explanation-text').innerText = q.explanation;
+        document.getElementById('quiz-explanation-box').style.display = 'block';
+      }
+
+      if (currentQuizIndex < lessonData.quiz.length - 1) {
+        document.getElementById('btn-quiz-next').style.display = 'block';
+      } else {
+        setTimeout(() => {
+          alert('🎉 Chúc mừng bạn đã hoàn thành bài trắc nghiệm của bài học này!');
+        }, 600);
+      }
+    }
+
+    function nextQuizQuestion() {
+      currentQuizIndex++;
+      renderCurrentQuiz();
+    }
+
+    window.onload = loadLessonRoom;
+  </script>
+</body>
+</html>

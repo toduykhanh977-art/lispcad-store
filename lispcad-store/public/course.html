@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khóa học AutoCAD 2D - Tin Học Click vn</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/learn.css">
+</head>
+<body class="lms-body">
+
+  <!-- TOP NAVBAR -->
+  <header class="lms-navbar">
+    <div class="lms-nav-left">
+      <a href="/" class="btn-back-circle" title="Về trang chủ">‹</a>
+      <a href="/" class="brand-box" style="text-decoration: none;">
+        <div class="brand-icon">A</div>
+        <div>
+          <div class="brand-text-name" style="color: #ffffff;">AutoCAD <span>Tin Học Click</span> vn</div>
+          <div class="brand-text-slogan" style="color: #94a3b8;">Đừng làm việc chăm chỉ, hãy làm việc thông minh</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- User Account / Login Button -->
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div id="user-info-area" style="display: none; align-items: center; gap: 10px;">
+        <div style="width: 34px; height: 34px; border-radius: 50%; background: #0284c7; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem;" id="user-avatar-initial">K</div>
+        <span style="color: #ffffff; font-weight: 700; font-size: 0.9rem;" id="user-display-name">Học viên</span>
+        <button onclick="handleLogout()" style="background: #1e293b; border: 1px solid #334155; color: #94a3b8; padding: 6px 12px; border-radius: 8px; font-size: 0.78rem; cursor: pointer;">Đăng xuất</button>
+      </div>
+
+      <button id="btn-open-login" class="btn-login" onclick="openAuthModal()" style="display: flex;">
+        <span>👤</span> Đăng nhập
+      </button>
+    </div>
+  </header>
+
+  <main class="lms-container">
+    <!-- HERO KHÓA HỌC -->
+    <div class="course-hero-banner">
+      <div class="course-badge-tag">⚡ Khóa học thực chiến toàn diện</div>
+      <h1 class="course-hero-title">Khóa học AutoCAD 2D Từ Cơ Bản Đến Nâng Cao</h1>
+      <p class="course-hero-desc">
+        Học mọi lúc mọi nơi – Làm chủ toàn bộ lệnh vẽ 2D, tiêu chuẩn bản vẽ kỹ thuật kiến trúc & cơ khí, kỹ thuật trình bày Layout và triển khai trọn bộ hồ sơ nhà phố 3 tầng.
+      </p>
+
+      <div class="course-features-pills">
+        <div class="course-pill"><span>📹</span> 19 bài giảng Full HD</div>
+        <div class="course-pill"><span>🎁</span> Cho học thử 5 bài đầu miễn phí</div>
+        <div class="course-pill"><span>📂</span> Tặng trọn bộ LispCAD & File DWG mẫu</div>
+        <div class="course-pill"><span>💬</span> Hỗ trợ sửa bản vẽ 1-1 qua Zalo</div>
+      </div>
+
+      <div class="course-cta-box">
+        <div>
+          <span class="course-price-now">299.000 đ</span>
+          <span class="course-price-old">599.000 đ</span>
+        </div>
+        <button class="btn-enroll-now" onclick="handleEnrollCourse()" id="btn-hero-action">
+          <span>🛒</span> ĐĂNG KÝ HỌC NGAY
+        </button>
+        <span id="enrolled-status-badge" style="display: none; background: #064e3b; color: #34d399; padding: 8px 16px; border-radius: 12px; font-weight: 700; border: 1px solid #059669;">
+          ✓ Bạn đã sở hữu khóa học này
+        </span>
+      </div>
+    </div>
+
+    <!-- DANH SÁCH BÀI GIẢNG (NHƯ ẢNH 1 MOCKUP) -->
+    <div class="lessons-header-row">
+      <div>
+        <h3>Giáo trình bài giảng</h3>
+        <p style="color: #64748b; font-size: 0.82rem; margin-top: 2px;">Các bài có nhãn <strong>[ĐANG MỞ]</strong> được học thử hoàn toàn miễn phí</p>
+      </div>
+      <div class="lessons-count-badge" id="lessons-count-text">Tổng: 19 bài học</div>
+    </div>
+
+    <div class="lesson-list-stack" id="lessons-list-container">
+      <!-- Sẽ render động từ API -->
+      <div style="text-align: center; color: #64748b; padding: 40px;">Đang tải danh sách bài học...</div>
+    </div>
+  </main>
+
+  <!-- MODAL ĐĂNG NHẬP / ĐĂNG KÝ HỌC VIÊN -->
+  <div class="detail-modal-overlay" id="auth-modal" style="display: none;">
+    <div class="detail-modal-content" style="background: #0f172a; color: #ffffff; border: 1px solid #334155; max-width: 440px;">
+      <span class="close-modal-x" onclick="closeAuthModal()" style="color: #94a3b8;">&times;</span>
+      
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div style="width: 50px; height: 50px; border-radius: 12px; background: #0284c7; color: #fff; font-size: 1.6rem; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px;">A</div>
+        <h3 style="font-size: 1.3rem; font-weight: 800;" id="auth-modal-title">Đăng Nhập Tài Khoản Học Viên</h3>
+        <p style="color: #94a3b8; font-size: 0.85rem;" id="auth-modal-subtitle">Đăng nhập để vào học hoặc kích hoạt khóa học</p>
+      </div>
+
+      <!-- Tabs Đăng nhập / Đăng ký -->
+      <div style="display: flex; border-bottom: 1px solid #334155; margin-bottom: 20px;">
+        <button id="tab-btn-login" onclick="switchAuthTab('login')" style="flex: 1; padding: 10px; background: none; border: none; border-bottom: 2px solid #38bdf8; color: #38bdf8; font-weight: 700; cursor: pointer;">Đăng Nhập</button>
+        <button id="tab-btn-register" onclick="switchAuthTab('register')" style="flex: 1; padding: 10px; background: none; border: none; border-bottom: 2px solid transparent; color: #94a3b8; font-weight: 700; cursor: pointer;">Đăng Ký Mới</button>
+      </div>
+
+      <!-- Form Đăng Nhập -->
+      <form id="form-login" onsubmit="submitLogin(event)">
+        <div style="margin-bottom: 14px;">
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Số điện thoại hoặc Email:</label>
+          <input type="text" id="login-account" required placeholder="0329... hoặc email@gmail.com" style="width: 100%; padding: 12px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 10px; font-size: 0.95rem;">
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Mật khẩu:</label>
+          <input type="password" id="login-password" required placeholder="Nhập mật khẩu" style="width: 100%; padding: 12px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 10px; font-size: 0.95rem;">
+        </div>
+        <button type="submit" style="width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-weight: 800; font-size: 1rem; cursor: pointer;">ĐĂNG NHẬP VÀO HỌC</button>
+      </form>
+
+      <!-- Form Đăng Ký -->
+      <form id="form-register" onsubmit="submitRegister(event)" style="display: none;">
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Họ và tên của bạn:</label>
+          <input type="text" id="reg-name" required placeholder="VD: Nguyễn Văn An" style="width: 100%; padding: 11px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 10px; font-size: 0.95rem;">
+        </div>
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Số điện thoại:</label>
+          <input type="tel" id="reg-phone" required placeholder="0912..." style="width: 100%; padding: 11px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 10px; font-size: 0.95rem;">
+        </div>
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Email (để nhận tài liệu):</label>
+          <input type="email" id="reg-email" placeholder="email@gmail.com" style="width: 100%; padding: 11px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 10px; font-size: 0.95rem;">
+        </div>
+        <div style="margin-bottom: 18px;">
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Mật khẩu đăng nhập:</label>
+          <input type="password" id="reg-password" required placeholder="Tạo mật khẩu" style="width: 100%; padding: 11px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 10px; font-size: 0.95rem;">
+        </div>
+        <button type="submit" style="width: 100%; padding: 12px; background: #0284c7; color: #fff; border: none; border-radius: 10px; font-weight: 800; font-size: 1rem; cursor: pointer;">TẠO TÀI KHOẢN HỌC VIÊN</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL THANH TOÁN VIETQR SEPAY CHO KHÓA HỌC -->
+  <div class="checkout-modal-overlay" id="checkout-modal" style="display: none;">
+    <div class="checkout-modal-content">
+      <span class="close-modal-x" onclick="closeCheckoutModal()">&times;</span>
+      
+      <!-- BƯỚC 1: XÁC NHẬN THÔNG TIN HỌC VIÊN -->
+      <div id="checkout-step-info">
+        <h3 style="font-size: 1.35rem; font-weight: 800; color: #ffffff; margin-bottom: 6px;">Đăng Ký Khóa Học AutoCAD 2D</h3>
+        <p style="color: #38bdf8; font-weight: 700; font-size: 1.05rem; margin-bottom: 16px;">Học phí ưu đãi: 299.000 đ (Truy cập trọn đời)</p>
+
+        <form onsubmit="handleCreateCourseOrder(event)">
+          <div class="form-group">
+            <label>Họ và tên của bạn:</label>
+            <input type="text" id="chk-name" required placeholder="Nhập họ và tên học viên">
+          </div>
+          <div class="form-group">
+            <label>Số điện thoại Zalo (nhận hỗ trợ 1-1 và làm tài khoản đăng nhập):</label>
+            <input type="tel" id="chk-phone" required placeholder="VD: 0912345678">
+          </div>
+          <button type="submit" class="btn-big-yellow" style="width: 100%; margin-top: 14px; border-radius: 12px; font-size: 1rem; padding: 12px;" id="btn-submit-enroll">
+            Lấy Mã VietQR Chuyển Khoản (299.000 đ) →
+          </button>
+        </form>
+      </div>
+
+      <!-- BƯỚC 2: HIỂN THỊ VIETQR CHUYỂN KHOẢN -->
+      <div id="checkout-step-qr" style="display: none; text-align: center;">
+        <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; border-radius: 8px; padding: 8px; margin-bottom: 12px;">
+          <span style="font-size: 0.8rem; color: #22c55e;">🔑 MÃ ĐƠN HÀNG CỦA BẠN:</span><br>
+          <strong id="display-order-code" style="font-size: 1.35rem; color: #fff; letter-spacing: 1px;">CAD123456</strong>
+        </div>
+
+        <p style="color: #38bdf8; font-size: 0.85rem; font-weight: 600;">
+          📲 Mở app ngân hàng quét mã bên dưới (Tự động điền số tiền & nội dung):
+        </p>
+
+        <div style="background: #fff; padding: 10px; border-radius: 12px; display: inline-block; margin: 10px 0;">
+          <img id="qr-image-code" src="" alt="Mã QR VietQR" style="width: 220px; height: 220px; object-fit: contain; display: block;">
+        </div>
+
+        <table class="bank-info-table">
+          <tr>
+            <td>Ngân hàng:</td>
+            <td><strong id="qr-bank-name">MBBank</strong></td>
+          </tr>
+          <tr>
+            <td>Số tài khoản:</td>
+            <td>
+              <strong id="qr-acc-num" style="color: #38bdf8;">0329778016</strong>
+              <span class="copy-pill" onclick="copyText('qr-acc-num')">Copy</span>
+            </td>
+          </tr>
+          <tr>
+            <td>Chủ tài khoản:</td>
+            <td><strong id="qr-acc-name">TO DUY KHANH</strong></td>
+          </tr>
+          <tr>
+            <td>Số tiền cần chuyển:</td>
+            <td><strong id="qr-amount" style="color: #4ade80; font-size: 1.15rem;">299.000 đ</strong></td>
+          </tr>
+          <tr>
+            <td>Nội dung CK:</td>
+            <td>
+              <strong id="qr-content" style="color: #fbbf24;">LISPCAD CADxxx</strong>
+              <span class="copy-pill" onclick="copyText('qr-content')">Copy</span>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Khung kiểm tra tự động thời gian thực từ SePay -->
+        <div class="waiting-box" id="waiting-status-box">
+          <div class="waiting-header">
+            <span class="pulse-dot"></span>
+            <span id="waiting-title">ĐANG CHỜ BẠN CHUYỂN KHOẢN...</span>
+          </div>
+          <p id="waiting-desc" style="font-size: 0.82rem; color: #94a3b8; margin-top: 6px; line-height: 1.4;">
+            Hệ thống đang tự động kiểm tra giao dịch tài khoản MBBank.<br>
+            Ngay khi tiền vào tài khoản, màn hình sẽ <strong>tự động mở khóa toàn bộ bài giảng</strong> ngay lập tức!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = null;
+    let allLessons = [];
+    let hasEnrolled = false;
+    let currentOrder = null;
+    let pollInterval = null;
+
+    async function initPage() {
+      await checkCurrentUser();
+      await loadLessons();
+    }
+
+    async function checkCurrentUser() {
+      try {
+        const res = await fetch('/api/user/me');
+        const data = await res.json();
+        currentUser = data.user;
+        updateUserUI();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function updateUserUI() {
+      const area = document.getElementById('user-info-area');
+      const btnLogin = document.getElementById('btn-open-login');
+      if (currentUser) {
+        area.style.display = 'flex';
+        btnLogin.style.display = 'none';
+        document.getElementById('user-display-name').innerText = currentUser.name;
+        document.getElementById('user-avatar-initial').innerText = (currentUser.name || 'U').charAt(0).toUpperCase();
+
+        if (currentUser.enrolledCourses && currentUser.enrolledCourses.includes('prod_course_2d')) {
+          hasEnrolled = true;
+          document.getElementById('enrolled-status-badge').style.display = 'inline-block';
+          document.getElementById('btn-hero-action').innerText = '▶ VÀO BÀI HỌC ĐẦU TIÊN';
+          document.getElementById('btn-hero-action').onclick = () => {
+            window.location.href = '/learn.html?lesson=lesson-2d-1';
+          };
+        }
+      } else {
+        area.style.display = 'none';
+        btnLogin.style.display = 'flex';
+      }
+    }
+
+    async function loadLessons() {
+      try {
+        const res = await fetch('/api/course/lessons');
+        const data = await res.json();
+        allLessons = data.lessons || [];
+        hasEnrolled = data.hasEnrolled;
+
+        document.getElementById('lessons-count-text').innerText = `Tổng: ${allLessons.length} bài học`;
+        renderLessonsList(allLessons);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderLessonsList(lessons) {
+      const container = document.getElementById('lessons-list-container');
+      container.innerHTML = '';
+
+      lessons.forEach(l => {
+        const row = document.createElement('div');
+        row.className = 'lesson-row-card';
+
+        const isOpen = !l.isLocked;
+        const iconHtml = isOpen 
+          ? `<div class="lesson-icon-box open">📹</div>`
+          : `<div class="lesson-icon-box locked">🔒</div>`;
+
+        const badgeHtml = isOpen
+          ? `<span class="badge-status-pill open">ĐANG MỞ</span>`
+          : `<span class="badge-status-pill locked">ĐÃ KHÓA</span>`;
+
+        row.innerHTML = `
+          <div class="lesson-left-content">
+            ${iconHtml}
+            <div style="min-width: 0;">
+              <div class="lesson-meta-line">
+                <span class="lesson-cat-label">AUTOCAD 2D CƠ BẢN</span>
+                <span style="color: #64748b;">•</span>
+                ${badgeHtml}
+              </div>
+              <div class="lesson-title-text" title="${l.title}">${l.title}</div>
+              <div class="lesson-duration-text">
+                <span>⏱</span> ${l.duration || '15:00'}
+              </div>
+            </div>
+          </div>
+
+          <div class="lesson-actions-group">
+            <a href="/learn.html?lesson=${l.id}" class="btn-view-lesson">
+              ${isOpen || hasEnrolled ? 'Xem bài' : 'Xem giới thiệu'}
+            </a>
+          </div>
+        `;
+
+        container.appendChild(row);
+      });
+    }
+
+    // Modal Auth
+    function openAuthModal() {
+      document.getElementById('auth-modal').style.display = 'flex';
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal').style.display = 'none';
+    }
+
+    function switchAuthTab(type) {
+      if (type === 'login') {
+        document.getElementById('form-login').style.display = 'block';
+        document.getElementById('form-register').style.display = 'none';
+        document.getElementById('tab-btn-login').style.borderColor = '#38bdf8';
+        document.getElementById('tab-btn-login').style.color = '#38bdf8';
+        document.getElementById('tab-btn-register').style.borderColor = 'transparent';
+        document.getElementById('tab-btn-register').style.color = '#94a3b8';
+      } else {
+        document.getElementById('form-login').style.display = 'none';
+        document.getElementById('form-register').style.display = 'block';
+        document.getElementById('tab-btn-login').style.borderColor = 'transparent';
+        document.getElementById('tab-btn-login').style.color = '#94a3b8';
+        document.getElementById('tab-btn-register').style.borderColor = '#38bdf8';
+        document.getElementById('tab-btn-register').style.color = '#38bdf8';
+      }
+    }
+
+    async function submitLogin(e) {
+      e.preventDefault();
+      const account = document.getElementById('login-account').value;
+      const pass = document.getElementById('login-password').value;
+
+      try {
+        const res = await fetch('/api/user/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ emailOrPhone: account, password: pass })
+        });
+        const data = await res.json();
+        if (data.success) {
+          currentUser = data.user;
+          closeAuthModal();
+          updateUserUI();
+          loadLessons();
+          alert(`Đăng nhập thành công! Chào mừng ${currentUser.name}`);
+        } else {
+          alert(data.error || 'Đăng nhập không thành công');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ!');
+      }
+    }
+
+    async function submitRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value;
+      const phone = document.getElementById('reg-phone').value;
+      const email = document.getElementById('reg-email').value;
+      const password = document.getElementById('reg-password').value;
+
+      try {
+        const res = await fetch('/api/user/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone, email, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          currentUser = data.user;
+          closeAuthModal();
+          updateUserUI();
+          loadLessons();
+          alert(`Tạo tài khoản thành công! Chào mừng học viên ${currentUser.name}`);
+        } else {
+          alert(data.error || 'Không thể tạo tài khoản');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ!');
+      }
+    }
+
+    async function handleLogout() {
+      await fetch('/api/user/logout', { method: 'POST' });
+      currentUser = null;
+      hasEnrolled = false;
+      updateUserUI();
+      loadLessons();
+      window.location.reload();
+    }
+
+    // Đăng ký mua khóa học
+    function handleEnrollCourse() {
+      // Điền thông tin nếu đã đăng nhập sẵn
+      if (currentUser) {
+        document.getElementById('chk-name').value = currentUser.name || '';
+        document.getElementById('chk-phone').value = currentUser.phone || '';
+      }
+      document.getElementById('checkout-step-info').style.display = 'block';
+      document.getElementById('checkout-step-qr').style.display = 'none';
+      document.getElementById('checkout-modal').style.display = 'flex';
+    }
+
+    function closeCheckoutModal() {
+      if (pollInterval) clearInterval(pollInterval);
+      document.getElementById('checkout-modal').style.display = 'none';
+    }
+
+    async function handleCreateCourseOrder(e) {
+      e.preventDefault();
+      const name = document.getElementById('chk-name').value.trim();
+      const phone = document.getElementById('chk-phone').value.trim();
+      const btn = document.getElementById('btn-submit-enroll');
+
+      if (!name || !phone) {
+        alert('Vui lòng điền họ tên và số điện thoại nhận kích hoạt!');
+        return;
+      }
+
+      const origBtnText = btn.innerText;
+      btn.disabled = true;
+      btn.innerText = 'Đang khởi tạo mã VietQR...';
+
+      try {
+        const res = await fetch('/api/public/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId: 'prod_course_2d',
+            customerName: name,
+            customerPhone: phone,
+            customerEmail: currentUser ? currentUser.email : '',
+            userId: currentUser ? currentUser.id : null
+          })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          currentOrder = data;
+          document.getElementById('checkout-step-info').style.display = 'none';
+          document.getElementById('checkout-step-qr').style.display = 'block';
+
+          document.getElementById('display-order-code').innerText = data.orderCode;
+          document.getElementById('qr-image-code').src = data.qrUrl;
+          document.getElementById('qr-bank-name').innerText = data.bankName;
+          document.getElementById('qr-acc-num').innerText = data.accountNumber;
+          document.getElementById('qr-acc-name').innerText = data.accountHolder;
+          document.getElementById('qr-amount').innerText = Number(data.amount).toLocaleString() + ' đ';
+          document.getElementById('qr-content').innerText = data.transferContent;
+
+          // Bắt đầu lắng nghe SePay Webhook tự động duyệt
+          startOrderPolling(data.orderCode);
+        } else {
+          alert(data.error || 'Có lỗi khi tạo đơn hàng!');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ!');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = origBtnText;
+      }
+    }
+
+    function copyText(elementId) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const text = el.innerText.trim();
+      navigator.clipboard.writeText(text);
+      alert('Đã sao chép: ' + text);
+    }
+
+    function startOrderPolling(orderCode) {
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/public/check-order/${orderCode}`);
+          const data = await res.json();
+          if (data.isPaid) {
+            clearInterval(pollInterval);
+            alert('🎉 Chúc mừng bạn! Thanh toán đã được xác nhận tự động. Khóa học AutoCAD 2D đã sẵn sàng.');
+            window.location.href = '/learn.html?lesson=lesson-2d-1';
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }, 2000);
+    }
+
+    window.onload = initPage;
+  </script>
+</body>
+</html>

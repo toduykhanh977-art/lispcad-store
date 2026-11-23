@@ -44,6 +44,17 @@
     }
     .panel { display: none; }
     .panel.active { display: block; }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+      overflow-y: auto;
+      padding: 20px;
+    }
     .admin-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -147,6 +158,9 @@
       <div class="nav-tabs">
         <button class="tab-btn active" onclick="switchTab('tab-payment')">💳 Cài Đặt Mã QR & Ngân Hàng</button>
         <button class="tab-btn" onclick="switchTab('tab-products')">📦 Quản Lý LispCAD & Giá Bán</button>
+        <button class="tab-btn" onclick="switchTab('tab-documents')">📚 Quản Lý Tài Liệu & Giáo Trình</button>
+        <button class="tab-btn" onclick="switchTab('tab-lessons')">🎓 Quản Lý Khóa Học 2D</button>
+        <button class="tab-btn" onclick="switchTab('tab-students')">👥 Quản Lý Học Viên</button>
         <button class="tab-btn" onclick="switchTab('tab-orders')">📑 Danh Sách Đơn Hàng</button>
         <button class="tab-btn" onclick="switchTab('tab-password')">🔒 Đổi Mật Khẩu</button>
       </div>
@@ -192,6 +206,16 @@
                   <label for="transferSyntax">Tiền tố cú pháp chuyển khoản</label>
                   <input type="text" id="transferSyntax" placeholder="Mặc định: LISPCAD">
                 </div>
+
+                <div class="form-group">
+                  <label for="zaloLink">Link Zalo hỗ trợ học viên</label>
+                  <input type="url" id="zaloLink" placeholder="VD: https://zalo.me/0329778016">
+                </div>
+
+                <div class="form-group">
+                  <label for="facebookLink">Link Facebook hỗ trợ học viên</label>
+                  <input type="url" id="facebookLink" placeholder="VD: https://www.facebook.com/your-fanpage">
+                </div>
               </div>
 
               <div>
@@ -225,6 +249,7 @@
             <table>
               <thead>
                 <tr>
+                  <th style="width: 60px;">Ảnh</th>
                   <th>Tên Sản Phẩm LispCAD</th>
                   <th>Giá Bán</th>
                   <th>Lệnh Hỗ Trợ</th>
@@ -235,6 +260,82 @@
               </thead>
               <tbody id="products-table-body">
                 <!-- Danh sách sản phẩm được load động -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: QUẢN LÝ TÀI LIỆU & GIÁO TRÌNH CAD -->
+      <div id="tab-documents" class="panel">
+        <div class="admin-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+              <h3 style="color: var(--accent-cyan); font-size: 1.25rem;">3. Quản Lý Tài Liệu & Giáo Trình CAD</h3>
+              <p style="color: var(--text-muted); font-size: 0.85rem;" id="admin-docs-count-text">Tài liệu và giáo trình cho học viên tải về</p>
+            </div>
+            <button class="btn-sm btn-primary" onclick="openDocModal()">+ Thêm Tài Liệu Mới</button>
+          </div>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 80px;">Ảnh Mẫu</th>
+                  <th>Tên Tài Liệu / Giáo Trình</th>
+                  <th>Phân Loại</th>
+                  <th>Giá Bán</th>
+                  <th>Định Dạng & Dung Lượng</th>
+                  <th>Danh Sách File & Link Drive</th>
+                  <th>Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="documents-table-body">
+                <!-- Render động -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB KHÓA HỌC 2D & BÀI GIẢNG (THEO MOCKUP ẢNH 1) -->
+      <div id="tab-lessons" class="panel">
+        <div class="admin-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+              <h3 style="color: var(--accent-cyan); font-size: 1.25rem;">Quản lý trạng thái Khóa / Mở khóa của từng bài giảng</h3>
+              <p style="color: var(--text-muted); font-size: 0.85rem;" id="admin-lessons-count-text">Tổng: 19 bài học</p>
+            </div>
+            <button class="btn-sm btn-primary" onclick="openLessonModal()">+ Thêm Bài Học Mới</button>
+          </div>
+
+          <div id="admin-lessons-list" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Render động danh sách bài học -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB QUẢN LÝ HỌC VIÊN -->
+      <div id="tab-students" class="panel">
+        <div class="admin-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="color: var(--accent-cyan);">Danh Sách Học Viên Đăng Ký Tài Khoản</h3>
+            <button class="btn-sm btn-secondary" onclick="loadStudentsData()">🔄 Làm Mới</button>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tên Học Viên</th>
+                  <th>Số Điện Thoại</th>
+                  <th>Email</th>
+                  <th>Khóa Học 2D</th>
+                  <th>Ngày Đăng Ký</th>
+                  <th>Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="students-table-body">
+                <!-- Render động -->
               </tbody>
             </table>
           </div>
@@ -295,9 +396,22 @@
       <form id="form-product" onsubmit="saveProduct(event)">
         <input type="hidden" id="prod-id">
 
-        <div class="form-group">
-          <label for="prod-name">Tên Bộ LispCAD</label>
-          <input type="text" id="prod-name" placeholder="VD: Bộ LispCAD Tự Động Hóa Bản Vẽ" required>
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="prod-name">Tên Bộ LispCAD</label>
+            <input type="text" id="prod-name" placeholder="VD: Đánh số thứ tự tự động" required>
+          </div>
+          <div class="form-group">
+            <label for="prod-category">Danh Mục (Thẻ Phân Loại)</label>
+            <select id="prod-category" style="width: 100%; padding: 12px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 8px;">
+              <option value="Vẽ nhanh">Vẽ nhanh</option>
+              <option value="Dim">Dim</option>
+              <option value="Text">Text</option>
+              <option value="Block">Block</option>
+              <option value="Layer">Layer</option>
+              <option value="Dữ liệu">Dữ liệu</option>
+            </select>
+          </div>
         </div>
 
         <div class="grid-2">
@@ -330,6 +444,29 @@
           <label for="prod-videourl">🎥 Link Video Hướng Dẫn Sử Dụng (YouTube)</label>
           <input type="url" id="prod-videourl" placeholder="VD: https://www.youtube.com/watch?v=... hoặc https://youtu.be/..." style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 8px;">
           <small style="color: var(--text-muted); display: block; margin-top: 4px;">Video sẽ được nhúng phát trực tiếp trên trang chủ để khách xem trước khi bấm mua.</small>
+        </div>
+
+        <!-- ẢNH MINH HỌA / GIF MÔ PHỎNG SẢN PHẨM -->
+        <div class="form-group" style="background: rgba(14, 165, 233, 0.06); padding: 14px; border-radius: 8px; border: 1px dashed var(--accent-cyan);">
+          <label style="color: var(--accent-cyan); font-weight: 700; display: block; margin-bottom: 8px;">
+            🖼️ Ảnh Minh Họa / GIF Mô Phỏng Cho Lisp (Hiển thị ở đầu card Lisp)
+          </label>
+          <div style="display: flex; gap: 14px; align-items: center;">
+            <div id="prod-img-preview-box" style="width: 110px; height: 75px; background: #091422; border: 1px solid var(--card-border); border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+              <span id="prod-img-placeholder" style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 4px;">Chưa có ảnh</span>
+              <img id="prod-img-preview" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+            </div>
+            <div style="flex-grow: 1;">
+              <label for="prod-image-file" style="font-size: 0.82rem; color: #94a3b8; display: block; margin-bottom: 4px;">1. Tải ảnh hoặc ảnh động GIF từ máy tính:</label>
+              <input type="file" id="prod-image-file" accept="image/*" onchange="previewProductImage(this)">
+              <div style="margin-top: 6px;">
+                <input type="url" id="prod-image-url" placeholder="2. Hoặc dán link ảnh/GIF trực tiếp (VD: https://...)" style="width: 100%; font-size: 0.85rem; padding: 7px 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 6px;" oninput="previewProductImageUrl(this.value)">
+              </div>
+            </div>
+          </div>
+          <small style="color: var(--text-muted); display: block; margin-top: 6px;">
+            💡 Khuyên dùng: Ảnh động GIF ghi lại thao tác vẽ CAD hoặc ảnh chụp màn hình bản vẽ (.png, .jpg, .gif, .webp).
+          </small>
         </div>
 
         <div class="form-group">
@@ -366,6 +503,238 @@
           <button type="submit" class="btn-sm btn-primary" style="padding: 10px 20px;">Lưu Sản Phẩm</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL THÊM / SỬA BÀI HỌC (KHÓA HỌC 2D) -->
+  <div id="lesson-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; overflow-y: auto; padding: 20px;">
+    <div class="admin-card" style="max-width: 680px; margin: 40px auto; background: var(--card-bg); border: 1px solid var(--accent-cyan); box-shadow: 0 25px 60px rgba(0,0,0,0.9); border-radius: 12px; padding: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 12px;">
+        <h3 id="lesson-modal-title" style="color: var(--accent-cyan); margin: 0; font-size: 1.25rem;">Thêm Bài Giảng Khóa Học 2D</h3>
+        <span onclick="closeLessonModal()" style="font-size: 1.8rem; cursor: pointer; color: var(--text-muted); line-height: 1;" title="Đóng">&times;</span>
+      </div>
+      <form id="form-lesson" onsubmit="saveLesson(event)">
+        <input type="hidden" id="lesson-id">
+        
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="lesson-title">Tiêu Đề Bài Giảng</label>
+            <input type="text" id="lesson-title" required placeholder="VD: Bài 1 - Làm quen AutoCAD & Thiết lập ban đầu">
+          </div>
+          <div class="form-group">
+            <label for="lesson-duration">Thời Lượng (Phút:Giây)</label>
+            <input type="text" id="lesson-duration" required placeholder="VD: 15:20">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lesson-videourl">🎥 Link Video Bài Giảng (YouTube / Bunny / MediaDelivery / mp4)</label>
+          <input type="text" id="lesson-videourl" placeholder="VD: https://www.youtube.com/watch?v=... hoặc link embed">
+        </div>
+
+        <div class="form-group">
+          <label for="lesson-desc">Giới Thiệu Tóm Tắt Bài Học</label>
+          <textarea id="lesson-desc" rows="3" placeholder="Mô tả nội dung bài học này giúp ích gì cho học viên..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="lesson-summary">Nội Dung Chính (Mỗi ý gạch đầu dòng 1 hàng):</label>
+          <textarea id="lesson-summary" rows="4" placeholder="1. Làm quen giao diện Ribbon&#10;2. Thiết lập con trỏ chuột Options&#10;3. Đơn vị đo Units và giới hạn Limits"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="lesson-keynotes">Ghi Chú Quan Trọng & Phím Tắt (Mỗi ý 1 hàng):</label>
+          <textarea id="lesson-keynotes" rows="3" placeholder="Phím F3: Bật/tắt bắt điểm Object Snap&#10;Phím F8: Bật/tắt chế độ vuông góc Ortho"></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="lesson-pdfurl">Link File Bài Tập PDF (Google Drive / OneDrive)</label>
+            <input type="url" id="lesson-pdfurl" placeholder="https://drive.google.com/file/d/...">
+          </div>
+          <div class="form-group">
+            <label for="lesson-dwgurl">Link File Bản Vẽ Mẫu DWG</label>
+            <input type="url" id="lesson-dwgurl" placeholder="https://drive.google.com/file/d/...">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 10px;">
+          <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="lesson-isopen">
+            <strong style="color: #34d399;">Cho phép Học thử miễn phí (Đang mở)</strong>
+          </label>
+          <small style="color: var(--text-muted); display: block; margin-top: 4px;">Nếu không chọn, bài học này sẽ bị KHÓA và chỉ học viên đã mua khóa học mới xem được.</small>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <button type="button" class="btn-sm btn-secondary" onclick="closeLessonModal()">Hủy Bỏ</button>
+          <button type="submit" class="btn-sm btn-primary" style="padding: 10px 20px;">Lưu Bài Giảng</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL THÊM / SỬA TÀI LIỆU & GIÁO TRÌNH -->
+  <div id="doc-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; overflow-y: auto; padding: 20px;">
+    <div class="admin-card" style="max-width: 780px; margin: 40px auto; background: var(--card-bg); border: 1px solid var(--accent-cyan); box-shadow: 0 25px 60px rgba(0,0,0,0.9); border-radius: 12px; padding: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 12px;">
+        <h3 id="doc-modal-title" style="color: var(--accent-cyan); margin: 0; font-size: 1.25rem;">Thêm Tài Liệu &amp; Giáo Trình Mới</h3>
+        <span onclick="closeDocModal()" style="font-size: 1.8rem; cursor: pointer; color: var(--text-muted); line-height: 1;" title="Đóng">&times;</span>
+      </div>
+      <form id="form-doc" onsubmit="saveDoc(event)">
+        <input type="hidden" id="doc-id">
+
+        <div class="form-group">
+          <label for="doc-title">Tên Tài Liệu / Giáo Trình</label>
+          <input type="text" id="doc-title" required placeholder="VD: Bộ Thư Viện 1000+ Block CAD Kiến Trúc & Nội Thất">
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="doc-category">Chuyên Mục</label>
+            <select id="doc-category" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 8px;">
+              <option value="Giáo trình">Giáo trình</option>
+              <option value="Thư viện DWG">Thư viện DWG</option>
+              <option value="Sổ tay phím tắt">Sổ tay phím tắt</option>
+              <option value="Hướng dẫn Lisp">Hướng dẫn Lisp</option>
+              <option value="Tài liệu khác">Tài liệu khác</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="doc-format">Định Dạng File Hiển Thị</label>
+            <input type="text" id="doc-format" placeholder="VD: DWG / ZIP hoặc PDF" value="DWG / ZIP">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="doc-size">Tổng Dung Lượng Ước Lượng</label>
+            <input type="text" id="doc-size" placeholder="VD: 45.2 MB, 15.8 MB..." value="45.2 MB">
+          </div>
+          <div class="form-group">
+            <label for="doc-author">Đơn Vị Phát Hành / Tác Giả</label>
+            <input type="text" id="doc-author" placeholder="Tin Học Click" value="Tin Học Click">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="doc-desc">Mô Tả Chi Tiết Bộ Tài Liệu</label>
+          <textarea id="doc-desc" rows="2" placeholder="Tóm tắt nội dung các file bên trong bộ tài liệu..."></textarea>
+        </div>
+
+        <!-- THIẾT LẬP GIÁ BÁN (CÓ PHÍ / MIỄN PHÍ) -->
+        <div class="form-group" style="background: rgba(16, 185, 129, 0.05); padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(16, 185, 129, 0.3); margin-bottom: 20px;">
+          <label style="color: #34d399; font-weight: 700; display: block; margin-bottom: 8px; font-size: 0.95rem;">
+            💰 Thiết Lập Giá Bán:
+          </label>
+          <div style="display: flex; gap: 24px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              <input type="radio" name="docPricingType" value="free" checked onchange="toggleDocPricingType()">
+              <strong style="color: #34d399;">Miễn phí (Học viên tải không mất tiền)</strong>
+            </label>
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              <input type="radio" name="docPricingType" value="paid" onchange="toggleDocPricingType()">
+              <strong style="color: #f59e0b;">Có phí (Mất tiền - Thanh toán qua VietQR)</strong>
+            </label>
+          </div>
+
+          <div id="doc-price-inputs-row" class="grid-2" style="display: none; margin-top: 10px;">
+            <div>
+              <label for="doc-price" style="font-size: 0.82rem; color: #94a3b8; display: block; margin-bottom: 4px;">Giá Bán (VNĐ):</label>
+              <input type="number" id="doc-price" placeholder="VD: 49000" min="0" step="1000" style="width: 100%; padding: 9px; background: #091422; border: 1px solid var(--card-border); color: #00e676; font-weight: 700; border-radius: 6px;">
+            </div>
+            <div>
+              <label for="doc-oldprice" style="font-size: 0.82rem; color: #94a3b8; display: block; margin-bottom: 4px;">Giá Gốc / Cũ Trước Giảm (VNĐ):</label>
+              <input type="number" id="doc-oldprice" placeholder="VD: 99000" min="0" step="1000" style="width: 100%; padding: 9px; background: #091422; border: 1px solid var(--card-border); color: #94a3b8; border-radius: 6px;">
+            </div>
+          </div>
+        </div>
+
+        <!-- THIẾT LẬP GIỚI HẠN SỐ TRANG CHO KHÁCH ĐỌC THỬ (XEM TRƯỚC) -->
+        <div class="form-group" style="background: rgba(56, 189, 248, 0.06); padding: 14px 16px; border-radius: 10px; border: 1px dashed var(--accent-cyan); margin-bottom: 20px;">
+          <label style="color: var(--accent-cyan); font-weight: 700; display: block; margin-bottom: 6px; font-size: 0.95rem;">
+            📖 Giới Hạn Số Trang Cho Khách Đọc Thử (Xem Trước):
+          </label>
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <input type="number" id="doc-preview-pages" min="1" max="500" value="10" placeholder="10" style="width: 120px; padding: 9px 12px; background: #0d1117; border: 1px solid var(--card-border); color: #00e676; border-radius: 8px; font-weight: 800; font-size: 1.1rem; text-align: center;">
+            <span style="font-size: 0.85rem; color: #cbd5e1; font-weight: 500;">
+              trang đầu tiên. <span style="color: var(--text-muted);">(Ví dụ: File có 20 trang, nhập <strong>10</strong> thì khách chỉ đọc được 10 trang đầu, không cho tải về; xem hết phải mua mới tải và xem trọn bộ).</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- KHU VỰC TẢI LÊN 2 ĐẾN 3 ẢNH MINH HỌA -->
+        <div class="form-group" style="background: rgba(14, 165, 233, 0.05); padding: 14px 16px; border-radius: 10px; border: 1px dashed var(--accent-cyan); margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label style="color: var(--accent-cyan); font-weight: 700; margin: 0; font-size: 0.95rem;">
+              🖼️ Ảnh Minh Họa / Bản Vẽ Mẫu (Tải lên 2 đến 3 ảnh)
+            </label>
+            <span style="font-size: 0.8rem; color: #38bdf8; font-weight: 700;" id="doc-images-count-label">0 ảnh</span>
+          </div>
+          <p style="font-size: 0.8rem; color: #94a3b8; margin: 0 0 10px 0;">
+            Bạn có thể chọn 1 lần 2 đến 3 ảnh chụp bản vẽ, mẫu block CAD hoặc trang bìa để học viên xem trước.
+          </p>
+
+          <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
+            <input type="file" id="doc-images-file" accept="image/*" multiple onchange="handleDocImagesFileChange(this)" style="display: none;">
+            <button type="button" class="btn-sm btn-secondary" onclick="document.getElementById('doc-images-file').click()" style="display: flex; align-items: center; gap: 6px; padding: 7px 14px;">
+              <span>📁</span> Chọn 2-3 ảnh từ máy tính
+            </button>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">(.png, .jpg, .svg, .webp, .gif)</span>
+          </div>
+
+          <!-- Preview danh sách ảnh -->
+          <div id="doc-images-preview-grid" style="display: flex; gap: 12px; flex-wrap: wrap; min-height: 75px; align-items: center; background: #091422; padding: 10px; border-radius: 8px; border: 1px solid var(--card-border);">
+            <span style="color: var(--text-muted); font-size: 0.82rem; padding: 10px;">Chưa có ảnh minh họa nào. Hãy bấm nút chọn 2-3 ảnh ở trên.</span>
+          </div>
+        </div>
+
+        <!-- KHU VỰC NHIỀU FILE & LINK GOOGLE DRIVE -->
+        <div class="form-group" style="background: #091422; padding: 16px; border-radius: 10px; border: 1px solid var(--card-border); margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <label style="color: #38bdf8; font-weight: 700; margin: 0; font-size: 0.95rem;">
+                📁 Danh Sách File & Link Tải Google Drive
+              </label>
+              <p style="font-size: 0.8rem; color: #94a3b8; margin: 2px 0 0 0;">
+                Bạn có thể thêm nhiều file hoặc nhiều link Drive vào bộ tài liệu này.
+              </p>
+            </div>
+            <button type="button" class="btn-sm btn-primary" onclick="addDocFileRow()" style="padding: 6px 14px; font-size: 0.82rem;">
+              + Thêm File / Link Drive
+            </button>
+          </div>
+
+          <div id="doc-files-container" style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px;">
+            <!-- Danh sách file render động -->
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-end; gap: 12px; margin-top: 24px;">
+          <button type="button" class="btn-sm btn-secondary" onclick="closeDocModal()">Hủy Bỏ</button>
+          <button type="submit" class="btn-sm btn-primary" style="padding: 10px 24px; font-weight: 700;">💾 Lưu Tài Liệu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL XEM TRƯỚC PDF TOÀN MÀN HÌNH (ADMIN) -->
+  <div id="fullscreen-pdf-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.92); z-index: 2000; flex-direction: column; padding: 14px;" onclick="if(event.target===this) closeFullscreenPdfPreview()">
+    <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 12px 20px; border-radius: 12px 12px 0 0; border: 1px solid #334155; border-bottom: none;">
+      <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+        <span style="font-size: 1.3rem;">📄</span>
+        <div>
+          <div id="fullscreen-pdf-title" style="color: #ffffff; font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 600px;">Xem Trước File PDF</div>
+          <small style="color: #38bdf8; font-size: 0.75rem;">Chế độ đọc thử trực tuyến (Kiểm tra link Google Drive / PDF)</small>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button type="button" class="btn-sm btn-secondary" onclick="openPdfInNewTab()" style="padding: 7px 14px; font-size: 0.82rem; background: #1e293b; color: #fff; border: 1px solid #334155; cursor: pointer;">↗ Mở Tab Mới</button>
+        <button type="button" onclick="closeFullscreenPdfPreview()" style="background: #e11d48; color: #fff; border: none; border-radius: 8px; width: 34px; height: 34px; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Đóng">&times;</button>
+      </div>
+    </div>
+    <div style="flex: 1; position: relative; background: #1e293b; border: 1px solid #334155; border-radius: 0 0 12px 12px; overflow: hidden;">
+      <iframe id="fullscreen-pdf-iframe" src="" style="width: 100%; height: 100%; border: none;" allow="autoplay" allowfullscreen></iframe>
     </div>
   </div>
 
@@ -438,6 +807,9 @@
         globalData = await res.json();
         renderPaymentSettings(globalData.paymentSettings);
         renderProducts(globalData.products);
+        renderAdminDocuments(globalData.documents);
+        renderAdminLessons(globalData.lessons);
+        renderStudents(globalData.users);
         renderOrders(globalData.orders);
       } catch (e) {
         console.error(e);
@@ -451,6 +823,8 @@
       document.getElementById('accountNumber').value = settings.accountNumber || '';
       document.getElementById('accountHolder').value = settings.accountHolder || '';
       document.getElementById('transferSyntax').value = settings.transferSyntax || 'LISPCAD';
+      if (document.getElementById('zaloLink')) document.getElementById('zaloLink').value = settings.zaloLink || '';
+      if (document.getElementById('facebookLink')) document.getElementById('facebookLink').value = settings.facebookLink || '';
 
       const modeRadio = document.querySelector(`input[name="payMode"][value="${settings.mode || 'auto_confirm'}"]`);
       if (modeRadio) modeRadio.checked = true;
@@ -490,6 +864,8 @@
       form.append('accountNumber', document.getElementById('accountNumber').value);
       form.append('accountHolder', document.getElementById('accountHolder').value);
       form.append('transferSyntax', document.getElementById('transferSyntax').value);
+      form.append('zaloLink', document.getElementById('zaloLink') ? document.getElementById('zaloLink').value : '');
+      form.append('facebookLink', document.getElementById('facebookLink') ? document.getElementById('facebookLink').value : '');
 
       const qrFileInput = document.getElementById('qrImage');
       if (qrFileInput.files[0]) {
@@ -512,19 +888,22 @@
       const tbody = document.getElementById('products-table-body');
       tbody.innerHTML = '';
       if (!products || products.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Chưa có sản phẩm LispCAD nào. Bấm nút "+ Thêm Sản Phẩm Mới".</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Chưa có sản phẩm LispCAD nào. Bấm nút "+ Thêm Sản Phẩm Mới".</td></tr>';
         return;
       }
       products.forEach(p => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
+          <td>
+            ${p.imageUrl ? `<img src="${p.imageUrl}" style="width: 48px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid var(--card-border); display: block;">` : `<div style="width: 48px; height: 32px; background: #091422; border-radius: 4px; border: 1px solid var(--card-border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: var(--text-muted);">Mặc định</div>`}
+          </td>
           <td><strong>${p.name}</strong></td>
           <td style="color: #00e676; font-weight: 700;">${Number(p.price).toLocaleString()} đ</td>
           <td><code style="color: var(--accent-cyan);">${p.commands || 'N/A'}</code></td>
           <td>${p.downloadType === 'link' ? '<a href="' + p.downloadUrl + '" target="_blank" style="color: var(--accent-cyan);">Đường link</a>' : 'File nội bộ'}</td>
           <td>${p.isActive ? '<span class="status-badge status-paid">Đang bán</span>' : '<span class="status-badge status-pending">Đã ẩn</span>'}</td>
           <td>
-            <button class="btn-sm btn-secondary" onclick='editProduct(${JSON.stringify(p)})'>Sửa</button>
+            <button class="btn-sm btn-secondary" onclick="editProductById('${p.id}')">Sửa</button>
             <button class="btn-sm btn-danger" onclick="deleteProduct('${p.id}')">Xóa</button>
           </td>
         `;
@@ -532,14 +911,21 @@
       });
     }
 
+    function editProductById(id) {
+      if (!globalData || !globalData.products) return;
+      const p = globalData.products.find(x => x.id === id);
+      if (p) editProduct(p);
+    }
+
     // Modal Sản phẩm
     function openProductModal() {
       document.getElementById('modal-title').innerText = 'Thêm Sản Phẩm LispCAD Mới';
       document.getElementById('prod-id').value = '';
       document.getElementById('prod-name').value = '';
-      document.getElementById('prod-price').value = 99000;
-      document.getElementById('prod-oldprice').value = 199000;
-      document.getElementById('prod-commands').value = 'TL, STT, DTL';
+      document.getElementById('prod-category').value = 'Vẽ nhanh';
+      document.getElementById('prod-price').value = 50000;
+      document.getElementById('prod-oldprice').value = 100000;
+      document.getElementById('prod-commands').value = 'STT';
       document.getElementById('prod-desc').value = '';
       document.getElementById('prod-instructions').value = '';
       document.getElementById('prod-videourl').value = '';
@@ -547,6 +933,14 @@
       document.getElementById('prod-link').value = '';
       document.getElementById('current-file-label').innerText = '';
       document.getElementById('prod-active').checked = true;
+
+      // Reset ảnh minh họa
+      document.getElementById('prod-image-file').value = '';
+      document.getElementById('prod-image-url').value = '';
+      document.getElementById('prod-img-preview').src = '';
+      document.getElementById('prod-img-preview').style.display = 'none';
+      document.getElementById('prod-img-placeholder').style.display = 'block';
+
       document.querySelector('input[name="downloadType"][value="local"]').checked = true;
       toggleDownloadType();
       document.getElementById('product-modal').style.display = 'block';
@@ -556,6 +950,7 @@
       document.getElementById('modal-title').innerText = 'Chỉnh Sửa Bộ LispCAD';
       document.getElementById('prod-id').value = p.id;
       document.getElementById('prod-name').value = p.name;
+      document.getElementById('prod-category').value = p.category || 'Vẽ nhanh';
       document.getElementById('prod-price').value = p.price;
       document.getElementById('prod-oldprice').value = p.oldPrice || '';
       document.getElementById('prod-commands').value = p.commands || '';
@@ -563,6 +958,19 @@
       document.getElementById('prod-instructions').value = p.instructions || '';
       document.getElementById('prod-videourl').value = p.videoUrl || '';
       document.getElementById('prod-active').checked = p.isActive;
+
+      // Nạp ảnh minh họa hiện tại
+      document.getElementById('prod-image-file').value = '';
+      document.getElementById('prod-image-url').value = p.imageUrl || '';
+      if (p.imageUrl) {
+        document.getElementById('prod-img-preview').src = p.imageUrl;
+        document.getElementById('prod-img-preview').style.display = 'block';
+        document.getElementById('prod-img-placeholder').style.display = 'none';
+      } else {
+        document.getElementById('prod-img-preview').src = '';
+        document.getElementById('prod-img-preview').style.display = 'none';
+        document.getElementById('prod-img-placeholder').style.display = 'block';
+      }
 
       if (p.downloadType === 'link') {
         document.querySelector('input[name="downloadType"][value="link"]').checked = true;
@@ -573,6 +981,31 @@
       }
       toggleDownloadType();
       document.getElementById('product-modal').style.display = 'block';
+    }
+
+    function previewProductImage(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('prod-img-preview').src = e.target.result;
+          document.getElementById('prod-img-preview').style.display = 'block';
+          document.getElementById('prod-img-placeholder').style.display = 'none';
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    function previewProductImageUrl(url) {
+      const trimmed = (url || '').trim();
+      if (trimmed.length > 5) {
+        document.getElementById('prod-img-preview').src = trimmed;
+        document.getElementById('prod-img-preview').style.display = 'block';
+        document.getElementById('prod-img-placeholder').style.display = 'none';
+      } else {
+        document.getElementById('prod-img-preview').src = '';
+        document.getElementById('prod-img-preview').style.display = 'none';
+        document.getElementById('prod-img-placeholder').style.display = 'block';
+      }
     }
 
     function closeProductModal() {
@@ -595,6 +1028,7 @@
       const form = new FormData();
       form.append('id', document.getElementById('prod-id').value);
       form.append('name', document.getElementById('prod-name').value);
+      form.append('category', document.getElementById('prod-category').value);
       form.append('price', document.getElementById('prod-price').value);
       form.append('oldPrice', document.getElementById('prod-oldprice').value);
       form.append('commands', document.getElementById('prod-commands').value);
@@ -602,6 +1036,13 @@
       form.append('instructions', document.getElementById('prod-instructions').value);
       form.append('videoUrl', document.getElementById('prod-videourl').value);
       form.append('isActive', document.getElementById('prod-active').checked);
+
+      // Ảnh minh họa / GIF
+      const imgFileInput = document.getElementById('prod-image-file');
+      if (imgFileInput.files && imgFileInput.files[0]) {
+        form.append('imageFile', imgFileInput.files[0]);
+      }
+      form.append('imageUrl', document.getElementById('prod-image-url').value);
 
       const downloadType = document.querySelector('input[name="downloadType"]:checked').value;
       form.append('downloadType', downloadType);
@@ -629,6 +1070,440 @@
     async function deleteProduct(id) {
       if (!confirm('Bạn có chắc chắn muốn xóa bộ Lisp này không?')) return;
       const res = await fetch('/api/admin/product/' + id, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) loadDashboardData();
+    }
+
+    // ==========================================
+    // QUẢN LÝ TÀI LIỆU & GIÁO TRÌNH CAD (HỖ TRỢ 2-3 ẢNH & NHIỀU FILE/LINK DRIVE)
+    // ==========================================
+    let docCurrentImages = [];
+
+    function renderAdminDocuments(docs) {
+      const tbody = document.getElementById('documents-table-body');
+      tbody.innerHTML = '';
+      if (!docs || docs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 25px;">Chưa có tài liệu giáo trình nào. Bấm "+ Thêm Tài Liệu Mới".</td></tr>';
+        return;
+      }
+      const countEl = document.getElementById('admin-docs-count-text');
+      if (countEl) countEl.innerText = `Tổng: ${docs.length} bộ tài liệu & giáo trình`;
+
+      docs.forEach(d => {
+        const tr = document.createElement('tr');
+        tr.style.cursor = 'pointer';
+
+        // Ảnh minh họa đại diện
+        const hasImages = d.images && d.images.length > 0;
+        const firstImg = hasImages ? d.images[0] : '';
+        const imgCount = hasImages ? d.images.length : 0;
+
+        const thumbHtml = hasImages 
+          ? `<div style="position: relative; width: 68px; height: 48px; border-radius: 6px; overflow: hidden; border: 1px solid var(--card-border); background: #091422;">
+               <img src="${firstImg}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+               <span style="position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.75); color: #38bdf8; font-size: 0.65rem; font-weight: 700; padding: 1px 4px; border-radius: 3px;">${imgCount} ảnh</span>
+             </div>`
+          : `<div style="width: 68px; height: 48px; border-radius: 6px; background: #091422; border: 1px dashed var(--card-border); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--text-muted);">
+               0 ảnh
+             </div>`;
+
+        // Danh sách file & link Drive
+        const filesCount = d.files ? d.files.length : (d.downloadUrl ? 1 : 0);
+        let filesSummaryHtml = '';
+        if (d.files && d.files.length > 0) {
+          const pdfFile = d.files.find(f => isPdfResource(f.url, f.name, d.format));
+          const pdfPreviewLink = (pdfFile && pdfFile.url) 
+            ? `<a href="javascript:void(0)" onclick="event.stopPropagation(); openAdminPdfPreview('${encodeURIComponent(pdfFile.url)}', '${encodeURIComponent(pdfFile.name || d.title)}')" style="color: #38bdf8; font-size: 0.76rem; text-decoration: underline; display: inline-flex; align-items: center; gap: 3px; margin-top: 4px;"><span>👁️</span> Xem thử PDF</a>` 
+            : '';
+
+          filesSummaryHtml = `
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3); width: fit-content;">
+                📁 ${filesCount} file / link Drive
+              </span>
+              <small style="color: var(--text-muted); font-size: 0.75rem;">
+                ${d.files.map(f => f.name).slice(0, 2).join(', ')}${d.files.length > 2 ? '...' : ''}
+              </small>
+              ${pdfPreviewLink}
+            </div>
+          `;
+        } else {
+          const isPdf = isPdfResource(d.downloadUrl, d.title, d.format);
+          const pdfPreviewLink = (isPdf && d.downloadUrl)
+            ? `<a href="javascript:void(0)" onclick="event.stopPropagation(); openAdminPdfPreview('${encodeURIComponent(d.downloadUrl)}', '${encodeURIComponent(d.title)}')" style="color: #38bdf8; font-size: 0.76rem; text-decoration: underline; margin-left: 6px;">[👁 Xem thử PDF]</a>`
+            : '';
+
+          filesSummaryHtml = `<a href="${d.downloadUrl || '#'}" target="_blank" style="color: var(--accent-cyan); text-decoration: underline; font-size: 0.85rem;">${d.downloadType === 'local' ? 'File tải về' : 'Link Google Drive'}</a> ${pdfPreviewLink}`;
+        }
+
+        // Giá bán (Có phí / Miễn phí)
+        const isFree = d.isFree !== false && (!d.price || Number(d.price) === 0);
+        const priceHtml = isFree
+          ? `<span style="background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3);">Miễn phí</span>`
+          : `<div style="display: flex; flex-direction: column;">
+               <strong style="color: #00e676; font-size: 0.9rem;">${Number(d.price).toLocaleString()}đ</strong>
+               ${d.oldPrice ? `<small style="text-decoration: line-through; color: #94a3b8; font-size: 0.72rem;">${Number(d.oldPrice).toLocaleString()}đ</small>` : ''}
+             </div>`;
+
+        tr.innerHTML = `
+          <td>${thumbHtml}</td>
+          <td>
+            <strong style="color: #f8fafc; font-size: 0.95rem;">${d.title}</strong>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 3px;">${d.description || ''}</div>
+          </td>
+          <td><span style="background: rgba(14, 165, 233, 0.15); color: #38bdf8; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; border: 1px solid rgba(14, 165, 233, 0.3); font-weight: 600;">${d.category || 'Tài liệu'}</span></td>
+          <td>${priceHtml}</td>
+          <td>
+            <strong style="color: #f59e0b; display: block; font-size: 0.85rem;">${d.format || 'DWG / ZIP'}</strong>
+            <span style="color: var(--text-muted); font-size: 0.8rem;">${d.size || 'N/A'}</span>
+            <div style="margin-top: 4px;">
+              <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">Đọc thử: ${d.previewPages || 10} trang</span>
+            </div>
+          </td>
+          <td>${filesSummaryHtml}</td>
+          <td>
+            <button class="btn-sm btn-secondary" onclick="event.stopPropagation(); editDocById('${d.id}')">Sửa</button>
+            <button class="btn-sm btn-danger" onclick="event.stopPropagation(); deleteDoc('${d.id}')">Xóa</button>
+          </td>
+        `;
+
+        tr.onclick = () => editDocById(d.id);
+        tbody.appendChild(tr);
+      });
+    }
+
+    // --- QUẢN LÝ 2-3 ẢNH MINH HỌA ---
+    function handleDocImagesFileChange(input) {
+      if (!input.files || input.files.length === 0) return;
+      const files = Array.from(input.files);
+      
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          docCurrentImages.push({
+            type: 'new',
+            file: file,
+            previewUrl: e.target.result,
+            name: file.name
+          });
+          renderDocImagesPreviews();
+        };
+        reader.readAsDataURL(file);
+      });
+      input.value = '';
+    }
+
+    function renderDocImagesPreviews() {
+      const container = document.getElementById('doc-images-preview-grid');
+      const countLabel = document.getElementById('doc-images-count-label');
+      container.innerHTML = '';
+      countLabel.innerText = `${docCurrentImages.length} ảnh`;
+
+      if (docCurrentImages.length === 0) {
+        container.innerHTML = '<span style="color: var(--text-muted); font-size: 0.82rem; padding: 10px;">Chưa có ảnh minh họa nào. Hãy bấm nút chọn 2-3 ảnh ở trên.</span>';
+        return;
+      }
+
+      docCurrentImages.forEach((imgItem, idx) => {
+        const box = document.createElement('div');
+        box.style.cssText = 'position: relative; width: 110px; height: 80px; border-radius: 8px; overflow: hidden; border: 1px solid var(--accent-cyan); background: #0b192c; flex-shrink: 0;';
+        
+        const src = imgItem.type === 'existing' ? imgItem.url : imgItem.previewUrl;
+        box.innerHTML = `
+          <img src="${src}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+          <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); display: flex; justify-content: space-between; align-items: center; padding: 2px 6px;">
+            <span style="font-size: 0.65rem; color: #38bdf8;">Ảnh ${idx + 1}</span>
+            <button type="button" onclick="removeDocImage(${idx})" style="background: none; border: none; color: #ef4444; font-size: 0.85rem; font-weight: 900; cursor: pointer; padding: 0;" title="Xóa ảnh này">&times;</button>
+          </div>
+        `;
+        container.appendChild(box);
+      });
+    }
+
+    function removeDocImage(index) {
+      docCurrentImages.splice(index, 1);
+      renderDocImagesPreviews();
+    }
+
+    // --- QUẢN LÝ NHIỀU FILE & LINK GOOGLE DRIVE ---
+    let docFileRowCounter = 0;
+
+    function addDocFileRow(fileData = null) {
+      docFileRowCounter++;
+      const rowId = 'doc_file_row_' + docFileRowCounter;
+      const container = document.getElementById('doc-files-container');
+
+      const nameVal = fileData ? fileData.name : `Phần ${container.children.length + 1} - File đính kèm`;
+      const typeVal = fileData ? fileData.type : 'link';
+      const urlVal = fileData ? (fileData.url || '') : '';
+      const sizeVal = fileData ? (fileData.size || '10 MB') : '10 MB';
+
+      const row = document.createElement('div');
+      row.className = 'doc-file-row';
+      row.id = rowId;
+      row.style.cssText = 'background: #111d2d; border: 1px solid var(--card-border); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;';
+
+      row.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.78rem; font-weight: 700; color: #38bdf8; text-transform: uppercase;">
+            📄 File #${container.children.length + 1}
+          </span>
+          <button type="button" onclick="removeDocFileRow('${rowId}')" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 6px; padding: 3px 8px; font-size: 0.75rem; cursor: pointer;">
+            ✕ Xóa file này
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px;">
+          <div>
+            <label style="font-size: 0.78rem; color: #94a3b8; display: block; margin-bottom: 3px;">Tên file / Nội dung bản vẽ:</label>
+            <input type="text" class="df-name" value="${nameVal}" placeholder="VD: Bản vẽ kiến trúc cửa & vách (DWG)" required style="width: 100%; padding: 8px; background: #091422; border: 1px solid var(--card-border); color: #fff; border-radius: 6px; font-size: 0.85rem;">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; color: #94a3b8; display: block; margin-bottom: 3px;">Dung lượng (ước tính):</label>
+            <input type="text" class="df-size" value="${sizeVal}" placeholder="VD: 15.2 MB" style="width: 100%; padding: 8px; background: #091422; border: 1px solid var(--card-border); color: #fff; border-radius: 6px; font-size: 0.85rem;">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 140px 1fr; gap: 8px; align-items: center;">
+          <div>
+            <label style="font-size: 0.78rem; color: #94a3b8; display: block; margin-bottom: 3px;">Hình thức:</label>
+            <select class="df-type" onchange="toggleSingleFileRowType('${rowId}')" style="width: 100%; padding: 8px; background: #091422; border: 1px solid var(--card-border); color: #38bdf8; border-radius: 6px; font-size: 0.82rem; font-weight: 600;">
+              <option value="link" ${typeVal === 'link' ? 'selected' : ''}>Link Google Drive</option>
+              <option value="local" ${typeVal === 'local' ? 'selected' : ''}>Tải file từ máy</option>
+            </select>
+          </div>
+          <div class="df-link-box" style="${typeVal === 'local' ? 'display: none;' : ''}">
+            <label style="font-size: 0.78rem; color: #94a3b8; display: block; margin-bottom: 3px;">Dán đường link tải Google Drive:</label>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input type="url" class="df-url" value="${urlVal}" placeholder="https://drive.google.com/file/d/.../view?usp=sharing" style="flex: 1; padding: 8px; background: #091422; border: 1px solid var(--card-border); color: #fff; border-radius: 6px; font-size: 0.85rem;">
+              <button type="button" class="btn-sm btn-secondary" onclick="testPdfFromRow(this)" style="padding: 7px 10px; font-size: 0.8rem; background: #1e293b; color: #38bdf8; border: 1px solid #334155; cursor: pointer; white-space: nowrap;" title="Xem thử link Google Drive / PDF này">
+                👁 Xem thử PDF
+              </button>
+            </div>
+          </div>
+          <div class="df-file-box" style="${typeVal === 'local' ? '' : 'display: none;'}">
+            <label style="font-size: 0.78rem; color: #94a3b8; display: block; margin-bottom: 3px;">Chọn file từ máy (.dwg, .zip, .pdf...):</label>
+            <input type="file" class="df-file-input" style="font-size: 0.8rem; color: #94a3b8;">
+            <input type="hidden" class="df-existing-url" value="${typeVal === 'local' ? urlVal : ''}">
+            <span class="df-file-current-label" style="font-size: 0.75rem; color: #38bdf8; display: block; margin-top: 2px;">
+              ${typeVal === 'local' && urlVal ? 'Đã có file: ' + urlVal : ''}
+            </span>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(row);
+    }
+
+    function toggleSingleFileRowType(rowId) {
+      const row = document.getElementById(rowId);
+      if (!row) return;
+      const type = row.querySelector('.df-type').value;
+      const linkBox = row.querySelector('.df-link-box');
+      const fileBox = row.querySelector('.df-file-box');
+
+      if (type === 'link') {
+        linkBox.style.display = 'block';
+        fileBox.style.display = 'none';
+      } else {
+        linkBox.style.display = 'none';
+        fileBox.style.display = 'block';
+      }
+    }
+
+    function removeDocFileRow(rowId) {
+      const row = document.getElementById(rowId);
+      if (row) row.remove();
+    }
+
+    function toggleDocPricingType() {
+      const type = document.querySelector('input[name="docPricingType"]:checked').value;
+      const priceRow = document.getElementById('doc-price-inputs-row');
+      if (type === 'paid') {
+        priceRow.style.display = 'grid';
+      } else {
+        priceRow.style.display = 'none';
+      }
+    }
+
+    // Mở modal thêm mới
+    function openDocModal() {
+      document.getElementById('doc-modal-title').innerText = 'Thêm Tài Liệu & Giáo Trình Mới';
+      document.getElementById('doc-id').value = '';
+      document.getElementById('doc-title').value = '';
+      document.getElementById('doc-category').value = 'Thư viện DWG';
+      document.getElementById('doc-format').value = 'DWG / ZIP';
+      document.getElementById('doc-size').value = '45.2 MB';
+      document.getElementById('doc-author').value = 'Tin Học Click';
+      document.getElementById('doc-desc').value = '';
+      document.getElementById('doc-preview-pages').value = '10';
+
+      // Reset giá bán
+      document.querySelector('input[name="docPricingType"][value="free"]').checked = true;
+      document.getElementById('doc-price').value = '';
+      document.getElementById('doc-oldprice').value = '';
+      toggleDocPricingType();
+
+      // Reset ảnh
+      docCurrentImages = [];
+      renderDocImagesPreviews();
+
+      // Reset file list
+      document.getElementById('doc-files-container').innerHTML = '';
+      addDocFileRow({ name: 'Phần 1 - Thư viện Block Bản vẽ DWG', type: 'link', url: '', size: '20 MB' });
+      addDocFileRow({ name: 'Phần 2 - Tài liệu hướng dẫn sử dụng (PDF)', type: 'link', url: '', size: '5 MB' });
+
+      document.getElementById('doc-modal').style.display = 'block';
+    }
+
+    function closeDocModal() {
+      document.getElementById('doc-modal').style.display = 'none';
+    }
+
+    // Mở modal sửa tài liệu
+    function editDocById(id) {
+      if (!globalData || !globalData.documents) return;
+      const d = globalData.documents.find(x => x.id === id);
+      if (!d) return;
+
+      document.getElementById('doc-modal-title').innerText = 'Chỉnh Sửa Bộ Tài Liệu & Giáo Trình';
+      document.getElementById('doc-id').value = d.id;
+      document.getElementById('doc-title').value = d.title || '';
+      document.getElementById('doc-category').value = d.category || 'Thư viện DWG';
+      document.getElementById('doc-format').value = d.format || 'DWG / ZIP';
+      document.getElementById('doc-size').value = d.size || '';
+      document.getElementById('doc-author').value = d.author || 'Tin Học Click';
+      document.getElementById('doc-desc').value = d.description || '';
+      document.getElementById('doc-preview-pages').value = d.previewPages || 10;
+
+      // Nạp giá bán
+      const isPaid = Number(d.price) > 0;
+      if (isPaid) {
+        document.querySelector('input[name="docPricingType"][value="paid"]').checked = true;
+        document.getElementById('doc-price').value = d.price || '';
+        document.getElementById('doc-oldprice').value = d.oldPrice || '';
+      } else {
+        document.querySelector('input[name="docPricingType"][value="free"]').checked = true;
+        document.getElementById('doc-price').value = '';
+        document.getElementById('doc-oldprice').value = '';
+      }
+      toggleDocPricingType();
+
+      // Nạp ảnh minh họa
+      docCurrentImages = (d.images || []).map(url => ({
+        type: 'existing',
+        url: url
+      }));
+      renderDocImagesPreviews();
+
+      // Nạp danh sách file & link Drive
+      const filesContainer = document.getElementById('doc-files-container');
+      filesContainer.innerHTML = '';
+
+      if (d.files && d.files.length > 0) {
+        d.files.forEach(f => addDocFileRow(f));
+      } else if (d.downloadUrl) {
+        addDocFileRow({
+          name: d.title,
+          type: d.downloadType || 'link',
+          url: d.downloadUrl,
+          size: d.size || '10 MB'
+        });
+      } else {
+        addDocFileRow();
+      }
+
+      document.getElementById('doc-modal').style.display = 'block';
+    }
+
+    // Lưu Tài liệu (Hỗ trợ Giá bán + 2-3 ảnh + nhiều file/link Drive)
+    async function saveDoc(e) {
+      e.preventDefault();
+      const form = new FormData();
+      form.append('id', document.getElementById('doc-id').value);
+      form.append('title', document.getElementById('doc-title').value);
+      form.append('category', document.getElementById('doc-category').value);
+      form.append('format', document.getElementById('doc-format').value);
+      form.append('size', document.getElementById('doc-size').value);
+      form.append('author', document.getElementById('doc-author').value);
+      form.append('description', document.getElementById('doc-desc').value);
+      form.append('previewPages', document.getElementById('doc-preview-pages').value || '10');
+
+      // Giá bán
+      const isPaidType = document.querySelector('input[name="docPricingType"]:checked').value === 'paid';
+      const inputPrice = isPaidType ? (Number(document.getElementById('doc-price').value) || 0) : 0;
+      const isActuallyPaid = isPaidType && inputPrice > 0;
+      form.append('isFree', !isActuallyPaid);
+      form.append('price', isActuallyPaid ? inputPrice : 0);
+      form.append('oldPrice', isActuallyPaid ? (document.getElementById('doc-oldprice').value || '') : '');
+
+      // 1. Ảnh minh họa (giữ ảnh cũ + gửi ảnh mới)
+      const existingImages = docCurrentImages.filter(i => i.type === 'existing').map(i => i.url);
+      form.append('existingImages', JSON.stringify(existingImages));
+
+      docCurrentImages.filter(i => i.type === 'new').forEach(imgItem => {
+        form.append('docImages', imgItem.file);
+      });
+
+      // 2. Danh sách file & link Drive
+      const fileRows = document.querySelectorAll('#doc-files-container .doc-file-row');
+      const filesList = [];
+
+      fileRows.forEach((row, idx) => {
+        const name = row.querySelector('.df-name').value;
+        const size = row.querySelector('.df-size').value;
+        const type = row.querySelector('.df-type').value;
+        const urlInput = row.querySelector('.df-url');
+        const fileInput = row.querySelector('.df-file-input');
+        const existingUrlInput = row.querySelector('.df-existing-url');
+
+        const fileItem = {
+          id: 'f_' + Date.now() + '_' + idx,
+          name: name,
+          size: size,
+          type: type,
+          url: ''
+        };
+
+        if (type === 'link') {
+          fileItem.url = urlInput.value.trim();
+        } else {
+          // local file
+          if (fileInput.files && fileInput.files[0]) {
+            const fileKey = 'file_upload_' + idx;
+            fileItem.fileKey = fileKey;
+            form.append(fileKey, fileInput.files[0]);
+          } else {
+            fileItem.url = existingUrlInput.value || '';
+          }
+        }
+
+        filesList.push(fileItem);
+      });
+
+      form.append('filesJson', JSON.stringify(filesList));
+
+      try {
+        const res = await fetch('/api/admin/document', {
+          method: 'POST',
+          body: form
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Đã lưu bộ tài liệu thành công!');
+          closeDocModal();
+          loadDashboardData();
+        } else {
+          alert(data.error || 'Có lỗi xảy ra');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ');
+      }
+    }
+
+    async function deleteDoc(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa bộ tài liệu này?')) return;
+      const res = await fetch('/api/admin/document/' + id, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) loadDashboardData();
     }
@@ -678,6 +1553,279 @@
       const res = await fetch('/api/admin/order/' + orderCode, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) loadDashboardData();
+    }
+
+    // ==========================================
+    // QUẢN LÝ BÀI GIẢNG KHÓA HỌC 2D (THEO ẢNH 1 MOCKUP)
+    // ==========================================
+    function renderAdminLessons(lessons) {
+      const container = document.getElementById('admin-lessons-list');
+      container.innerHTML = '';
+
+      if (!lessons || lessons.length === 0) {
+        container.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 30px;">Chưa có bài học nào. Bấm "+ Thêm Bài Học Mới".</div>';
+        return;
+      }
+
+      document.getElementById('admin-lessons-count-text').innerText = `Tổng: ${lessons.length} bài học`;
+
+      lessons.forEach(l => {
+        const isLocked = Boolean(l.isLocked);
+        const card = document.createElement('div');
+        card.style.cssText = 'background: #0d1117; border: 1px solid var(--card-border); border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px;';
+
+        const iconBg = isLocked ? 'background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); color: #fbbf24;' : 'background: rgba(2, 132, 199, 0.15); border: 1px solid rgba(2, 132, 199, 0.35); color: #38bdf8;';
+        const iconSymbol = isLocked ? '🔒' : '📹';
+        const badgeClass = isLocked ? 'background: #451a03; color: #fbbf24; border: 1px solid #78350f;' : 'background: #022c22; color: #34d399; border: 1px solid #065f46;';
+        const badgeText = isLocked ? 'ĐÃ KHÓA' : 'ĐANG MỞ';
+
+        const toggleBtnStyle = isLocked 
+          ? 'background: rgba(245, 158, 11, 0.18); border: 1px solid rgba(245, 158, 11, 0.5); color: #fbbf24;' 
+          : 'background: rgba(16, 185, 129, 0.18); border: 1px solid rgba(16, 185, 129, 0.5); color: #34d399;';
+        const toggleBtnText = isLocked ? '🔓 Bấm để Mở khóa' : '🔒 Bấm để Khóa';
+
+        card.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
+            <div style="width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; ${iconBg}">
+              ${iconSymbol}
+            </div>
+            <div style="min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+                <span style="font-size: 0.72rem; font-weight: 700; color: #38bdf8; text-transform: uppercase;">AUTOCAD 2D CƠ BẢN</span>
+                <span style="color: #64748b;">•</span>
+                <span style="font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 10px; ${badgeClass}">
+                  ${badgeText}
+                </span>
+              </div>
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${l.title}
+              </h4>
+              <div style="font-size: 0.8rem; color: #64748b; font-family: monospace;">
+                ⏱ ${l.duration || '15:00'}
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+            <button onclick="toggleLessonLock('${l.id}')" style="padding: 7px 12px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; cursor: pointer; ${toggleBtnStyle}">
+              ${toggleBtnText}
+            </button>
+            <button onclick="editLessonById('${l.id}')" class="btn-sm btn-secondary" style="padding: 7px 10px; font-size: 0.78rem;">
+              ✏ Sửa
+            </button>
+            <button onclick="deleteLesson('${l.id}')" class="btn-sm btn-danger" style="padding: 7px 10px; font-size: 0.78rem;">
+              🗑
+            </button>
+            <a href="/learn.html?lesson=${l.id}" target="_blank" class="btn-sm btn-primary" style="text-decoration: none; padding: 7px 12px; font-size: 0.78rem;">
+              Xem bài
+            </a>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function toggleLessonLock(id) {
+      try {
+        const res = await fetch(`/api/admin/lessons/${id}/toggle-lock`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          loadDashboardData();
+        }
+      } catch (e) {
+        alert('Lỗi thao tác!');
+      }
+    }
+
+    function openLessonModal() {
+      document.getElementById('lesson-modal-title').innerText = 'Thêm Bài Giảng Khóa Học 2D Mới';
+      document.getElementById('lesson-id').value = '';
+      document.getElementById('lesson-title').value = '';
+      document.getElementById('lesson-duration').value = '15:00';
+      document.getElementById('lesson-videourl').value = '';
+      document.getElementById('lesson-desc').value = '';
+      document.getElementById('lesson-summary').value = '';
+      document.getElementById('lesson-keynotes').value = '';
+      document.getElementById('lesson-pdfurl').value = '';
+      document.getElementById('lesson-dwgurl').value = '';
+      document.getElementById('lesson-isopen').checked = false;
+      document.getElementById('lesson-modal').style.display = 'flex';
+    }
+
+    function editLessonById(id) {
+      if (!globalData || !globalData.lessons) return;
+      const lesson = globalData.lessons.find(l => l.id === id);
+      if (!lesson) return;
+
+      document.getElementById('lesson-modal-title').innerText = 'Chỉnh Sửa Bài Giảng: ' + lesson.title;
+      document.getElementById('lesson-id').value = lesson.id;
+      document.getElementById('lesson-title').value = lesson.title || '';
+      document.getElementById('lesson-duration').value = lesson.duration || '';
+      document.getElementById('lesson-videourl').value = lesson.videoUrl || '';
+      document.getElementById('lesson-desc').value = lesson.description || '';
+      document.getElementById('lesson-summary').value = Array.isArray(lesson.summary) ? lesson.summary.join('\n') : (lesson.summary || '');
+      document.getElementById('lesson-keynotes').value = Array.isArray(lesson.keyNotes) ? lesson.keyNotes.join('\n') : (lesson.keyNotes || '');
+      document.getElementById('lesson-pdfurl').value = lesson.pdfUrl || '';
+      document.getElementById('lesson-dwgurl').value = lesson.dwgUrl || '';
+      document.getElementById('lesson-isopen').checked = !lesson.isLocked;
+      document.getElementById('lesson-modal').style.display = 'flex';
+    }
+
+    function closeLessonModal() {
+      document.getElementById('lesson-modal').style.display = 'none';
+    }
+
+    async function saveLesson(e) {
+      e.preventDefault();
+      const id = document.getElementById('lesson-id').value;
+      const title = document.getElementById('lesson-title').value;
+      const duration = document.getElementById('lesson-duration').value;
+      const videoUrl = document.getElementById('lesson-videourl').value;
+      const description = document.getElementById('lesson-desc').value;
+      const summary = document.getElementById('lesson-summary').value;
+      const keyNotes = document.getElementById('lesson-keynotes').value;
+      const pdfUrl = document.getElementById('lesson-pdfurl').value;
+      const dwgUrl = document.getElementById('lesson-dwgurl').value;
+      const isLocked = !document.getElementById('lesson-isopen').checked;
+
+      const res = await fetch('/api/admin/lesson', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id, title, duration, videoUrl, description, summary, keyNotes, pdfUrl, dwgUrl, isLocked
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Đã lưu bài học thành công!');
+        closeLessonModal();
+        loadDashboardData();
+      } else {
+        alert(data.error || 'Có lỗi xảy ra');
+      }
+    }
+
+    async function deleteLesson(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa bài học này khỏi giáo trình?')) return;
+      const res = await fetch('/api/admin/lesson/' + id, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) loadDashboardData();
+    }
+
+    // ==========================================
+    // QUẢN LÝ HỌC VIÊN
+    // ==========================================
+    function renderStudents(students) {
+      const tbody = document.getElementById('students-table-body');
+      tbody.innerHTML = '';
+
+      if (!students || students.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Chưa có học viên nào đăng ký.</td></tr>';
+        return;
+      }
+
+      students.forEach(u => {
+        const hasCourse = u.enrolledCourses && u.enrolledCourses.includes('prod_course_2d');
+        const dateStr = u.createdAt ? new Date(u.createdAt).toLocaleDateString('vi-VN') : 'N/A';
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td><strong>${u.name}</strong> <span style="font-size: 0.75rem; color: #38bdf8;">(${u.role || 'Học viên'})</span></td>
+          <td><a href="tel:${u.phone}" style="color: var(--accent-cyan);">${u.phone || 'N/A'}</a></td>
+          <td>${u.email || 'N/A'}</td>
+          <td>
+            ${hasCourse 
+              ? '<span class="status-badge status-paid">✓ Đã kích hoạt 2D</span>' 
+              : '<span class="status-badge status-pending">Chưa sở hữu</span>'}
+          </td>
+          <td style="font-size: 0.85rem; color: var(--text-muted);">${dateStr}</td>
+          <td>
+            <button onclick="toggleStudentEnroll('${u.id}')" class="btn-sm ${hasCourse ? 'btn-danger' : 'btn-success'}" style="font-size: 0.78rem;">
+              ${hasCourse ? 'Khóa quyền' : 'Kích hoạt Khóa 2D'}
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function toggleStudentEnroll(userId) {
+      const res = await fetch(`/api/admin/students/${userId}/toggle-enroll`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) loadDashboardData();
+    }
+
+    async function loadStudentsData() {
+      try {
+        const res = await fetch('/api/admin/students');
+        const data = await res.json();
+        if (data.success) renderStudents(data.students);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // --- HỖ TRỢ XEM TRƯỚC FILE PDF TRỰC TUYẾN (ADMIN) ---
+    let currentAdminPdfUrl = '';
+    let currentAdminRawUrl = '';
+
+    function isPdfResource(url, filename, format) {
+      const str = `${url || ''} ${filename || ''} ${format || ''}`.toLowerCase();
+      if (str.includes('.pdf') || str.includes('pdf')) return true;
+      if (url && url.includes('drive.google.com') && (str.includes('pdf') || str.includes('giáo trình') || str.includes('sách') || str.includes('tài liệu'))) return true;
+      return false;
+    }
+
+    function getPdfEmbedUrl(url) {
+      if (!url) return '';
+      const m1 = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (m1 && m1[1]) {
+        return `https://drive.google.com/file/d/${m1[1]}/preview`;
+      }
+      const m2 = url.match(/id=([a-zA-Z0-9_-]+)/);
+      if (m2 && m2[1]) {
+        return `https://drive.google.com/file/d/${m2[1]}/preview`;
+      }
+      return url;
+    }
+
+    function openAdminPdfPreview(encodedUrl, encodedTitle) {
+      const rawUrl = decodeURIComponent(encodedUrl);
+      const title = decodeURIComponent(encodedTitle);
+      currentAdminRawUrl = rawUrl;
+      currentAdminPdfUrl = getPdfEmbedUrl(rawUrl);
+
+      document.getElementById('fullscreen-pdf-title').innerText = title || 'Xem Trước File PDF';
+      document.getElementById('fullscreen-pdf-iframe').src = currentAdminPdfUrl;
+      document.getElementById('fullscreen-pdf-modal').style.display = 'flex';
+    }
+
+    function closeFullscreenPdfPreview() {
+      document.getElementById('fullscreen-pdf-modal').style.display = 'none';
+      document.getElementById('fullscreen-pdf-iframe').src = '';
+    }
+
+    function openPdfInNewTab() {
+      if (currentAdminRawUrl) {
+        window.open(currentAdminRawUrl, '_blank');
+      } else if (currentAdminPdfUrl) {
+        window.open(currentAdminPdfUrl, '_blank');
+      }
+    }
+
+    function testPdfFromRow(btn) {
+      const row = btn.closest('.doc-file-item');
+      if (!row) return;
+      const urlInput = row.querySelector('.df-url');
+      const nameInput = row.querySelector('.df-name');
+      const url = urlInput ? urlInput.value.trim() : '';
+      const name = nameInput ? nameInput.value.trim() : 'Bản xem trước PDF';
+      if (!url) {
+        alert('Vui lòng dán link Google Drive hoặc đường link PDF vào ô trước khi bấm xem thử!');
+        if (urlInput) urlInput.focus();
+        return;
+      }
+      openAdminPdfPreview(encodeURIComponent(url), encodeURIComponent(name));
     }
 
     // Tự động kiểm tra phiên đăng nhập ban đầu
