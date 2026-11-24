@@ -1,0 +1,838 @@
+{
+  "_id": "main_db",
+  "adminPassword": "admin",
+  "paymentSettings": {
+    "mode": "strict",
+    "qrType": "dynamic",
+    "bankName": "MBBank",
+    "accountNumber": "0329778016",
+    "accountHolder": "TO DUY KHANH",
+    "qrImageUrl": "",
+    "transferSyntax": "LISPCAD",
+    "zaloLink": "https://zalo.me/0329778016",
+    "facebookLink": "https://www.facebook.com/",
+    "supportPhone": "0329778016",
+    "note": "Khách quét mã sẽ tự động có số tiền và nội dung chuyển khoản."
+  },
+  "products": [
+    {
+      "id": "prod_1795520863375",
+      "createdAt": "2026-11-24T11:47:43.375Z",
+      "name": "IN BẢN VẼ HÀNG LOẠT+XUẤT THÀNH 1 FILE PDF+2 KHUNG CÙNG 1 LẦN IN",
+      "category": "Vẽ nhanh",
+      "price": 69000,
+      "oldPrice": 150000,
+      "description": "In hàng loạt Model & Layout trực tiếp ra 1 file PDF duy nhất (không cần máy in ảo). Hỗ trợ in gộp 2 loại khung & 2 khổ giấy khác nhau trong 1 lần quét, tự động chống tràn khung Dynamic Block và in Full Bleed sát mép.",
+      "commands": "MP, IN",
+      "instructions": "🔥 TÍNH NĂNG NỔI BẬT (PRO EDITION V6.2):\r\n- Xuất PDF trực tiếp từ AutoCAD (DWG To PDF.pc3), KHÔNG cần cài thêm máy in ảo hay phần mềm ghép PDF bên ngoài.\r\n- In cùng lúc 2 loại khung & 2 khổ giấy khác nhau (VD: vừa A3 vừa A4, trộn lẫn Block, Dynamic Block, Polyline/Rect, Xref) trong 1 lần quét chọn.\r\n- Tự động ghép tất cả bản vẽ thành 1 file PDF duy nhất (hoặc xuất từng file lẻ), tự động lưu gọn vào thư mục PDF_IN_HANG_LOAT ngoài Desktop.\r\n- Chống lỗi tràn khung Dynamic Block, in tràn viền Full Bleed 0-margin sát mép giấy.\r\n- Sắp xếp thứ tự in thông minh: Trái -> Phải, Trên -> Dưới, Pick tay, hoặc vẽ đường Line/Pline dẫn hướng ziczac tùy ý (có đường chỉ đỏ xem trước luồng in).\r\n- Nút \"Chỉnh nét...\" mở thẳng bảng chỉnh nét CTB trực quan.\r\n\r\n📌 CÁC BƯỚC THỰC HIỆN:\r\n- Bước 1: Tải file về, mở AutoCAD và gõ lệnh AP (APPLOAD) -> chọn file InHangLoat_MP_2LoaiKhung.lsp -> bấm Load (có thể thêm vào Startup Suite để dùng vĩnh viễn).\r\n- Bước 2: Gõ lệnh MP (hoặc IN) -> nhấn Enter để mở bảng điều khiển.\r\n- Bước 3: Chọn Khổ giấy, Nét in (.ctb) và kiểu xuất file (\"Ghép thành 1 file duy nhất\" hoặc \"Từng file riêng lẻ\").\r\n- Bước 4: Bấm nút \"CHỌN KHUNG 1\" rồi click vào 1 khung bản vẽ mẫu trên màn hình (Lisp tự nhận diện tên Block, Layer Polyline hoặc Xref). Nếu bản vẽ có thêm loại khung/khổ giấy thứ 2, tích chọn \"Dùng thêm loại khung thứ 2\" và bấm \"CHỌN KHUNG 2\".\r\n- Bước 5: Chọn Thứ tự in (Trái -> Phải, Trên -> Dưới, Theo đường Line hoặc Pick tay) -> bấm nút \"IN\".\r\n- Bước 6: Quét chọn toàn bộ vùng bản vẽ cần in -> nhấn Enter. Lisp sẽ tự động chạy từ đầu đến cuối không dừng lại hỏi xác nhận và tự mở thư mục chứa file PDF trên Desktop khi hoàn tất.",
+      "videoUrl": "https://youtu.be/YtVa5SSEdc4?si=ySf6zuh2p5t9pLtw",
+      "downloadType": "link",
+      "isActive": true,
+      "imageUrl": "/uploads/1795520863161_2126.png",
+      "downloadUrl": "https://drive.google.com/file/d/18FkXcDFdwqdjpBcu4UeFPWaR5VEAwS-O/view?usp=drive_link",
+      "downloadCount": 156
+    },
+    {
+      "id": "prod_1795520504944",
+      "createdAt": "2026-11-24T11:41:44.944Z",
+      "name": "Khóa học AutoCAD 2D Từ Cơ Bản Đến Nâng Cao",
+      "category": "Khóa học",
+      "price": 299000,
+      "oldPrice": 590000,
+      "description": "Khóa học video bài giảng AutoCAD 2D bài bản từ cơ bản đến nâng cao, thực chiến bản vẽ kỹ thuật.",
+      "commands": "ACAD 2D",
+      "instructions": "Khóa học trực tuyến kèm bộ giáo trình và file bài tập thực hành. Học viên được hỗ trợ trọn đời.",
+      "videoUrl": "",
+      "downloadType": "local",
+      "isActive": true,
+      "imageUrl": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600",
+      "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
+      "downloadCount": 320
+    },
+    {
+      "id": "prod_lisp_kientruc_ketcau",
+      "name": "BỘ LISP KIẾN TRÚC - KẾT CẤU TOÀN DIỆN (TRỤC, CỘT, TƯỜNG, CỬA, DIM 3 LỚP)",
+      "category": "Vẽ nhanh",
+      "price": 69000,
+      "oldPrice": 150000,
+      "commands": "VLT, VCOT, KT, FXT, VT, CD, CS, CUA, DT",
+      "description": "VLT (vẽ lưới trục), VCOT (chèn cột), KT (kéo trục kiểu Revit), FXT (sửa nét đứt trục), VT (vẽ tường bo góc & đục chữ T), CD/CS/CUA (chèn Block cửa đục tường), DT (Dim trục 3 lớp).",
+      "instructions": "Nạp lisp bằng lệnh APPLOAD, sử dụng các lệnh tắt: VLT, VCOT, KT, FXT, VT, DT.",
+      "videoUrl": "",
+      "downloadType": "link",
+      "downloadUrl": "https://drive.google.com/file/d/1CbVl8GWx_6OIqeJjkubODIqpliEKBCtU/view?usp=drive_link",
+      "isActive": true,
+      "imageUrl": "/uploads/1795519569399_2792.png",
+      "downloadCount": 265
+    },
+    {
+      "id": "prod_lisp_chuyen_font",
+      "name": "LISP CHUYỂN FONT & ĐỒNG BỘ MÃ TIẾNG VIỆT VỀ UNICODE ARIAL CHUẨN",
+      "category": "Text",
+      "price": 35000,
+      "oldPrice": 80000,
+      "commands": "CF, B4, BAN4",
+      "description": "Lệnh CF (hoặc B4): Tự động chuyển toàn bộ chữ lỗi font (TCVN3) sang Unicode Arial chuẩn, giữ nguyên định d���ng chữ HOA / chữ thường gốc, xử lý triệt để Text, MText, Dim, MLeader và cả chữ trong Block/Attribute.",
+      "instructions": "Bước 1: Nạp file LISP CHUYEN FONT-CF.lsp bằng APPLOAD.\\nBước 2: Gõ lệnh CF (hoặc B4) -> Enter.\\nBước 3: Lisp tự động quét chuyển sang Unicode Arial trong 1 giây.",
+      "videoUrl": "",
+      "downloadType": "link",
+      "downloadUrl": "https://drive.google.com/file/d/1nYSjjNI_zYkfwH-GpnspjXAI13OgV_Co/view?usp=sharing",
+      "isActive": true,
+      "imageUrl": "/uploads/1795519508898_4496.png",
+      "downloadCount": 412
+    },
+    {
+      "id": "prod_combo_116_lisp",
+      "name": "COMBO 116 LISP AUTOCAD ĐA NGÀNH ĐẦY ĐỦ NHẤT (20 NHÓM CHỨC NĂNG)",
+      "category": "Vẽ nhanh",
+      "price": 99000,
+      "oldPrice": 250000,
+      "commands": "FULL 116 LISP",
+      "description": "Tổng hợp 116 tiện ích AutoLISP chọn lọc phân chia theo 20 nhóm chức năng chuyên sâu cho kiến trúc, kết cấu, MEP, trắc địa và quy hoạch.",
+      "instructions": "Giải nén bộ file, tra cứu lệnh tắt trong file Excel kèm theo. Nạp từng Lisp qua lệnh APPLOAD.",
+      "videoUrl": "",
+      "downloadType": "link",
+      "downloadUrl": "https://drive.google.com/drive/folders/1_RxOflJnwVB3jfpDQJhpali3s8mE8Fd4?usp=sharing",
+      "isActive": true,
+      "imageUrl": "/uploads/1795519947648_5152.png",
+      "downloadCount": 589
+    },
+    {
+      "id": "prod_lisp_stt_tu_dong",
+      "name": "LISP ĐÁNH SỐ THỨ TỰ TỰ ĐỘNG (TEXT, MTEXT & BLOCK ATTRIBUTE)",
+      "category": "Text",
+      "price": 39000,
+      "oldPrice": 100000,
+      "commands": "DS",
+      "description": "Đánh số thứ tự tự động tăng dần 1, 2, 3... hoặc A, B, C... cho Text, MText và cả thuộc tính trong Block Attribute (Cửa, bản vẽ, trục...).",
+      "instructions": "Bước 1: Nạp file danh so thu tu-DS-TODUYKHANH.lsp bằng APPLOAD.\\nBước 2: Gõ lệnh DS -> Enter để mở hộp thoại cài đặt số bắt đầu và bước nhảy.",
+      "videoUrl": "",
+      "downloadType": "link",
+      "downloadUrl": "https://drive.google.com/file/d/1bTlU1D4GNGcc8AxSMv35I5W3D4izN83y/view?usp=sharing",
+      "isActive": true,
+      "imageUrl": "/uploads/1795519992374_5673.png",
+      "downloadCount": 198
+    }
+  ],
+  "orders": [],
+  "lessons": [
+    {
+      "id": "lesson-2d-1",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 1,
+      "title": "Bài 1 - Làm quen AutoCAD & Thiết lập ban đầu",
+      "duration": "12:45",
+      "isLocked": true,
+      "videoUrl": "https://player.mediadelivery.net/embed/771580/99e10cc1-db06-4bda-960a-b11c649cccc1?autoplay=false&loop=false&muted=false&preload=true&responsive=true",
+      "description": "Giới thiệu giao diện làm việc, hệ tọa độ WCS/UCS, cài đặt Options chuẩn và các thiết lập Drafting ban đầu.",
+      "summary": [
+        "Giao diện Ribbon, Command Line, Status Bar",
+        "Cách tùy chỉnh Options hiển thị và con trỏ chuột",
+        "Đơn vị đo Units và giới hạn bản vẽ Limits",
+        "Quản lý phím tắt và chuột trong AutoCAD"
+      ],
+      "keyNotes": [
+        "Phím F3: Bật/tắt bắt điểm Object Snap",
+        "Phím F8: Bật/tắt chế độ vuông góc Ortho"
+      ],
+      "pdfUrl": "https://drive.google.com/file/d/1iUAp1IVUXHu0ouWLestVLxLupbsmqY3a/view?usp=drive_link",
+      "dwgUrl": "",
+      "quiz": [
+        {
+          "question": "Phím tắt nào dùng để bật/tắt chế độ vẽ thẳng góc (Ortho) trong AutoCAD?",
+          "options": [
+            {
+              "key": "A",
+              "text": "F2"
+            },
+            {
+              "key": "B",
+              "text": "F3"
+            },
+            {
+              "key": "C",
+              "text": "F8"
+            },
+            {
+              "key": "D",
+              "text": "F9"
+            }
+          ],
+          "correctAnswer": "C",
+          "explanation": "F8 là phím tắt mặc định để bật/tắt chế độ Ortho Mode giúp các đường thẳng vuông góc 90 độ."
+        },
+        {
+          "question": "Để mở bảng cài đặt tùy chọn hệ thống (Options) trong AutoCAD, bạn gõ lệnh nào?",
+          "options": [
+            {
+              "key": "A",
+              "text": "OP"
+            },
+            {
+              "key": "B",
+              "text": "SET"
+            },
+            {
+              "key": "C",
+              "text": "OPT"
+            },
+            {
+              "key": "D",
+              "text": "PREF"
+            }
+          ],
+          "correctAnswer": "A",
+          "explanation": "Lệnh OP (Options) dùng để cài đặt hiển thị con trỏ, màu nền, đường dẫn lưu file."
+        }
+      ]
+    },
+    {
+      "id": "lesson-2d-2",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 2,
+      "title": "Bài 2 - Các lệnh vẽ cơ bản (Line, Circle, Arc, Rect)",
+      "duration": "15:28",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Nắm vững các lệnh vẽ hình học cơ bản: Line, Circle, Arc, Rectangle, Polygon.",
+      "summary": [
+        "Lệnh Line (L) và phương pháp nhập tọa độ tuyệt đối / tương đối",
+        "Lệnh Circle (C) - 6 phương thức vẽ đường tròn",
+        "Lệnh Rectangle (REC) - vẽ hình chữ nhật có kích thước chuẩn",
+        "Lệnh Arc (A) và Polygon (POL) vẽ đa giác đều"
+      ],
+      "keyNotes": [
+        "Nhập tọa độ cực tương đối: @khoảng_cách<góc (Ví dụ: @100<45)"
+      ],
+      "pdfUrl": "https://drive.google.com/file/d/1iUAp1IVUXHu0ouWLestVLxLupbsmqY3a/view?usp=drive_link",
+      "dwgUrl": "",
+      "quiz": [
+        {
+          "question": "Phím tắt của lệnh vẽ hình chữ nhật trong AutoCAD là gì?",
+          "options": [
+            {
+              "key": "A",
+              "text": "R"
+            },
+            {
+              "key": "B",
+              "text": "REC"
+            },
+            {
+              "key": "C",
+              "text": "RC"
+            },
+            {
+              "key": "D",
+              "text": "RECT"
+            }
+          ],
+          "correctAnswer": "B",
+          "explanation": "Lệnh REC (Rectangle) dùng để vẽ hình chữ nhật theo tọa độ 2 đỉnh đối diện."
+        }
+      ]
+    },
+    {
+      "id": "lesson-2d-3",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 3,
+      "title": "Bài 3 - Hiệu chỉnh đối tượng (Move, Copy, Rotate, Scale)",
+      "duration": "18:35",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Học cách biến đổi hình học chuẩn xác với Move, Copy, Rotate, Scale, Mirror.",
+      "summary": [
+        "Lệnh Move (M) & Copy (CO/CP) với base point chính xác",
+        "Lệnh Rotate (RO) quay góc chuẩn hoặc dùng Reference",
+        "Lệnh Scale (SC) tỉ lệ phóng to thu nhỏ",
+        "Lệnh Mirror (MI) lấy đối xứng qua trục đối xứng"
+      ],
+      "keyNotes": [
+        "Nhấn phím Cách (Space) để lặp lại lệnh vừa dùng mà không cần gõ lại"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": [
+        {
+          "question": "Muốn sao chép đối tượng trong AutoCAD ta dùng lệnh nào?",
+          "options": [
+            {
+              "key": "A",
+              "text": "C"
+            },
+            {
+              "key": "B",
+              "text": "CO hoặc CP"
+            },
+            {
+              "key": "C",
+              "text": "CC"
+            },
+            {
+              "key": "D",
+              "text": "COPYALL"
+            }
+          ],
+          "correctAnswer": "B",
+          "explanation": "Lệnh C là Circle (hình tròn), còn lệnh Copy là CO hoặc CP."
+        }
+      ]
+    },
+    {
+      "id": "lesson-2d-4",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 4,
+      "title": "Bài 4 - Lệnh TRIM - EXTEND",
+      "duration": "14:10",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Cắt tỉa và kéo dài đối tượng nhanh chóng, phân biệt chế độ Quick mode và Standard mode.",
+      "summary": [
+        "Lệnh TRIM (TR): Cắt các đoạn thẳng thừa giao nhau",
+        "Lệnh EXTEND (EX): Phóng kéo dài đối tượng tới biên giới hạn",
+        "Mẹo giữ phím Shift khi đang dùng TRIM để biến thành EXTEND và ngược lại"
+      ],
+      "keyNotes": [
+        "Trong CAD đời mới, nhấn Enter sau lệnh TR để dùng Quick Trim cắt mọi đường cắt tức thì"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": [
+        {
+          "question": "Khi đang thực hiện lệnh TRIM, giữ phím nào sẽ tạm thời chuyển sang lệnh EXTEND?",
+          "options": [
+            {
+              "key": "A",
+              "text": "Ctrl"
+            },
+            {
+              "key": "B",
+              "text": "Alt"
+            },
+            {
+              "key": "C",
+              "text": "Shift"
+            },
+            {
+              "key": "D",
+              "text": "Tab"
+            }
+          ],
+          "correctAnswer": "C",
+          "explanation": "Giữ phím Shift đảo ngược tính năng giữa Trim và Extend cực kỳ nhanh chóng."
+        }
+      ]
+    },
+    {
+      "id": "lesson-2d-5",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 5,
+      "title": "Bài 5 - Lệnh OFFSET",
+      "duration": "16:18",
+      "isLocked": true,
+      "videoUrl": "https://player.mediadelivery.net/embed/771580/6e6c58cb-56c5-4d55-873b-d3c958187d35?autoplay=false&loop=false&muted=false&preload=true&responsive=true",
+      "description": "Lệnh OFFSET dùng để tạo ra các đối tượng song song hoặc đồng tâm với đối tượng gốc.",
+      "summary": [
+        "Công dụng của lệnh OFFSET trong vẽ tường kiến trúc & cơ khí",
+        "Cách phát lệnh và nhập khoảng cách offset chính xác",
+        "Các tùy chọn nâng cao (Through, Erase, Layer)",
+        "Ví dụ thực tế vẽ tường nhà và tim trục"
+      ],
+      "keyNotes": [
+        "Cú pháp: OFFSET (phím tắt O) -> Nhập khoảng cách -> Chọn đối tượng -> Nhấp chuột về phía muốn tạo bản sao",
+        "Tùy chọn Through (T): Kéo điểm sao chép đi qua vị trí bất kỳ",
+        "Tùy chọn Multiple (M): Offset liên tục nhiều lần cùng khoảng cách"
+      ],
+      "pdfUrl": "https://drive.google.com/file/d/1iUAp1IVUXHu0ouWLestVLxLupbsmqY3a/view?usp=drive_link",
+      "dwgUrl": "",
+      "quiz": [
+        {
+          "question": "Lệnh OFFSET trong AutoCAD dùng để làm gì?",
+          "options": [
+            {
+              "key": "A",
+              "text": "Vẽ đường thẳng vuông góc"
+            },
+            {
+              "key": "B",
+              "text": "Tạo đối tượng song song hoặc đồng tâm"
+            },
+            {
+              "key": "C",
+              "text": "Cắt đối tượng thừa"
+            },
+            {
+              "key": "D",
+              "text": "Nối hai đối tượng"
+            }
+          ],
+          "correctAnswer": "B",
+          "explanation": "Lệnh OFFSET (phím tắt O) có chức năng tạo ra bản sao song song với đường thẳng hoặc đồng tâm với đường cong."
+        }
+      ]
+    },
+    {
+      "id": "lesson-2d-6",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 6,
+      "title": "Bài 6 - Lệnh FILLET - CHAMFER",
+      "duration": "10:45",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Bo tròn góc với bán kính R (Fillet) và vát cạnh góc nhọn (Chamfer).",
+      "summary": [
+        "Lệnh Fillet (F): Bo tròn góc với tham số Radius (R)",
+        "Lệnh Chamfer (CHA): Vát mép góc với 2 khoảng cách (Distance)",
+        "Mẹo bo góc R=0 để nối 2 đoạn thẳng vuông góc nhanh"
+      ],
+      "keyNotes": [
+        "Fillet với R=0 là phương pháp nối vuông góc phổ biến nhất của kỹ sư CAD"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": []
+    },
+    {
+      "id": "lesson-2d-7",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 7,
+      "title": "Bài 7 - Lệnh ARRAY (Mảng đối tượng)",
+      "duration": "13:30",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Sao chép dãy hình chữ nhật (Rectangular Array), dãy tròn (Polar Array) và theo đường dẫn (Path Array).",
+      "summary": [
+        "Tạo mảng đối tượng hình chữ nhật theo hàng và cột",
+        "Tạo mảng tròn đối xứng quanh 1 tâm (vẽ bánh răng, mặt bích)",
+        "Quản lý mảng liên kết Associative Array"
+      ],
+      "keyNotes": [
+        "Polar Array giúp vẽ các lỗ bulông trên mặt bích cực nhanh"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": []
+    },
+    {
+      "id": "lesson-2d-8",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 8,
+      "title": "Bài 8 - Quản lý Lớp (Layer) chuyên nghiệp",
+      "duration": "17:15",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Tạo, quản lý thuộc tính màu sắc, độ dày nét vẽ (Lineweight), kiểu đường nét (Linetype) cho từng Layer.",
+      "summary": [
+        "Nguyên tắc đặt tên Layer theo tiêu chuẩn xây dựng & kiến trúc",
+        "Quản lý On/Off, Freeze/Thaw, Lock/Unlock layer",
+        "Lệnh Matchprop (MA) sao chép nhanh thuộc tính Layer"
+      ],
+      "keyNotes": [
+        "Không vẽ tất cả trên Layer 0 hoặc Defpoints"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": []
+    },
+    {
+      "id": "lesson-2d-9",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 9,
+      "title": "Bài 9 - Ghi kích thước (Dimension) & Thiết lập Dimstyle",
+      "duration": "19:40",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Thiết lập Dimstyle chuẩn theo tỷ lệ bản vẽ 1/100, 1/50, 1/20 và các lệnh Dim thẳng hàng, Dim liên tục.",
+      "summary": [
+        "Lệnh D (Dimstyle) cài đặt Text, Arrows, Lines, Primary Units",
+        "Lệnh DLI (Dim Linear), DAL (Dim Aligned)",
+        "Lệnh DCO (Dim Continue) bắt kích thước nối đuôi hàng loạt"
+      ],
+      "keyNotes": [
+        "Thiết lập Fit Annotative hoặc scale theo tỷ lệ khổ giấy"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": []
+    },
+    {
+      "id": "lesson-2d-10",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 10,
+      "title": "Bài 10 - Quản lý Chữ (Text, MText) & Sửa lỗi Font",
+      "duration": "14:20",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Cài đặt Text Style chuẩn Unicode, TCVN3 (VnTime), VNI, xử lý triệt để lỗi nhảy font khi mở bản vẽ lạ.",
+      "summary": [
+        "Lệnh ST (Style) quản lý kiểu chữ",
+        "Phân biệt Single Line Text (DT) và Multiline Text (MT)",
+        "Chèn ký tự đặc biệt: Độ (°), Đường kính (Ø), Dung sai (±)"
+      ],
+      "keyNotes": [
+        "Ký tự %%C viết ra Ø, %%D viết ra độ °"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": []
+    },
+    {
+      "id": "lesson-2d-11",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 11,
+      "title": "Bài 11 - Tạo và quản lý Khối (Block & WBlock)",
+      "duration": "16:50",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Đóng gói các chi tiết lặp lại thành Block (B), xuất thư viện Block ra file riêng (WBlock) và lệnh chèn Insert (I).",
+      "summary": [
+        "Tạo Block nội bộ với lệnh B",
+        "Xuất thư viện Block với lệnh W",
+        "Chỉnh sửa nội dung Block tại chỗ với REFEDIT / BEDIT",
+        "Lệnh X (Explode) phá khối"
+      ],
+      "keyNotes": [
+        "Vẽ chi tiết bằng Layer 0 trước khi Block để Block thừa hưởng thuộc tính của Layer chứa nó"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": []
+    },
+    {
+      "id": "lesson-2d-12",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 12,
+      "title": "Bài 12 - Mặt cắt và Tô vật liệu (Hatch & Gradient)",
+      "duration": "15:10",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Đổ vật liệu bê tông, gạch xây, cát, kính, nước, gỗ bằng lệnh HATCH (H) chuẩn đẹp không bị lỗi hở biên.",
+      "summary": [
+        "Lệnh H (Hatch) và cách chọn Pick Points hoặc Select Objects",
+        "Điều chỉnh Tỷ lệ Hatch (Scale) và Góc nghiêng (Angle)",
+        "Xử lý lỗi Hatch bị tràn do đường bao không khép kín",
+        "Định vị gốc Hatch với Set Origin"
+      ],
+      "keyNotes": [
+        "Luôn tách Layer riêng cho Hatch để tránh làm nặng bản vẽ"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": []
+    },
+    {
+      "id": "lesson-2d-13",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 13,
+      "title": "Bài 13 - Thực hành vẽ Chi tiết Kiến trúc & Cửa",
+      "duration": "22:15",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Thực hành dựng các loại cửa đi 1 cánh, cửa 4 cánh, cửa sổ lùa, chi tiết cầu thang 2 vế và tam cấp.",
+      "summary": [
+        "Vẽ khung bao cửa, cánh cửa và hướng mở cửa",
+        "Vẽ bậc thang, chiếu nghỉ và lan can tay vịn",
+        "Gắn ký hiệu cao độ và đánh số bậc thang"
+      ],
+      "keyNotes": [
+        "Lưu chi tiết cửa thành Block thư viện để dùng lại cho các dự án sau"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": []
+    },
+    {
+      "id": "lesson-2d-14",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 14,
+      "title": "Bài 14 - Thực hành vẽ Mặt bằng Kiến trúc hoàn chỉnh",
+      "duration": "25:30",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Tổng hợp toàn bộ kỹ năng: Dựng trục cột, vẽ tường bao 220/110, lắp cửa, bố trí vật dụng nội thất phòng khách, bếp, ngủ.",
+      "summary": [
+        "Bước 1: Thiết lập hệ trục tọa độ và lưới trục cột",
+        "Bước 2: Dựng tường bao, tường ngăn bằng lệnh Mline hoặc Offset",
+        "Bước 3: Trổ cửa đi, cửa sổ và chèn thiết bị nội thất",
+        "Bước 4: Ghi kích thước tổng thể và ký hiệu tên phòng"
+      ],
+      "keyNotes": [
+        "Quy trình vẽ chuẩn giúp tiết kiệm 50% thời gian triển khai hồ sơ"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": []
+    },
+    {
+      "id": "lesson-2d-15",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 15,
+      "title": "Bài 15 - Thực hành vẽ Mặt đứng và Mặt cắt",
+      "duration": "21:00",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Cách dóng hình từ mặt bằng xuống mặt đứng bằng đường gióng dóng tia Xline (XL), dựng cao độ tầng, mái ngói và seno.",
+      "summary": [
+        "Lệnh Xline (XL) tạo đường dóng thẳng đứng và nằm ngang vô tận",
+        "Phát triển mặt đứng từ mặt bằng và mặt cắt",
+        "Thể hiện vật liệu ốp lát mặt tiền và lan can kính"
+      ],
+      "keyNotes": [
+        "Tia gióng Xline giúp khớp 100% trục cột giữa mặt bằng và mặt đứng"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": []
+    },
+    {
+      "id": "lesson-2d-16",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 16,
+      "title": "Bài 16 - Thiết lập Khung tên và Trình bày Bản vẽ (Layout)",
+      "duration": "18:45",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Làm chủ không gian giấy vẽ (Layout), tạo Viewport (MV), khóa khung nhìn và quản lý tỷ lệ bản vẽ A1, A2, A3, A4.",
+      "summary": [
+        "Sự khác biệt giữa Model Space và Paper Space (Layout)",
+        "Lệnh MV (Mview) tạo các cổng nhìn tỷ lệ",
+        "Khóa góc nhìn Viewport chống nhảy tỷ lệ khi zoom",
+        "Chèn khung bản vẽ chuẩn có tiêu đề và thông tin dự án"
+      ],
+      "keyNotes": [
+        "Layout là chuẩn mực quốc tế khi xuất hồ sơ bản vẽ kỹ thuật"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": []
+    },
+    {
+      "id": "lesson-2d-17",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 17,
+      "title": "Bài 17 - Kỹ thuật In ấn & Xuất bản vẽ sang PDF hàng loạt",
+      "duration": "16:20",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Cài đặt nét in (Plot Style Table .ctb), in trắng đen monochrome sắc nét, xuất PDF chuẩn không bị mờ nhòe nét vẽ.",
+      "summary": [
+        "Tạo file cài đặt nét in Monochrome.ctb",
+        "Quy định chiều dày nét cắt, nét thấy, nét khuất và dim",
+        "Lệnh PUBLISH in hàng loạt hàng chục bản vẽ trong 1 phút"
+      ],
+      "keyNotes": [
+        "Luôn kiểm tra Preview trước khi bấm in thật"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": []
+    },
+    {
+      "id": "lesson-2d-18",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 18,
+      "title": "Bài 18 - Ứng dụng AutoLISP tăng tốc độ vẽ gấp 5 lần",
+      "duration": "19:10",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Hướng dẫn cài đặt và sử dụng các Lisp thần thánh: Lisp đánh số thứ tự (STT), tính diện tích (AREA), đo kích thước nhanh (DIM), sửa font hàng loạt (FONTALL).",
+      "summary": [
+        "Lệnh APPLOAD (AP) nạp file .lsp vào AutoCAD",
+        "Thêm Lisp vào Startup Suite để tự động chạy khi khởi động CAD",
+        "Thực hành lệnh STT, AREA, FONTALL, DIM trong thực tế"
+      ],
+      "keyNotes": [
+        "AutoLISP là vũ khí bí mật giúp kỹ sư hoàn thành công việc nhanh vượt trội"
+      ],
+      "pdfUrl": "",
+      "dwgUrl": "",
+      "quiz": []
+    },
+    {
+      "id": "lesson-2d-19",
+      "courseId": "prod_course_2d",
+      "lessonNumber": 19,
+      "title": "Bài 19 - Đồ án Tốt nghiệp: Triển khai Hồ sơ Nhà Phố 3 Tầng",
+      "duration": "35:00",
+      "isLocked": true,
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "description": "Triển khai hoàn chỉnh bộ hồ sơ thiết kế thi công nhà phố 3 tầng từ A đến Z, nộp bài tập để giảng viên chấm và cấp chứng nhận.",
+      "summary": [
+        "Mặt bằng tầng 1, 2, 3 và tầng mái",
+        "Mặt đứng chính và 2 mặt cắt dọc/ngang công trình",
+        "Chi tiết cầu thang, vệ sinh, cửa và hoàn thiện hồ sơ",
+        "Xuất tập file PDF đóng quyển giao chủ đầu tư"
+      ],
+      "keyNotes": [
+        "Học viên hoàn thành đồ án sẽ được nhận xét 1-1 trực tiếp từ Giảng viên qua Zalo"
+      ],
+      "pdfUrl": "https://drive.google.com/file/d/1iUAp1IVUXHu0ouWLestVLxLupbsmqY3a/view?usp=drive_link",
+      "dwgUrl": "",
+      "quiz": []
+    }
+  ],
+  "users": [
+    {
+      "id": "usr_1795410403228",
+      "name": "TÔ DUY KHÁNH",
+      "email": "toduykhanh977@gmail.com",
+      "phone": "0329778016",
+      "password": "Khanhmai1",
+      "role": "Admin",
+      "enrolledCourses": [],
+      "createdAt": "2026-11-23T05:06:43.230Z"
+    },
+    {
+      "id": "usr_sample",
+      "name": "Học Viên Demo",
+      "email": "hocvien@gmail.com",
+      "phone": "0912345678",
+      "password": "123456",
+      "role": "Học viên",
+      "enrolledCourses": [],
+      "createdAt": "2026-11-23T05:06:43.230Z"
+    },
+    {
+      "id": "usr_1795411744982",
+      "name": "khanha kaan",
+      "email": "khanhautocad@gmail.com",
+      "phone": "01255478555",
+      "password": "trêtrteryt",
+      "role": "Học viên",
+      "enrolledCourses": [
+        "prod_course_2d"
+      ],
+      "createdAt": "2026-11-23T05:29:04.984Z"
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc_1",
+      "title": "Giáo Trình AutoCAD 2D Từ Cơ Bản Đến Nâng Cao",
+      "category": "Giáo trình",
+      "format": "PDF",
+      "size": "15.8 MB",
+      "author": "Tin Học Click",
+      "description": "Giáo trình chuẩn gồm 19 chương lý thuyết kèm bài tập vẽ chi tiết mặt bằng kiến trúc, kết cấu và cơ khí.",
+      "downloadType": "link",
+      "downloadUrl": "https://drive.google.com/file/d/1U2F4DPzoj2wEYTrq6xBgoehZYf1obU8A/view?usp=sharing",
+      "createdAt": "2026-11-23T06:48:05.325Z",
+      "files": [
+        {
+          "id": "f_1795520575993_0",
+          "name": "Giáo Trình AutoCAD 2D Từ Cơ Bản Đến Nâng Cao",
+          "size": "15.8 MB",
+          "type": "link",
+          "url": "https://drive.google.com/file/d/1U2F4DPzoj2wEYTrq6xBgoehZYf1obU8A/view?usp=sharing"
+        }
+      ],
+      "images": [
+        "/uploads/1795520576302_5247.png"
+      ],
+      "isFree": false,
+      "price": 49000,
+      "oldPrice": 99000,
+      "previewPages": 10,
+      "downloadCount": 350
+    },
+    {
+      "id": "doc_2",
+      "title": "Bộ Thư Viện 1000+ Block CAD Kiến Trúc & Nội Thất",
+      "category": "Thư viện DWG",
+      "format": "DWG / ZIP",
+      "size": "45.2 MB",
+      "author": "Tin Học Click",
+      "description": "Tổng hợp hơn 1000 mẫu Block CAD 2D chuẩn: cửa, bàn ghế, thiết bị vệ sinh, cây xanh, xe cộ chuẩn tỷ lệ kiến trúc.",
+      "downloadType": "link",
+      "downloadUrl": "https://drive.google.com/file/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/view?usp=sharing",
+      "createdAt": "2026-11-23T06:48:05.326Z",
+      "images": [
+        "/uploads/cad_block_preview_1.svg",
+        "/uploads/cad_block_preview_2.svg",
+        "/uploads/cad_block_preview_3.svg"
+      ],
+      "files": [
+        {
+          "id": "f_21",
+          "name": "Phần 1 - Thư viện Block Cửa đi, Cửa sổ & Vách kính (DWG)",
+          "type": "link",
+          "url": "https://drive.google.com/file/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/view?usp=sharing",
+          "size": "15.2 MB"
+        },
+        {
+          "id": "f_22",
+          "name": "Phần 2 - Thư viện Block Nội thất: Sofa, Bàn ăn, Giường ngủ (DWG)",
+          "type": "link",
+          "url": "https://drive.google.com/file/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/view?usp=sharing",
+          "size": "20.0 MB"
+        },
+        {
+          "id": "f_23",
+          "name": "Phần 3 - Thư viện Thiết bị vệ sinh, Cây cảnh, Ô tô (DWG)",
+          "type": "link",
+          "url": "https://drive.google.com/file/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/view?usp=sharing",
+          "size": "10.0 MB"
+        }
+      ],
+      "isFree": false,
+      "price": 49000,
+      "oldPrice": 99000,
+      "previewPages": 10,
+      "downloadCount": 680
+    },
+    {
+      "id": "doc_3",
+      "title": "Bảng Tổng Hợp 150+ Phím Tắt & Lệnh CAD Thường Dùng",
+      "category": "Sổ tay phím tắt",
+      "format": "PDF",
+      "size": "3.5 MB",
+      "author": "Tin Học Click",
+      "description": "Bảng tra cứu nhanh lệnh tắt AutoCAD trình bày đẹp mắt, dễ in ra khổ A4 để bàn làm việc.",
+      "downloadType": "link",
+      "downloadUrl": "https://drive.google.com/file/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/view?usp=sharing",
+      "createdAt": "2026-11-23T06:48:05.326Z",
+      "files": [
+        {
+          "id": "f_doc_3",
+          "name": "Bảng Tổng Hợp 150+ Phím Tắt & Lệnh CAD Thường Dùng",
+          "type": "link",
+          "url": "https://drive.google.com/file/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/view?usp=sharing",
+          "size": "3.5 MB"
+        }
+      ],
+      "images": [],
+      "isFree": true,
+      "price": 0,
+      "oldPrice": null,
+      "previewPages": 10,
+      "downloadCount": 1240
+    },
+    {
+      "id": "doc_4",
+      "title": "Sách Hướng Dẫn Tải & Cài Đặt LispCAD Toàn Tập",
+      "category": "Hướng dẫn Lisp",
+      "format": "PDF",
+      "size": "5.1 MB",
+      "author": "Tin Học Click",
+      "description": "Hướng dẫn từng bước cách nạp Lisp bằng lệnh APPLOAD, Startup Suite và cách khắc phục mọi lỗi font chữ.",
+      "downloadType": "link",
+      "downloadUrl": "https://drive.google.com/file/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/view?usp=sharing",
+      "createdAt": "2026-11-23T06:48:05.326Z",
+      "files": [
+        {
+          "id": "f_doc_4",
+          "name": "Sách Hướng Dẫn Tải & Cài Đặt LispCAD Toàn Tập",
+          "type": "link",
+          "url": "https://drive.google.com/file/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/view?usp=sharing",
+          "size": "5.1 MB"
+        }
+      ],
+      "images": [],
+      "isFree": true,
+      "price": 0,
+      "oldPrice": null,
+      "previewPages": 10,
+      "downloadCount": 890
+    }
+  ]
+}
