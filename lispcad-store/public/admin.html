@@ -6,8 +6,28 @@
   <title>Trang Quản Trị - Bán LispCAD</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    :root {
+      --bg-page: #f1f5f9;
+      --card-bg: #ffffff;
+      --card-border: #cbd5e1;
+      --border-color: #cbd5e1;
+      --text-main: #0f172a;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --accent-cyan: #0284c7;
+      --accent-blue: #0284c7;
+      --accent-gradient: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+    }
+
     .admin-container {
-      max-width: 1050px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 24px 20px;
     }
@@ -16,31 +36,37 @@
       justify-content: space-between;
       align-items: center;
       padding-bottom: 20px;
-      border-bottom: 1px solid var(--card-border);
+      border-bottom: 2px solid #e2e8f0;
       margin-bottom: 24px;
     }
     .nav-tabs {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       margin-bottom: 28px;
-      border-bottom: 1px solid var(--card-border);
+      border-bottom: 2px solid #e2e8f0;
       padding-bottom: 12px;
+      flex-wrap: wrap;
     }
     .tab-btn {
-      background: transparent;
-      border: 1px solid transparent;
-      color: var(--text-muted);
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
       padding: 10px 18px;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       transition: all 0.2s;
     }
+    .tab-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
     .tab-btn.active {
-      background: var(--card-bg);
-      color: var(--accent-cyan);
-      border-color: var(--card-border);
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      border-color: #0284c7 !important;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
     }
     .panel { display: none; }
     .panel.active { display: block; }
@@ -50,49 +76,98 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(15, 23, 42, 0.8);
       z-index: 1000;
       overflow-y: auto;
       padding: 20px;
     }
     .admin-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
       border-radius: 12px;
       padding: 24px;
       margin-bottom: 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+      color: #0f172a;
     }
     .table-responsive {
       width: 100%;
       overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      background: #ffffff;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
+      background: #ffffff;
     }
     th, td {
       padding: 12px 14px;
-      border-bottom: 1px solid var(--card-border);
-      font-size: 0.95rem;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.92rem;
     }
     th {
-      color: var(--text-muted);
-      font-weight: 600;
-      background: #0d1117;
+      color: #ffffff !important;
+      font-weight: 700;
+      background: #0f172a !important; /* Header đen xanh đậm, chữ trắng sáng nổi bật 100% */
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    td {
+      color: #1e293b;
+      background: #ffffff;
+    }
+    tr:hover td {
+      background: #f8fafc;
     }
     .btn-sm {
-      padding: 6px 12px;
+      padding: 8px 16px;
       border-radius: 6px;
       border: none;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
     }
-    .btn-success { background: #2ea043; color: #fff; }
-    .btn-danger { background: #da3633; color: #fff; }
-    .btn-secondary { background: #30363d; color: #fff; }
-    .btn-primary { background: var(--accent-gradient); color: #fff; }
+    .btn-success { background: #16a34a !important; color: #ffffff !important; }
+    .btn-success:hover { background: #15803d !important; }
+    .btn-danger { background: #dc2626 !important; color: #ffffff !important; }
+    .btn-danger:hover { background: #b91c1c !important; }
+    .btn-secondary { background: #475569 !important; color: #ffffff !important; }
+    .btn-secondary:hover { background: #334155 !important; }
+    .btn-primary {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+    }
+    .btn-primary:hover {
+      background: #0369a1 !important;
+      color: #ffffff !important;
+    }
+    .btn-buy {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+      color: #ffffff !important;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: inline-block;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+      transition: all 0.2s;
+    }
+    .btn-buy:hover {
+      background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
+    }
     .status-badge {
       padding: 4px 10px;
       border-radius: 12px;
@@ -100,8 +175,8 @@
       font-weight: 600;
       display: inline-block;
     }
-    .status-paid { background: rgba(46, 160, 67, 0.2); color: #3fb950; }
-    .status-pending { background: rgba(210, 153, 34, 0.2); color: #d29922; }
+    .status-paid { background: #dcfce7 !important; color: #166534 !important; border: 1px solid #bbf7d0; }
+    .status-pending { background: #fef9c3 !important; color: #854d0e !important; border: 1px solid #fef08a; }
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -111,12 +186,12 @@
       .grid-2 { grid-template-columns: 1fr; }
     }
     .preview-box {
-      border: 2px dashed var(--card-border);
+      border: 2px dashed #cbd5e1;
       border-radius: 10px;
       padding: 20px;
       text-align: center;
       margin-top: 10px;
-      background: #0d1117;
+      background: #f8fafc;
     }
     .preview-box img {
       max-width: 220px;
@@ -148,9 +223,14 @@
           <h2>🛠️ Quản Trị Website LispCAD</h2>
           <p style="color: var(--text-muted); font-size: 0.9rem;">Tùy chỉnh mã QR ngân hàng, sản phẩm Lisp, giá bán và kiểm tra đơn hàng</p>
         </div>
-        <div style="display: flex; gap: 10px;">
-          <a href="/" target="_blank" class="btn-sm btn-secondary" style="text-decoration: none; padding: 10px 14px;">🌐 Xem Trang Bán</a>
-          <button class="btn-sm btn-danger" onclick="handleLogout()">Đăng Xuất</button>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button type="button" class="btn-sm btn-secondary" onclick="exportBackupData()" style="padding: 9px 13px; background: #0284c7; color: #fff; border: none; font-weight: 600;" title="Tải toàn bộ dữ liệu web về máy">📥 Tải Dữ Liệu Về Máy</button>
+          <label class="btn-sm btn-secondary" style="padding: 9px 13px; background: #16a34a; color: #fff; cursor: pointer; margin: 0; display: inline-flex; align-items: center; border: none; font-weight: 600;" title="Nạp file dữ liệu từ máy tính lên web">
+            📤 Nạp Dữ Liệu Lên Web
+            <input type="file" accept=".json" onchange="importBackupData(event)" style="display: none;">
+          </label>
+          <a href="/" target="_blank" class="btn-sm btn-secondary" style="text-decoration: none; padding: 9px 13px;">🌐 Xem Trang Bán</a>
+          <button class="btn-sm btn-danger" onclick="handleLogout()" style="padding: 9px 13px;">Đăng Xuất</button>
         </div>
       </div>
 
@@ -158,7 +238,7 @@
       <div class="nav-tabs">
         <button class="tab-btn active" onclick="switchTab('tab-payment')">💳 Cài Đặt Mã QR & Ngân Hàng</button>
         <button class="tab-btn" onclick="switchTab('tab-products')">📦 Quản Lý LispCAD & Giá Bán</button>
-        <button class="tab-btn" onclick="switchTab('tab-documents')">📚 Quản Lý Tài Liệu & Giáo Trình</button>
+        <button class="tab-btn" onclick="switchTab('tab-documents')">📚 Tổng Hợp File CAD & Tài Liệu</button>
         <button class="tab-btn" onclick="switchTab('tab-lessons')">🎓 Quản Lý Khóa Học 2D</button>
         <button class="tab-btn" onclick="switchTab('tab-students')">👥 Quản Lý Học Viên</button>
         <button class="tab-btn" onclick="switchTab('tab-orders')">📑 Danh Sách Đơn Hàng</button>
@@ -173,7 +253,7 @@
           <form id="form-payment" onsubmit="savePaymentSettings(event)">
             <div class="form-group">
               <label><strong>Chế độ mở khóa file sau thanh toán:</strong></label>
-              <div style="margin: 10px 0; background: #0d1117; padding: 15px; border-radius: 8px; border: 1px solid var(--card-border);">
+              <div style="margin: 10px 0; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; color: #0f172a;">
                 <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; cursor: pointer;">
                   <input type="radio" name="payMode" value="auto_confirm" checked>
                   <span><strong>Tự động cho tải file ngay</strong> khi khách bấm "Tôi đã chuyển khoản" (Khuyên dùng: bạn không cần trực máy).</span>
@@ -252,6 +332,7 @@
                   <th style="width: 60px;">Ảnh</th>
                   <th>Tên Sản Phẩm LispCAD</th>
                   <th>Giá Bán</th>
+                  <th>Lượt Tải</th>
                   <th>Lệnh Hỗ Trợ</th>
                   <th>File / Link Tải</th>
                   <th>Trạng Thái</th>
@@ -271,10 +352,10 @@
         <div class="admin-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <div>
-              <h3 style="color: var(--accent-cyan); font-size: 1.25rem;">3. Quản Lý Tài Liệu & Giáo Trình CAD</h3>
-              <p style="color: var(--text-muted); font-size: 0.85rem;" id="admin-docs-count-text">Tài liệu và giáo trình cho học viên tải về</p>
+              <h3 style="color: var(--accent-cyan); font-size: 1.25rem;">3. Tổng Hợp File CAD &amp; Tài Liệu</h3>
+              <p style="color: var(--text-muted); font-size: 0.85rem;" id="admin-docs-count-text">Quản lý các bộ file CAD, thư viện DWG và tài liệu cho học viên tải về</p>
             </div>
-            <button class="btn-sm btn-primary" onclick="openDocModal()">+ Thêm Tài Liệu Mới</button>
+            <button class="btn-sm btn-primary" onclick="openDocModal()">+ Thêm File CAD / Tài Liệu Mới</button>
           </div>
 
           <div class="table-responsive">
@@ -282,9 +363,10 @@
               <thead>
                 <tr>
                   <th style="width: 80px;">Ảnh Mẫu</th>
-                  <th>Tên Tài Liệu / Giáo Trình</th>
+                  <th>Tên File CAD / Tài Liệu</th>
                   <th>Phân Loại</th>
                   <th>Giá Bán</th>
+                  <th>Lượt Tải</th>
                   <th>Định Dạng & Dung Lượng</th>
                   <th>Danh Sách File & Link Drive</th>
                   <th>Thao Tác</th>
@@ -300,6 +382,23 @@
 
       <!-- TAB KHÓA HỌC 2D & BÀI GIẢNG (THEO MOCKUP ẢNH 1) -->
       <div id="tab-lessons" class="panel">
+        <!-- Card Cài đặt Học phí & Bảng giá Khóa học -->
+        <div class="admin-card" style="margin-bottom: 20px; border-left: 4px solid #0284c7;">
+          <h3 style="color: var(--accent-cyan); font-size: 1.15rem; margin-bottom: 8px;">💰 Cài Đặt Học Phí Khóa Học AutoCAD 2D (Bảng Giá)</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 14px;">Thiết lập giá bán khóa học hiển thị trên trang chủ và trang đăng ký thanh toán VietQR cho học viên.</p>
+          <div style="display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 180px;">
+              <label style="display: block; font-size: 0.88rem; font-weight: 700; margin-bottom: 6px; color: #0f172a;">Học Phí Bán Thực Tế (VNĐ):</label>
+              <input type="number" id="admin-course-price" placeholder="299000" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-weight: 700; color: #0284c7; font-size: 1.05rem;">
+            </div>
+            <div style="flex: 1; min-width: 180px;">
+              <label style="display: block; font-size: 0.88rem; font-weight: 700; margin-bottom: 6px; color: #0f172a;">Giá Gốc Gạch Ngang (VNĐ):</label>
+              <input type="number" id="admin-course-oldprice" placeholder="590000" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; color: #64748b; font-size: 1rem;">
+            </div>
+            <button type="button" class="btn-sm btn-primary" onclick="saveCoursePriceSettings()" style="padding: 11px 22px; font-size: 0.95rem; font-weight: 700;">💾 Lưu Học Phí</button>
+          </div>
+        </div>
+
         <div class="admin-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <div>
@@ -359,6 +458,7 @@
                   <th>Số Điện Thoại</th>
                   <th>Sản Phẩm</th>
                   <th>Số Tiền</th>
+                  <th>Nhận File</th>
                   <th>Thời Gian</th>
                   <th>Trạng Thái</th>
                   <th>Thao Tác</th>
@@ -404,6 +504,7 @@
           <div class="form-group">
             <label for="prod-category">Danh Mục (Thẻ Phân Loại)</label>
             <select id="prod-category" style="width: 100%; padding: 12px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 8px;">
+              <option value="Khóa học">🎓 Khóa học</option>
               <option value="Vẽ nhanh">Vẽ nhanh</option>
               <option value="Dim">Dim</option>
               <option value="Text">Text</option>
@@ -493,6 +594,12 @@
         </div>
 
         <div class="form-group" style="margin-top: 15px;">
+          <label for="prod-downloads">📥 Số Lượt Tải Hiển Thị (Download Count)</label>
+          <input type="number" id="prod-downloads" min="0" placeholder="VD: 150" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 8px;">
+          <small style="color: var(--text-muted); font-size: 0.78rem;">Số lượt tải sẽ tự động tăng mỗi khi khách hàng thanh toán/tải file, bạn cũng có thể tùy chỉnh tại đây.</small>
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
           <label style="cursor: pointer;">
             <input type="checkbox" id="prod-active" checked> <strong>Hiển thị bán trên trang chủ</strong>
           </label>
@@ -578,14 +685,14 @@
   <div id="doc-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; overflow-y: auto; padding: 20px;">
     <div class="admin-card" style="max-width: 780px; margin: 40px auto; background: var(--card-bg); border: 1px solid var(--accent-cyan); box-shadow: 0 25px 60px rgba(0,0,0,0.9); border-radius: 12px; padding: 24px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 12px;">
-        <h3 id="doc-modal-title" style="color: var(--accent-cyan); margin: 0; font-size: 1.25rem;">Thêm Tài Liệu &amp; Giáo Trình Mới</h3>
+        <h3 id="doc-modal-title" style="color: var(--accent-cyan); margin: 0; font-size: 1.25rem;">Thêm File CAD &amp; Tài Liệu Mới</h3>
         <span onclick="closeDocModal()" style="font-size: 1.8rem; cursor: pointer; color: var(--text-muted); line-height: 1;" title="Đóng">&times;</span>
       </div>
       <form id="form-doc" onsubmit="saveDoc(event)">
         <input type="hidden" id="doc-id">
 
         <div class="form-group">
-          <label for="doc-title">Tên Tài Liệu / Giáo Trình</label>
+          <label for="doc-title">Tên File CAD / Tài Liệu</label>
           <input type="text" id="doc-title" required placeholder="VD: Bộ Thư Viện 1000+ Block CAD Kiến Trúc & Nội Thất">
         </div>
 
@@ -618,7 +725,13 @@
         </div>
 
         <div class="form-group">
-          <label for="doc-desc">Mô Tả Chi Tiết Bộ Tài Liệu</label>
+          <label for="doc-downloads">📥 Số Lượt Tải Hiển Thị (Download Count)</label>
+          <input type="number" id="doc-downloads" min="0" placeholder="VD: 250" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 8px;">
+          <small style="color: var(--text-muted); font-size: 0.78rem;">Số lượt tải sẽ tự động tăng mỗi khi khách hàng tải file, bạn cũng có thể tùy chỉnh tại đây.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="doc-desc">Mô Tả Chi Tiết File CAD / Tài Liệu</label>
           <textarea id="doc-desc" rows="2" placeholder="Tóm tắt nội dung các file bên trong bộ tài liệu..."></textarea>
         </div>
 
@@ -712,7 +825,7 @@
 
         <div style="display: flex; justify-content: space-end; gap: 12px; margin-top: 24px;">
           <button type="button" class="btn-sm btn-secondary" onclick="closeDocModal()">Hủy Bỏ</button>
-          <button type="submit" class="btn-sm btn-primary" style="padding: 10px 24px; font-weight: 700;">💾 Lưu Tài Liệu</button>
+          <button type="submit" class="btn-sm btn-primary" style="padding: 10px 24px; font-weight: 700;">💾 Lưu File CAD &amp; Tài Liệu</button>
         </div>
       </form>
     </div>
@@ -777,6 +890,57 @@
       location.reload();
     }
 
+    // Tải toàn bộ dữ liệu web về máy tính (Backup JSON)
+    async function exportBackupData() {
+      try {
+        const res = await fetch('/api/admin/dashboard');
+        const data = await res.json();
+        const fullBackup = {
+          paymentSettings: data.paymentSettings,
+          products: data.products,
+          documents: data.documents,
+          courses: data.courses,
+          lessons: data.lessons,
+          users: data.users
+        };
+        const blob = new Blob([JSON.stringify(fullBackup, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `backup_lispcad_web_${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+      } catch (err) {
+        alert('Có lỗi khi tải dữ liệu về máy');
+      }
+    }
+
+    // Nạp dữ liệu từ máy tính lên web (Restore JSON)
+    function importBackupData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const json = JSON.parse(e.target.result);
+          if (!confirm('Bạn có chắc muốn nạp dữ liệu từ file này lên web? Toàn bộ danh sách Lisp, giá bán và cài đặt sẽ được cập nhật.')) return;
+          const res = await fetch('/api/admin/restore-db', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(json)
+          });
+          const result = await res.json();
+          if (result.success) {
+            alert('🎉 ' + result.message);
+            location.reload();
+          } else {
+            alert('Lỗi: ' + (result.error || 'Không thể khôi phục'));
+          }
+        } catch (err) {
+          alert('File JSON không hợp lệ!');
+        }
+      };
+      reader.readAsText(file);
+    }
+
     // Đổi mật khẩu
     async function changePassword(e) {
       e.preventDefault();
@@ -811,6 +975,15 @@
         renderAdminLessons(globalData.lessons);
         renderStudents(globalData.users);
         renderOrders(globalData.orders);
+
+        // Hiển thị học phí khóa học 2D
+        const courseProd = (globalData.products || []).find(p => p.id === 'prod_course_2d' || p.category === 'Khóa học' || (p.name && p.name.includes('Khóa học')));
+        if (courseProd) {
+          const priceInput = document.getElementById('admin-course-price');
+          const oldPriceInput = document.getElementById('admin-course-oldprice');
+          if (priceInput) priceInput.value = courseProd.price || 299000;
+          if (oldPriceInput) oldPriceInput.value = courseProd.oldPrice || 590000;
+        }
       } catch (e) {
         console.error(e);
       }
@@ -883,22 +1056,51 @@
       }
     }
 
-    // Hiển thị Sản phẩm
+    // Lưu học phí Khóa học AutoCAD 2D
+    async function saveCoursePriceSettings() {
+      const price = document.getElementById('admin-course-price').value;
+      const oldPrice = document.getElementById('admin-course-oldprice').value;
+      if (!price) return alert('Vui lòng nhập học phí!');
+      try {
+        const res = await fetch('/api/admin/course-price', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ price: Number(price), oldPrice: Number(oldPrice) })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Đã lưu bảng giá học phí Khóa học AutoCAD 2D thành công!');
+          loadDashboardData();
+        } else {
+          alert(data.error || 'Có lỗi xảy ra');
+        }
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    // Hiển thị Sản phẩm LispCAD (tách riêng Khóa học 2D)
     function renderProducts(products) {
       const tbody = document.getElementById('products-table-body');
       tbody.innerHTML = '';
-      if (!products || products.length === 0) {
+      const lispOnly = (products || []).filter(p => p.id !== 'prod_course_2d' && p.category !== 'Khóa học' && !(p.name && p.name.includes('Khóa học')));
+      if (!lispOnly || lispOnly.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Chưa có sản phẩm LispCAD nào. Bấm nút "+ Thêm Sản Phẩm Mới".</td></tr>';
         return;
       }
-      products.forEach(p => {
+      lispOnly.forEach(p => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>
-            ${p.imageUrl ? `<img src="${p.imageUrl}" style="width: 48px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid var(--card-border); display: block;">` : `<div style="width: 48px; height: 32px; background: #091422; border-radius: 4px; border: 1px solid var(--card-border); display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: var(--text-muted);">Mặc định</div>`}
+            ${p.imageUrl ? `<img src="${p.imageUrl}" style="width: 48px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; display: block;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500';">` : `<div style="width: 48px; height: 32px; background: #f1f5f9; border-radius: 4px; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #64748b;">Mặc định</div>`}
           </td>
           <td><strong>${p.name}</strong></td>
           <td style="color: #00e676; font-weight: 700;">${Number(p.price).toLocaleString()} đ</td>
+          <td>
+            <span style="background: rgba(14, 165, 233, 0.15); color: #38bdf8; padding: 3px 8px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; white-space: nowrap;">
+              📥 ${(Number(p.downloadCount) || 0).toLocaleString()}
+            </span>
+          </td>
           <td><code style="color: var(--accent-cyan);">${p.commands || 'N/A'}</code></td>
           <td>${p.downloadType === 'link' ? '<a href="' + p.downloadUrl + '" target="_blank" style="color: var(--accent-cyan);">Đường link</a>' : 'File nội bộ'}</td>
           <td>${p.isActive ? '<span class="status-badge status-paid">Đang bán</span>' : '<span class="status-badge status-pending">Đã ẩn</span>'}</td>
@@ -932,6 +1134,7 @@
       document.getElementById('prod-file').value = '';
       document.getElementById('prod-link').value = '';
       document.getElementById('current-file-label').innerText = '';
+      document.getElementById('prod-downloads').value = 120;
       document.getElementById('prod-active').checked = true;
 
       // Reset ảnh minh họa
@@ -957,6 +1160,7 @@
       document.getElementById('prod-desc').value = p.description || '';
       document.getElementById('prod-instructions').value = p.instructions || '';
       document.getElementById('prod-videourl').value = p.videoUrl || '';
+      document.getElementById('prod-downloads').value = p.downloadCount !== undefined ? p.downloadCount : 0;
       document.getElementById('prod-active').checked = p.isActive;
 
       // Nạp ảnh minh họa hiện tại
@@ -1035,6 +1239,7 @@
       form.append('description', document.getElementById('prod-desc').value);
       form.append('instructions', document.getElementById('prod-instructions').value);
       form.append('videoUrl', document.getElementById('prod-videourl').value);
+      form.append('downloadCount', document.getElementById('prod-downloads').value || 0);
       form.append('isActive', document.getElementById('prod-active').checked);
 
       // Ảnh minh họa / GIF
@@ -1083,11 +1288,11 @@
       const tbody = document.getElementById('documents-table-body');
       tbody.innerHTML = '';
       if (!docs || docs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 25px;">Chưa có tài liệu giáo trình nào. Bấm "+ Thêm Tài Liệu Mới".</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 25px;">Chưa có file CAD hoặc tài liệu nào. Bấm "+ Thêm File CAD / Tài Liệu Mới".</td></tr>';
         return;
       }
       const countEl = document.getElementById('admin-docs-count-text');
-      if (countEl) countEl.innerText = `Tổng: ${docs.length} bộ tài liệu & giáo trình`;
+      if (countEl) countEl.innerText = `Tổng: ${docs.length} bộ file CAD & tài liệu`;
 
       docs.forEach(d => {
         const tr = document.createElement('tr');
@@ -1148,11 +1353,16 @@
         tr.innerHTML = `
           <td>${thumbHtml}</td>
           <td>
-            <strong style="color: #f8fafc; font-size: 0.95rem;">${d.title}</strong>
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 3px;">${d.description || ''}</div>
+            <strong style="color: #0f172a; font-size: 0.95rem;">${d.title}</strong>
+            <div style="font-size: 0.8rem; color: #475569; margin-top: 3px;">${d.description || ''}</div>
           </td>
           <td><span style="background: rgba(14, 165, 233, 0.15); color: #38bdf8; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; border: 1px solid rgba(14, 165, 233, 0.3); font-weight: 600;">${d.category || 'Tài liệu'}</span></td>
           <td>${priceHtml}</td>
+          <td>
+            <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 3px 8px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; white-space: nowrap;">
+              📥 ${(Number(d.downloadCount) || 0).toLocaleString()}
+            </span>
+          </td>
           <td>
             <strong style="color: #f59e0b; display: block; font-size: 0.85rem;">${d.format || 'DWG / ZIP'}</strong>
             <span style="color: var(--text-muted); font-size: 0.8rem;">${d.size || 'N/A'}</span>
@@ -1328,7 +1538,7 @@
 
     // Mở modal thêm mới
     function openDocModal() {
-      document.getElementById('doc-modal-title').innerText = 'Thêm Tài Liệu & Giáo Trình Mới';
+      document.getElementById('doc-modal-title').innerText = 'Thêm File CAD & Tài Liệu Mới';
       document.getElementById('doc-id').value = '';
       document.getElementById('doc-title').value = '';
       document.getElementById('doc-category').value = 'Thư viện DWG';
@@ -1336,6 +1546,7 @@
       document.getElementById('doc-size').value = '45.2 MB';
       document.getElementById('doc-author').value = 'Tin Học Click';
       document.getElementById('doc-desc').value = '';
+      document.getElementById('doc-downloads').value = 250;
       document.getElementById('doc-preview-pages').value = '10';
 
       // Reset giá bán
@@ -1366,7 +1577,7 @@
       const d = globalData.documents.find(x => x.id === id);
       if (!d) return;
 
-      document.getElementById('doc-modal-title').innerText = 'Chỉnh Sửa Bộ Tài Liệu & Giáo Trình';
+      document.getElementById('doc-modal-title').innerText = 'Chỉnh Sửa File CAD & Tài Liệu';
       document.getElementById('doc-id').value = d.id;
       document.getElementById('doc-title').value = d.title || '';
       document.getElementById('doc-category').value = d.category || 'Thư viện DWG';
@@ -1374,6 +1585,7 @@
       document.getElementById('doc-size').value = d.size || '';
       document.getElementById('doc-author').value = d.author || 'Tin Học Click';
       document.getElementById('doc-desc').value = d.description || '';
+      document.getElementById('doc-downloads').value = d.downloadCount !== undefined ? d.downloadCount : 0;
       document.getElementById('doc-preview-pages').value = d.previewPages || 10;
 
       // Nạp giá bán
@@ -1427,6 +1639,7 @@
       form.append('size', document.getElementById('doc-size').value);
       form.append('author', document.getElementById('doc-author').value);
       form.append('description', document.getElementById('doc-desc').value);
+      form.append('downloadCount', document.getElementById('doc-downloads').value || 0);
       form.append('previewPages', document.getElementById('doc-preview-pages').value || '10');
 
       // Giá bán
@@ -1519,16 +1732,23 @@
       orders.forEach(o => {
         const isPaid = o.status === 'PAID';
         const dateStr = new Date(o.createdAt).toLocaleString('vi-VN');
+        const isZalo = o.deliveryMethod === 'zalo';
+        const deliveryBadge = isZalo
+          ? `<span style="background: rgba(0, 104, 255, 0.12); color: #0068ff; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; border: 1px solid rgba(0, 104, 255, 0.3); display: inline-flex; align-items: center; gap: 4px;">💬 Gửi Zalo</span>`
+          : `<span style="background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; border: 1px solid #cbd5e1;">📥 Tải về máy</span>`;
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><strong>#${o.orderCode}</strong></td>
           <td>${o.customerName}</td>
-          <td><a href="tel:${o.customerPhone}" style="color: var(--accent-cyan);">${o.customerPhone || 'N/A'}</a></td>
+          <td><a href="tel:${o.customerPhone}" style="color: var(--accent-cyan); font-weight: 600;">${o.customerPhone || 'N/A'}</a></td>
           <td>${o.productName}</td>
           <td style="color: #00e676; font-weight: 700;">${Number(o.amount).toLocaleString()} đ</td>
+          <td>${deliveryBadge}</td>
           <td style="font-size: 0.85rem; color: var(--text-muted);">${dateStr}</td>
           <td>${isPaid ? '<span class="status-badge status-paid">Đã thanh toán</span>' : '<span class="status-badge status-pending">Chờ xác nhận</span>'}</td>
           <td>
+            ${o.customerPhone ? `<a href="https://zalo.me/${o.customerPhone.replace(/[^0-9]/g, '')}" target="_blank" class="btn-sm" style="background: #0068ff; color: #fff; text-decoration: none; padding: 6px 10px; font-size: 0.78rem; font-weight: 700;" title="Mở Zalo nhắn cho khách">💬 Zalo</a>` : ''}
             ${!isPaid ? `<button class="btn-sm btn-success" onclick="approveOrder('${o.orderCode}')">Duyệt Đơn</button>` : ''}
             <button class="btn-sm btn-danger" onclick="deleteOrder('${o.orderCode}')">Xóa</button>
           </td>

@@ -153,6 +153,21 @@
             <label>Số điện thoại Zalo (nhận hỗ trợ 1-1 và làm tài khoản đăng nhập):</label>
             <input type="tel" id="chk-phone" required placeholder="VD: 0912345678">
           </div>
+          <div class="form-group" style="margin-top: 14px;">
+            <label style="font-weight: 700; color: #38bdf8; margin-bottom: 8px; display: block; font-size: 0.92rem;">
+              📦 Phương thức nhận khóa học & tài liệu:
+            </label>
+            <div style="display: flex; flex-direction: column; gap: 10px; background: #1e293b; padding: 12px 14px; border-radius: 10px; border: 1px solid #334155;">
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #fff; font-size: 0.92rem;">
+                <input type="radio" name="courseDeliveryMethod" value="download" checked style="width: 18px; height: 18px; accent-color: #0284c7;">
+                <span><strong>📥 Tự động mở khóa & tải về máy ngay</strong></span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #fff; font-size: 0.92rem;">
+                <input type="radio" name="courseDeliveryMethod" value="zalo" style="width: 18px; height: 18px; accent-color: #0284c7;">
+                <span><strong>💬 Gửi link truy cập & hỗ trợ qua Zalo</strong> (Theo SĐT ở trên)</span>
+              </label>
+            </div>
+          </div>
           <button type="submit" class="btn-big-yellow" style="width: 100%; margin-top: 14px; border-radius: 12px; font-size: 1rem; padding: 12px;" id="btn-submit-enroll">
             Lấy Mã VietQR Chuyển Khoản (299.000 đ) →
           </button>
@@ -270,6 +285,21 @@
         const data = await res.json();
         allLessons = data.lessons || [];
         hasEnrolled = data.hasEnrolled;
+        window.currentCourseId = data.courseId || 'prod_course_2d';
+
+        // Cập nhật giá bán học phí tự động từ Admin
+        if (data.coursePrice) {
+          const priceStr = Number(data.coursePrice).toLocaleString() + ' đ';
+          document.querySelectorAll('.course-price-now').forEach(el => el.innerText = priceStr);
+          const enrollBtn = document.getElementById('btn-submit-enroll');
+          if (enrollBtn) enrollBtn.innerText = `Lấy Mã VietQR Chuyển Khoản (${priceStr}) →`;
+          const enrollDesc = document.querySelector('#checkout-step-info p');
+          if (enrollDesc) enrollDesc.innerText = `Học phí ưu đãi: ${priceStr} (Truy cập trọn đời)`;
+        }
+        if (data.courseOldPrice) {
+          const oldPriceStr = Number(data.courseOldPrice).toLocaleString() + ' đ';
+          document.querySelectorAll('.course-price-old').forEach(el => el.innerText = oldPriceStr);
+        }
 
         document.getElementById('lessons-count-text').innerText = `Tổng: ${allLessons.length} bài học`;
         renderLessonsList(allLessons);
@@ -433,6 +463,8 @@
       e.preventDefault();
       const name = document.getElementById('chk-name').value.trim();
       const phone = document.getElementById('chk-phone').value.trim();
+      const delivEl = document.querySelector('input[name="courseDeliveryMethod"]:checked');
+      const deliveryMethod = delivEl ? delivEl.value : 'download';
       const btn = document.getElementById('btn-submit-enroll');
 
       if (!name || !phone) {
@@ -449,11 +481,12 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            productId: 'prod_course_2d',
+            productId: window.currentCourseId || 'prod_course_2d',
             customerName: name,
             customerPhone: phone,
             customerEmail: currentUser ? currentUser.email : '',
-            userId: currentUser ? currentUser.id : null
+            userId: currentUser ? currentUser.id : null,
+            deliveryMethod: deliveryMethod
           })
         });
 

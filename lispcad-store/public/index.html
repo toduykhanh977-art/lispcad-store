@@ -100,10 +100,10 @@
         </div>
       </li>
 
-      <!-- 3. TÀI LIỆU DROPDOWN -->
+      <!-- 3. TỔNG HỢP FILE CAD VÀ TÀI LIỆU DROPDOWN -->
       <li class="nav-item-dropdown">
         <a href="#tai-lieu" class="nav-link" onclick="scrollToDocuments()">
-          Tài liệu <span class="arrow-down">▾</span>
+          File CAD &amp; Tài liệu <span class="arrow-down">▾</span>
         </a>
         <div class="dropdown-menu">
           <a href="#tai-lieu" class="dropdown-item" onclick="scrollToDocuments()">
@@ -241,11 +241,11 @@
           </div>
         </div>
 
-        <!-- Mục 3: TÀI LIỆU & GIÁO TRÌNH CAD -->
+        <!-- Mục 3: TỔNG HỢP FILE CAD VÀ TÀI LIỆU -->
         <div id="tai-lieu" style="margin-top: 36px;">
-          <div class="section-header-title">📚 Tài Liệu, Giáo Trình &amp; Thư Viện CAD</div>
+          <div class="section-header-title">📚 TỔNG HỢP FILE CAD VÀ TÀI LIỆU</div>
           <p style="color: #64748b; font-size: 0.95rem; margin-top: -6px; margin-bottom: 18px;">
-            Tổng hợp giáo trình 19 chương, thư viện file bản vẽ DWG mẫu và tài liệu lệnh tắt cho học viên.
+            Tổng hợp file bản vẽ CAD, thư viện block DWG mẫu, giáo trình và tài liệu lệnh tắt cho học viên.
           </p>
 
           <div class="docs-cards-grid" id="docs-cards-container">
@@ -305,9 +305,10 @@
     <div class="detail-modal-content">
       <span class="close-modal-x" onclick="closeDetailModal()">&times;</span>
 
-      <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px;">
+      <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px; flex-wrap: wrap;">
         <span style="background: #e0f2fe; color: #0284c7; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700;" id="modal-category">LispCAD</span>
         <span style="color: #0066cc; font-family: monospace; font-size: 0.95rem; font-weight: 700;" id="modal-commands">Lệnh: STT</span>
+        <span style="background: #f0fdf4; color: #16a34a; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; border: 1px solid #bbf7d0;" id="modal-downloads">📥 150 lượt tải</span>
       </div>
       <h2 style="font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;" id="modal-name">Tên Lisp</h2>
       <p style="color: #64748b; font-size: 0.95rem;" id="modal-desc">Mô tả chi tiết tiện ích.</p>
@@ -323,7 +324,7 @@
       <!-- ẢNH MINH HỌA / GIF MÔ PHỎNG SẢN PHẨM -->
       <div id="modal-image-section" style="display: none; margin-top: 16px; text-align: center;">
         <h4 style="color: #0f172a; font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; text-align: left;">🖼️ Ảnh Minh Họa / GIF Mô Phỏng:</h4>
-        <img id="modal-image-display" src="" alt="Minh họa Lisp" style="max-width: 100%; max-height: 280px; border-radius: 8px; border: 1px solid #e2e8f0; object-fit: contain; background: #091422; display: block; margin: 0 auto;">
+        <img id="modal-image-display" src="" alt="Minh họa Lisp" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500';" style="max-width: 100%; max-height: 280px; border-radius: 8px; border: 1px solid #e2e8f0; object-fit: contain; background: #091422; display: block; margin: 0 auto;">
       </div>
 
       <!-- VIDEO HƯỚNG DẪN THAO TÁC -->
@@ -393,8 +394,23 @@
             <input type="text" id="custName" placeholder="Nguyễn Văn A" required>
           </div>
           <div class="form-group">
-            <label for="custPhone">Số điện thoại / Zalo (Nhận hỗ trợ nạp Lisp)</label>
+            <label for="custPhone">Số điện thoại / Zalo (Để nhận file & hỗ trợ)</label>
             <input type="tel" id="custPhone" placeholder="0912345678" required>
+          </div>
+          <div class="form-group" style="margin-top: 14px;">
+            <label style="font-weight: 700; color: #38bdf8; margin-bottom: 8px; display: block; font-size: 0.92rem;">
+              📦 Phương thức nhận file sau khi thanh toán:
+            </label>
+            <div style="display: flex; flex-direction: column; gap: 10px; background: #1e293b; padding: 12px 14px; border-radius: 10px; border: 1px solid #334155;">
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #fff; font-size: 0.92rem;">
+                <input type="radio" name="orderDeliveryMethod" value="download" checked style="width: 18px; height: 18px; accent-color: #0284c7;">
+                <span><strong>📥 Tự động tải xuống về máy ngay</strong></span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #fff; font-size: 0.92rem;">
+                <input type="radio" name="orderDeliveryMethod" value="zalo" style="width: 18px; height: 18px; accent-color: #0284c7;">
+                <span><strong>💬 Gửi file / link tải về Zalo</strong> (Theo số điện thoại ở trên)</span>
+              </label>
+            </div>
           </div>
           <button type="submit" class="btn-add-cart-solid" id="btn-create-order" style="width: 100%; padding: 12px; margin-top: 14px; justify-content: center;">
             Tạo Mã VietQR Thanh Toán
@@ -523,6 +539,7 @@
         <span id="doc-detail-format-badge" class="doc-format-badge dwg">📐 DWG / ZIP</span>
         <span id="doc-detail-category" style="color: #38bdf8; font-size: 0.85rem; font-weight: 700;">Thư viện DWG</span>
         <span id="doc-detail-pricing-badge" style="font-size: 0.8rem; font-weight: 800; padding: 3px 8px; border-radius: 6px;">Miễn phí</span>
+        <span id="doc-detail-downloads-badge" style="font-size: 0.8rem; font-weight: 800; padding: 3px 8px; border-radius: 6px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">📥 250 lượt tải</span>
       </div>
       <h2 id="doc-detail-title" style="font-size: 1.35rem; font-weight: 800; color: #ffffff; margin-bottom: 8px; line-height: 1.3;">
         Tên Tài Liệu
@@ -838,7 +855,12 @@
             <div class="doc-desc-text">${doc.description || 'Tài liệu học tập và tra cứu AutoCAD 2D chuẩn.'}</div>
           </div>
           <div class="doc-card-footer" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 10px;">
-            <span class="doc-size-text">📦 ${doc.size || '10 MB'} (${filesCount} file)</span>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <span class="doc-size-text">📦 ${doc.size || '10 MB'} (${filesCount} file)</span>
+              <span style="font-size: 0.76rem; color: #64748b; display: flex; align-items: center; gap: 3px;">
+                <span style="color: #10b981;">📥</span> <strong>${Number(doc.downloadCount || 0).toLocaleString()}</strong> lượt tải
+              </span>
+            </div>
             ${priceHtml}
           </div>
           ${actionsHtml}
@@ -872,6 +894,7 @@
       document.getElementById('doc-detail-category').innerText = doc.category || 'Tài liệu CAD';
       document.getElementById('doc-detail-desc').innerText = doc.description || '';
       document.getElementById('doc-detail-total-size').innerText = 'Tổng dung lượng: ' + (doc.size || '10 MB');
+      document.getElementById('doc-detail-downloads-badge').innerHTML = `📥 <strong>${(Number(doc.downloadCount) || 0).toLocaleString()}</strong> lượt tải`;
 
       const formatBadge = document.getElementById('doc-detail-format-badge');
       const isDwg = (doc.format || '').toLowerCase().includes('dwg');
@@ -1030,7 +1053,7 @@
           ? `<button type="button" class="btn-file-dl" onclick="buyCurrentDocNow()" style="background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); cursor: pointer;">
                <span>🔒</span> Mua để tải
              </button>`
-          : `<a href="${dlUrl}" target="_blank" download class="btn-file-dl">
+          : `<a href="${dlUrl}" target="_blank" download class="btn-file-dl" onclick="trackDownloadItem('${doc.id}')">
                <span>📥</span> Tải File (0đ)
              </a>`;
 
@@ -1302,9 +1325,28 @@
       }
     }
 
+    function trackDownloadItem(id) {
+      if (!id) return;
+      fetch('/api/public/track-download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      }).then(r => r.json()).then(res => {
+        if (res.success && res.downloadCount) {
+          const item = allProducts.find(x => x.id === id) || allDocuments.find(x => x.id === id);
+          if (item) item.downloadCount = res.downloadCount;
+          const badge = document.getElementById('doc-detail-downloads-badge');
+          if (badge && currentViewingDoc && currentViewingDoc.id === id) {
+            badge.innerHTML = `📥 <strong>${res.downloadCount.toLocaleString()}</strong> lượt tải`;
+          }
+        }
+      }).catch(() => {});
+    }
+
     // Tải toàn bộ file của tài liệu đang xem (Miễn phí)
     function downloadAllCurrentDocFiles() {
       if (!currentViewingDoc) return;
+      trackDownloadItem(currentViewingDoc.id);
       const files = (currentViewingDoc.files && currentViewingDoc.files.length > 0)
         ? currentViewingDoc.files
         : [{ url: currentViewingDoc.downloadUrl || '' }];
@@ -1345,7 +1387,12 @@
     // Điều hướng nhanh từ Thanh menu trên cùng
     function filterLispFromNav(category) {
       scrollToLisp();
-      const filtered = allProducts.filter(p => p.id !== 'prod_course_2d' && (!category || p.category === category));
+      const filtered = allProducts.filter(p => 
+        p.id !== 'prod_course_2d' && 
+        p.category !== 'Khóa học' && 
+        !(p.name && p.name.toLowerCase().includes('khóa học')) && 
+        (!category || p.category === category)
+      );
       renderLispCards(filtered);
     }
 
@@ -1360,20 +1407,24 @@
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Render danh sách LispCAD ở cột trái
+    // Render danh sách LispCAD ở cột trái (chỉ hiển thị Lisp, loại trừ Khóa học)
     function renderLispCards(products) {
       const container = document.getElementById('lisp-cards-container');
       container.innerHTML = '';
 
-      // Lọc các sản phẩm thuộc danh mục LispCAD
-      const lispItems = products.filter(p => p.id !== 'prod_course_2d');
+      // Lọc các sản phẩm thuộc danh mục LispCAD (tách riêng, không đưa Khóa học vào LispCAD)
+      const lispItems = products.filter(p => 
+        p.id !== 'prod_course_2d' && 
+        p.category !== 'Khóa học' && 
+        !(p.name && p.name.toLowerCase().includes('khóa học'))
+      );
 
       lispItems.forEach(p => {
         const card = document.createElement('div');
         card.className = 'lisp-item-card';
 
         const thumbHtml = p.imageUrl
-          ? `<img src="${p.imageUrl}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">`
+          ? `<img src="${p.imageUrl}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500';">`
           : `<svg width="100%" height="100%" viewBox="0 0 180 100" fill="none">
               <rect width="180" height="100" fill="#091422"/>
               <line x1="20" y1="50" x2="160" y2="50" stroke="#00d2ff" stroke-width="1.5" stroke-dasharray="4 2"/>
@@ -1394,7 +1445,12 @@
           <div class="lisp-item-body">
             <div class="lisp-item-title">${p.name}</div>
             <div class="lisp-item-desc">${p.description || 'Tiện ích AutoLisp tự động hóa.'}</div>
-            <div class="lisp-item-price">${Number(p.price).toLocaleString()}đ</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; margin-bottom: 2px;">
+              <div class="lisp-item-price" style="margin: 0;">${Number(p.price).toLocaleString()}đ</div>
+              <div style="font-size: 0.78rem; color: #64748b; display: flex; align-items: center; gap: 4px; background: #f1f5f9; padding: 2px 8px; border-radius: 12px; font-weight: 600;">
+                <span style="color: #0284c7;">📥</span> <span><strong>${Number(p.downloadCount || 0).toLocaleString()}</strong> lượt tải</span>
+              </div>
+            </div>
 
             <div class="lisp-actions-row">
               <button class="btn-detail-outline" onclick="openDetailModal('${p.id}')">
@@ -1506,6 +1562,7 @@
       document.getElementById('modal-name').innerText = selectedProduct.name;
       document.getElementById('modal-category').innerText = selectedProduct.category || 'LispCAD';
       document.getElementById('modal-commands').innerText = 'Lệnh: ' + (selectedProduct.commands || 'N/A');
+      document.getElementById('modal-downloads').innerHTML = `📥 <strong>${(Number(selectedProduct.downloadCount) || 0).toLocaleString()}</strong> lượt tải`;
       document.getElementById('modal-desc').innerText = selectedProduct.description || '';
       document.getElementById('modal-instructions').innerText = selectedProduct.instructions || 'Chưa có hướng dẫn sử dụng chi tiết.';
 
@@ -1578,8 +1635,16 @@
     }
 
     function handleBuyCourse() {
-      const course = allProducts.find(p => p.id === 'prod_course_2d');
-      if (!course) return;
+      const course = allProducts.find(p => p.id === 'prod_course_2d' || p.category === 'Khóa học' || (p.name && p.name.toLowerCase().includes('khóa học')));
+      if (!course) {
+        // Dự phòng nếu chưa kịp nạp
+        openCheckoutModal([{
+          id: 'prod_course_2d',
+          name: 'Khóa học AutoCAD 2D Từ Cơ Bản Đến Nâng Cao',
+          price: 299000
+        }]);
+        return;
+      }
 
       if (!currentUser) {
         alert('Khóa học AutoCAD 2D yêu cầu bạn đăng nhập tài khoản học viên để tự động kích hoạt bài giảng sau khi thanh toán. Vui lòng đăng nhập hoặc tạo tài khoản nhanh!');
@@ -1591,7 +1656,7 @@
     }
 
     function openCheckoutModal(items) {
-      const hasCourse = items.some(it => it.id === 'prod_course_2d');
+      const hasCourse = items.some(it => it.id === 'prod_course_2d' || it.category === 'Khóa học' || (it.name && it.name.toLowerCase().includes('khóa học')));
       if (hasCourse && !currentUser) {
         alert('Khóa học AutoCAD 2D yêu cầu bạn đăng nhập tài khoản học viên để tự động kích hoạt bài giảng sau khi thanh toán. Vui lòng đăng nhập hoặc tạo tài khoản nhanh!');
         openAuthModal();
@@ -1623,6 +1688,8 @@
       e.preventDefault();
       const custName = document.getElementById('custName').value.trim();
       const custPhone = document.getElementById('custPhone').value.trim();
+      const deliveryMethodEl = document.querySelector('input[name="orderDeliveryMethod"]:checked');
+      const deliveryMethod = deliveryMethodEl ? deliveryMethodEl.value : 'download';
 
       const btn = document.getElementById('btn-create-order');
       btn.disabled = true;
@@ -1637,7 +1704,8 @@
             customerName: custName,
             customerPhone: custPhone,
             customerEmail: currentUser ? currentUser.email : '',
-            userId: currentUser ? currentUser.id : null
+            userId: currentUser ? currentUser.id : null,
+            deliveryMethod: deliveryMethod
           })
         });
 
@@ -1794,9 +1862,10 @@
             const box = document.getElementById('waiting-status-box');
             if (box) box.classList.add('paid');
             document.getElementById('waiting-title').innerText = '✓ ĐÃ NHẬN TIỀN THÀNH CÔNG!';
-            document.getElementById('waiting-desc').innerHTML = '<strong style="color: #4ade80; font-size: 1rem;">Giao dịch MBBank hoàn tất! Đang tự động mở file tải về cho bạn...</strong>';
+            document.getElementById('waiting-desc').innerHTML = '<strong style="color: #4ade80; font-size: 1rem;">Giao dịch MBBank hoàn tất! Đang chuyển đến trang nhận file...</strong>';
+            const deliv = data.deliveryMethod || 'download';
             setTimeout(() => {
-              window.location.href = `/success.html?orderCode=${orderCode}`;
+              window.location.href = `/success.html?orderCode=${orderCode}&delivery=${deliv}`;
             }, 1000);
           }
         } catch (e) {

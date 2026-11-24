@@ -1,4 +1,5 @@
 {
+  "_id": "main_db",
   "adminPassword": "admin",
   "paymentSettings": {
     "mode": "strict",
@@ -15,292 +16,105 @@
   },
   "products": [
     {
-      "id": "prod_1795413347433",
-      "createdAt": "2026-11-23T05:55:47.433Z",
-      "name": "khasndkas ",
+      "id": "prod_1795520863375",
+      "createdAt": "2026-11-24T11:47:43.375Z",
+      "name": "IN BẢN VẼ HÀNG LOẠT+XUẤT THÀNH 1 FILE PDF+2 KHUNG CÙNG 1 LẦN IN",
       "category": "Vẽ nhanh",
-      "price": 50000,
-      "oldPrice": 100000,
-      "description": "",
-      "commands": "STT",
-      "instructions": "",
-      "videoUrl": "",
-      "downloadType": "local",
+      "price": 69000,
+      "oldPrice": 150000,
+      "description": "In hàng loạt Model & Layout trực tiếp ra 1 file PDF duy nhất (không cần máy in ảo). Hỗ trợ in gộp 2 loại khung & 2 khổ giấy khác nhau trong 1 lần quét, tự động chống tràn khung Dynamic Block và in Full Bleed sát mép.",
+      "commands": "MP, IN",
+      "instructions": "🔥 TÍNH NĂNG NỔI BẬT (PRO EDITION V6.2):\r\n- Xuất PDF trực tiếp từ AutoCAD (DWG To PDF.pc3), KHÔNG cần cài thêm máy in ảo hay phần mềm ghép PDF bên ngoài.\r\n- In cùng lúc 2 loại khung & 2 khổ giấy khác nhau (VD: vừa A3 vừa A4, trộn lẫn Block, Dynamic Block, Polyline/Rect, Xref) trong 1 lần quét chọn.\r\n- Tự động ghép tất cả bản vẽ thành 1 file PDF duy nhất (hoặc xuất từng file lẻ), tự động lưu gọn vào thư mục PDF_IN_HANG_LOAT ngoài Desktop.\r\n- Chống lỗi tràn khung Dynamic Block, in tràn viền Full Bleed 0-margin sát mép giấy.\r\n- Sắp xếp thứ tự in thông minh: Trái -> Phải, Trên -> Dưới, Pick tay, hoặc vẽ đường Line/Pline dẫn hướng ziczac tùy ý (có đường chỉ đỏ xem trước luồng in).\r\n- Nút \"Chỉnh nét...\" mở thẳng bảng chỉnh nét CTB trực quan.\r\n\r\n📌 CÁC BƯỚC THỰC HIỆN:\r\n- Bước 1: Tải file về, mở AutoCAD và gõ lệnh AP (APPLOAD) -> chọn file InHangLoat_MP_2LoaiKhung.lsp -> bấm Load (có thể thêm vào Startup Suite để dùng vĩnh viễn).\r\n- Bước 2: Gõ lệnh MP (hoặc IN) -> nhấn Enter để mở bảng điều khiển.\r\n- Bước 3: Chọn Khổ giấy, Nét in (.ctb) và kiểu xuất file (\"Ghép thành 1 file duy nhất\" hoặc \"Từng file riêng lẻ\").\r\n- Bước 4: Bấm nút \"CHỌN KHUNG 1\" rồi click vào 1 khung bản vẽ mẫu trên màn hình (Lisp tự nhận diện tên Block, Layer Polyline hoặc Xref). Nếu bản vẽ có thêm loại khung/khổ giấy thứ 2, tích chọn \"Dùng thêm loại khung thứ 2\" và bấm \"CHỌN KHUNG 2\".\r\n- Bước 5: Chọn Thứ tự in (Trái -> Phải, Trên -> Dưới, Theo đường Line hoặc Pick tay) -> bấm nút \"IN\".\r\n- Bước 6: Quét chọn toàn bộ vùng bản vẽ cần in -> nhấn Enter. Lisp sẽ tự động chạy từ đầu đến cuối không dừng lại hỏi xác nhận và tự mở thư mục chứa file PDF trên Desktop khi hoàn tất.",
+      "videoUrl": "https://youtu.be/YtVa5SSEdc4?si=ySf6zuh2p5t9pLtw",
+      "downloadType": "link",
       "isActive": true,
-      "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp"
+      "imageUrl": "/uploads/1795520863161_2126.png",
+      "downloadUrl": "https://drive.google.com/file/d/18FkXcDFdwqdjpBcu4UeFPWaR5VEAwS-O/view?usp=drive_link",
+      "downloadCount": 156
     },
     {
-      "id": "prod_1795413306554",
-      "createdAt": "2026-11-23T05:55:06.554Z",
-      "name": "đasa",
-      "category": "Vẽ nhanh",
-      "price": 50000,
-      "oldPrice": 100000,
-      "description": "",
-      "commands": "STT",
-      "instructions": "",
-      "videoUrl": "",
-      "downloadType": "local",
-      "isActive": false,
-      "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp"
-    },
-    {
-      "id": "prod_course_2d",
-      "name": "Khóa học AutoCAD 2D",
+      "id": "prod_1795520504944",
+      "createdAt": "2026-11-24T11:41:44.944Z",
+      "name": "Khóa học AutoCAD 2D Từ Cơ Bản Đến Nâng Cao",
       "category": "Khóa học",
       "price": 299000,
-      "oldPrice": 599000,
-      "commands": "FULL 2D",
-      "description": "Từ cơ bản đến nâng cao, giúp bạn thành thạo AutoCAD 2D một cách dễ dàng và chuyên nghiệp.",
-      "instructions": "Bước 1: Tải tài liệu và video khóa học sau khi thanh toán.\nBước 2: Xem các bài giảng từ bài 1 đến bài 20 theo lộ trình từ cơ bản đến nâng cao.\nBước 3: Thực hành làm các bài tập vẽ mặt bằng, chi tiết kiến trúc và kết cấu mẫu.\nBước 4: Nhắn tin cho Admin qua Zalo để được sửa bản vẽ trực tiếp 1-1.",
-      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "oldPrice": 590000,
+      "description": "Khóa học video bài giảng AutoCAD 2D bài bản từ cơ bản đến nâng cao, thực chiến bản vẽ kỹ thuật.",
+      "commands": "ACAD 2D",
+      "instructions": "Khóa học trực tuyến kèm bộ giáo trình và file bài tập thực hành. Học viên được hỗ trợ trọn đời.",
+      "videoUrl": "",
       "downloadType": "local",
-      "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
       "isActive": true,
-      "createdAt": "2026-11-23T11:00:00.000Z"
+      "imageUrl": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600",
+      "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
+      "downloadCount": 320
     },
     {
-      "id": "prod_lisp_stt",
-      "name": "LISP STT",
+      "id": "prod_lisp_kientruc_ketcau",
+      "name": "BỘ LISP KIẾN TRÚC - KẾT CẤU TOÀN DIỆN (TRỤC, CỘT, TƯỜNG, CỬA, DIM 3 LỚP)",
+      "category": "Vẽ nhanh",
+      "price": 69000,
+      "oldPrice": 150000,
+      "commands": "VLT, VCOT, KT, FXT, VT, CD, CS, CUA, DT",
+      "description": "VLT (vẽ lưới trục), VCOT (chèn cột), KT (kéo trục kiểu Revit), FXT (sửa nét đứt trục), VT (vẽ tường bo góc & đục chữ T), CD/CS/CUA (chèn Block cửa đục tường), DT (Dim trục 3 lớp).",
+      "instructions": "Nạp lisp bằng lệnh APPLOAD, sử dụng các lệnh tắt: VLT, VCOT, KT, FXT, VT, DT.",
+      "videoUrl": "",
+      "downloadType": "link",
+      "downloadUrl": "https://drive.google.com/file/d/1CbVl8GWx_6OIqeJjkubODIqpliEKBCtU/view?usp=drive_link",
+      "isActive": true,
+      "imageUrl": "/uploads/1795519569399_2792.png",
+      "downloadCount": 265
+    },
+    {
+      "id": "prod_lisp_chuyen_font",
+      "name": "LISP CHUYỂN FONT & ĐỒNG BỘ MÃ TIẾNG VIỆT VỀ UNICODE ARIAL CHUẨN",
+      "category": "Text",
+      "price": 35000,
+      "oldPrice": 80000,
+      "commands": "CF, B4, BAN4",
+      "description": "Lệnh CF (hoặc B4): Tự động chuyển toàn bộ chữ lỗi font (TCVN3) sang Unicode Arial chuẩn, giữ nguyên định d���ng chữ HOA / chữ thường gốc, xử lý triệt để Text, MText, Dim, MLeader và cả chữ trong Block/Attribute.",
+      "instructions": "Bước 1: Nạp file LISP CHUYEN FONT-CF.lsp bằng APPLOAD.\\nBước 2: Gõ lệnh CF (hoặc B4) -> Enter.\\nBước 3: Lisp tự động quét chuyển sang Unicode Arial trong 1 giây.",
+      "videoUrl": "",
+      "downloadType": "link",
+      "downloadUrl": "https://drive.google.com/file/d/1nYSjjNI_zYkfwH-GpnspjXAI13OgV_Co/view?usp=sharing",
+      "isActive": true,
+      "imageUrl": "/uploads/1795519508898_4496.png",
+      "downloadCount": 412
+    },
+    {
+      "id": "prod_combo_116_lisp",
+      "name": "COMBO 116 LISP AUTOCAD ĐA NGÀNH ĐẦY ĐỦ NHẤT (20 NHÓM CHỨC NĂNG)",
       "category": "Vẽ nhanh",
       "price": 99000,
-      "oldPrice": 199000,
-      "commands": "STT",
-      "description": "Đánh số thứ tự tự động trong bản vẽ chỉ với 1 click chuột liên tục.",
-      "instructions": "Bước 1: Nạp lisp vào AutoCAD bằng lệnh APPLOAD (phím tắt AP).\r\nBước 2: Gõ lệnh STT.\r\nBước 3: Nhập số bắt đầu <1> và bước nhảy <1>.\r\nBước 4: Click chuột liên tiếp vào các vị trí cần đặt số thứ tự.",
-      "videoUrl": "",
-      "downloadType": "local",
-      "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
-      "isActive": true,
-      "createdAt": "2026-11-23T11:01:00.000Z",
-      "imageUrl": "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=400"
-    },
-    {
-      "id": "prod_lisp_fontall",
-      "name": "LISP FONTALL",
-      "category": "LispCAD",
-      "price": 199000,
-      "oldPrice": 350000,
-      "commands": "FONTALL",
-      "description": "Chuẩn hóa font chữ trong CAD (ABC -> Arial), sửa lỗi font tiếng Việt hàng loạt.",
-      "instructions": "Bước 1: Nạp lisp vào AutoCAD bằng lệnh APPLOAD.\nBước 2: Gõ lệnh FONTALL.\nBước 3: Lisp sẽ tự động quét toàn bộ bản vẽ và chuyển toàn bộ font lỗi sang font chuẩn Unicode / Arial đẹp mắt.",
-      "videoUrl": "",
-      "downloadType": "local",
-      "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
-      "isActive": true,
-      "createdAt": "2026-11-23T11:02:00.000Z"
-    },
-    {
-      "id": "prod_lisp_area",
-      "name": "LISP AREA",
-      "category": "LispCAD",
-      "price": 149000,
       "oldPrice": 250000,
-      "commands": "AREA",
-      "description": "Tính diện tích nhanh chóng, chèn text diện tích m² và mm² tự động vào tâm hình.",
-      "instructions": "Bước 1: Nạp lisp vào AutoCAD bằng lệnh APPLOAD.\nBước 2: Gõ lệnh AREA.\nBước 3: Click chuột vào miền kín hoặc chọn polyline cần tính diện tích.\nBước 4: Click điểm đặt text kết quả diện tích.",
+      "commands": "FULL 116 LISP",
+      "description": "Tổng hợp 116 tiện ích AutoLISP chọn lọc phân chia theo 20 nhóm chức năng chuyên sâu cho kiến trúc, kết cấu, MEP, trắc địa và quy hoạch.",
+      "instructions": "Giải nén bộ file, tra cứu lệnh tắt trong file Excel kèm theo. Nạp từng Lisp qua lệnh APPLOAD.",
       "videoUrl": "",
-      "downloadType": "local",
-      "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
+      "downloadType": "link",
+      "downloadUrl": "https://drive.google.com/drive/folders/1_RxOflJnwVB3jfpDQJhpali3s8mE8Fd4?usp=sharing",
       "isActive": true,
-      "createdAt": "2026-11-23T11:03:00.000Z"
+      "imageUrl": "/uploads/1795519947648_5152.png",
+      "downloadCount": 589
     },
     {
-      "id": "prod_lisp_dim",
-      "name": "LISP DIM",
-      "category": "LispCAD",
-      "price": 129000,
-      "oldPrice": 220000,
-      "commands": "DIM",
-      "description": "Ghi kích thước tự động cho hàng loạt cấu kiện, tường, dầm cột cực nhanh.",
-      "instructions": "Bước 1: Nạp lisp vào AutoCAD bằng lệnh APPLOAD.\nBước 2: Gõ lệnh DIM.\nBước 3: Quét chọn toàn bộ các đối tượng cần ghi kích thước.\nBước 4: Click 1 điểm để đặt hàng dim thẳng tắp.",
+      "id": "prod_lisp_stt_tu_dong",
+      "name": "LISP ĐÁNH SỐ THỨ TỰ TỰ ĐỘNG (TEXT, MTEXT & BLOCK ATTRIBUTE)",
+      "category": "Text",
+      "price": 39000,
+      "oldPrice": 100000,
+      "commands": "DS",
+      "description": "Đánh số thứ tự tự động tăng dần 1, 2, 3... hoặc A, B, C... cho Text, MText và cả thuộc tính trong Block Attribute (Cửa, bản vẽ, trục...).",
+      "instructions": "Bước 1: Nạp file danh so thu tu-DS-TODUYKHANH.lsp bằng APPLOAD.\\nBước 2: Gõ lệnh DS -> Enter để mở hộp thoại cài đặt số bắt đầu và bước nhảy.",
       "videoUrl": "",
-      "downloadType": "local",
-      "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
+      "downloadType": "link",
+      "downloadUrl": "https://drive.google.com/file/d/1bTlU1D4GNGcc8AxSMv35I5W3D4izN83y/view?usp=sharing",
       "isActive": true,
-      "createdAt": "2026-11-23T11:04:00.000Z"
+      "imageUrl": "/uploads/1795519992374_5673.png",
+      "downloadCount": 198
     }
   ],
-  "orders": [
-    {
-      "orderCode": "CAD550152",
-      "productId": "doc_2",
-      "productName": "Bộ Thư Viện 1000+ Block CAD Kiến Trúc & Nội Thất",
-      "items": [
-        {
-          "id": "doc_2",
-          "name": "Bộ Thư Viện 1000+ Block CAD Kiến Trúc & Nội Thất",
-          "price": 49000,
-          "downloadUrl": "https://drive.google.com/file/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/view?usp=sharing",
-          "downloadType": "link"
-        }
-      ],
-      "amount": 49000,
-      "userId": "usr_1795411744982",
-      "customerName": "khanha kaan",
-      "customerPhone": "01255478555",
-      "customerEmail": "khanhautocad@gmail.com",
-      "status": "PENDING",
-      "createdAt": "2026-11-23T08:48:58.407Z"
-    },
-    {
-      "orderCode": "CAD642777",
-      "productId": "prod_1795413347433",
-      "productName": "khasndkas ",
-      "items": [
-        {
-          "id": "prod_1795413347433",
-          "name": "khasndkas ",
-          "price": 50000,
-          "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
-          "downloadType": "local"
-        }
-      ],
-      "amount": 50000,
-      "userId": null,
-      "customerName": "df",
-      "customerPhone": "sdsdf",
-      "customerEmail": "",
-      "status": "PENDING",
-      "createdAt": "2026-11-23T06:15:01.933Z"
-    },
-    {
-      "orderCode": "CAD303074",
-      "productId": "prod_course_2d",
-      "productName": "Khóa học AutoCAD 2D",
-      "items": [
-        {
-          "id": "prod_course_2d",
-          "name": "Khóa học AutoCAD 2D",
-          "price": 299000,
-          "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
-          "downloadType": "local"
-        }
-      ],
-      "amount": 299000,
-      "userId": "usr_1795411744982",
-      "customerName": "khanha kaan",
-      "customerPhone": "01255478555",
-      "customerEmail": "khanhautocad@gmail.com",
-      "status": "PENDING",
-      "createdAt": "2026-11-23T05:49:07.761Z"
-    },
-    {
-      "orderCode": "CAD720837",
-      "productId": "prod_course_2d",
-      "productName": "Khóa học AutoCAD 2D",
-      "items": [
-        {
-          "id": "prod_course_2d",
-          "name": "Khóa học AutoCAD 2D",
-          "price": 299000,
-          "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
-          "downloadType": "local"
-        }
-      ],
-      "amount": 299000,
-      "userId": "usr_1795411744982",
-      "customerName": "khanha kaan",
-      "customerPhone": "01255478555",
-      "customerEmail": "khanhautocad@gmail.com",
-      "status": "PENDING",
-      "createdAt": "2026-11-23T05:49:02.897Z"
-    },
-    {
-      "orderCode": "CAD875681",
-      "productId": "prod_course_2d",
-      "productName": "Khóa học AutoCAD 2D",
-      "items": [
-        {
-          "id": "prod_course_2d",
-          "name": "Khóa học AutoCAD 2D",
-          "price": 299000,
-          "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
-          "downloadType": "local"
-        }
-      ],
-      "amount": 299000,
-      "userId": null,
-      "customerName": "Nguyễn Văn Test",
-      "customerPhone": "0987654321",
-      "customerEmail": "",
-      "status": "PENDING",
-      "createdAt": "2026-11-23T05:46:41.207Z"
-    },
-    {
-      "orderCode": "CAD823362",
-      "productId": "prod_course_2d",
-      "productName": "Khóa học AutoCAD 2D",
-      "items": [
-        {
-          "id": "prod_course_2d",
-          "name": "Khóa học AutoCAD 2D",
-          "price": 299000,
-          "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
-          "downloadType": "local"
-        }
-      ],
-      "amount": 299000,
-      "userId": "usr_1795411744982",
-      "customerName": "khanha kaan",
-      "customerPhone": "01255478555",
-      "customerEmail": "khanhautocad@gmail.com",
-      "status": "PENDING",
-      "createdAt": "2026-11-23T05:29:11.860Z"
-    },
-    {
-      "orderCode": "CAD668498",
-      "productId": "prod_lisp_stt",
-      "productName": "Giỏ hàng (2 tiện ích CAD)",
-      "items": [
-        {
-          "id": "prod_lisp_stt",
-          "name": "LISP STT",
-          "price": 99000,
-          "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
-          "downloadType": "local"
-        },
-        {
-          "id": "prod_lisp_fontall",
-          "name": "LISP FONTALL",
-          "price": 199000,
-          "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
-          "downloadType": "local"
-        }
-      ],
-      "amount": 298000,
-      "customerName": "tẻ",
-      "customerPhone": "tẻt",
-      "status": "PENDING",
-      "createdAt": "2026-11-23T04:49:17.612Z"
-    },
-    {
-      "orderCode": "CAD388922",
-      "productId": "prod_lisp_stt",
-      "productName": "Giỏ hàng (2 tiện ích CAD)",
-      "items": [
-        {
-          "id": "prod_lisp_stt",
-          "name": "LISP STT",
-          "price": 99000,
-          "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
-          "downloadType": "local"
-        },
-        {
-          "id": "prod_lisp_dim",
-          "name": "LISP DIM",
-          "price": 129000,
-          "downloadUrl": "/files/AutoCAD_Pro_Toolbox.lsp",
-          "downloadType": "local"
-        }
-      ],
-      "amount": 228000,
-      "customerName": "Test Gio Hang",
-      "customerPhone": "0912345678",
-      "status": "PENDING",
-      "createdAt": "2026-11-23T04:41:24.854Z"
-    }
-  ],
+  "orders": [],
   "lessons": [
     {
       "id": "lesson-2d-1",
@@ -308,7 +122,7 @@
       "lessonNumber": 1,
       "title": "Bài 1 - Làm quen AutoCAD & Thiết lập ban đầu",
       "duration": "12:45",
-      "isLocked": false,
+      "isLocked": true,
       "videoUrl": "https://player.mediadelivery.net/embed/771580/99e10cc1-db06-4bda-960a-b11c649cccc1?autoplay=false&loop=false&muted=false&preload=true&responsive=true",
       "description": "Giới thiệu giao diện làm việc, hệ tọa độ WCS/UCS, cài đặt Options chuẩn và các thiết lập Drafting ban đầu.",
       "summary": [
@@ -378,7 +192,7 @@
       "lessonNumber": 2,
       "title": "Bài 2 - Các lệnh vẽ cơ bản (Line, Circle, Arc, Rect)",
       "duration": "15:28",
-      "isLocked": false,
+      "isLocked": true,
       "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
       "description": "Nắm vững các lệnh vẽ hình học cơ bản: Line, Circle, Arc, Rectangle, Polygon.",
       "summary": [
@@ -424,7 +238,7 @@
       "lessonNumber": 3,
       "title": "Bài 3 - Hiệu chỉnh đối tượng (Move, Copy, Rotate, Scale)",
       "duration": "18:35",
-      "isLocked": false,
+      "isLocked": true,
       "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
       "description": "Học cách biến đổi hình học chuẩn xác với Move, Copy, Rotate, Scale, Mirror.",
       "summary": [
@@ -470,7 +284,7 @@
       "lessonNumber": 4,
       "title": "Bài 4 - Lệnh TRIM - EXTEND",
       "duration": "14:10",
-      "isLocked": false,
+      "isLocked": true,
       "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
       "description": "Cắt tỉa và kéo dài đối tượng nhanh chóng, phân biệt chế độ Quick mode và Standard mode.",
       "summary": [
@@ -515,7 +329,7 @@
       "lessonNumber": 5,
       "title": "Bài 5 - Lệnh OFFSET",
       "duration": "16:18",
-      "isLocked": false,
+      "isLocked": true,
       "videoUrl": "https://player.mediadelivery.net/embed/771580/6e6c58cb-56c5-4d55-873b-d3c958187d35?autoplay=false&loop=false&muted=false&preload=true&responsive=true",
       "description": "Lệnh OFFSET dùng để tạo ra các đối tượng song song hoặc đồng tâm với đối tượng gốc.",
       "summary": [
@@ -885,7 +699,9 @@
       "phone": "01255478555",
       "password": "trêtrteryt",
       "role": "Học viên",
-      "enrolledCourses": [],
+      "enrolledCourses": [
+        "prod_course_2d"
+      ],
       "createdAt": "2026-11-23T05:29:04.984Z"
     }
   ],
@@ -899,22 +715,25 @@
       "author": "Tin Học Click",
       "description": "Giáo trình chuẩn gồm 19 chương lý thuyết kèm bài tập vẽ chi tiết mặt bằng kiến trúc, kết cấu và cơ khí.",
       "downloadType": "link",
-      "downloadUrl": "https://drive.google.com/file/d/1QJ74A0R37JTIVVK9OJ73kkugsDpRrdPp/view?usp=sharing",
+      "downloadUrl": "https://drive.google.com/file/d/1U2F4DPzoj2wEYTrq6xBgoehZYf1obU8A/view?usp=sharing",
       "createdAt": "2026-11-23T06:48:05.325Z",
       "files": [
         {
-          "id": "f_1795429051290_0",
+          "id": "f_1795520575993_0",
           "name": "Giáo Trình AutoCAD 2D Từ Cơ Bản Đến Nâng Cao",
           "size": "15.8 MB",
           "type": "link",
-          "url": "https://drive.google.com/file/d/1QJ74A0R37JTIVVK9OJ73kkugsDpRrdPp/view?usp=sharing"
+          "url": "https://drive.google.com/file/d/1U2F4DPzoj2wEYTrq6xBgoehZYf1obU8A/view?usp=sharing"
         }
       ],
-      "images": [],
+      "images": [
+        "/uploads/1795520576302_5247.png"
+      ],
       "isFree": false,
       "price": 49000,
       "oldPrice": 99000,
-      "previewPages": 10
+      "previewPages": 10,
+      "downloadCount": 350
     },
     {
       "id": "doc_2",
@@ -958,7 +777,8 @@
       "isFree": false,
       "price": 49000,
       "oldPrice": 99000,
-      "previewPages": 10
+      "previewPages": 10,
+      "downloadCount": 680
     },
     {
       "id": "doc_3",
@@ -984,7 +804,8 @@
       "isFree": true,
       "price": 0,
       "oldPrice": null,
-      "previewPages": 10
+      "previewPages": 10,
+      "downloadCount": 1240
     },
     {
       "id": "doc_4",
@@ -1010,7 +831,8 @@
       "isFree": true,
       "price": 0,
       "oldPrice": null,
-      "previewPages": 10
+      "previewPages": 10,
+      "downloadCount": 890
     }
   ]
 }
