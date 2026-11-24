@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoCAD Tin Học Click vn - Đừng làm việc chăm chỉ, hãy làm việc thông minh</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="/js/pdf.min.js"></script>
+  <script>
+    if (typeof pdfjsLib === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"><\/script>');
+    }
+  </script>
+</head>
+<body>
+  <!-- 1. TOP NAVBAR -->
+  <nav class="top-navbar">
+    <a href="/" class="brand-box">
+      <div class="brand-icon">A</div>
+      <div>
+        <div class="brand-text-name">AutoCAD Tin Học Click <span>vn</span></div>
+        <div class="brand-text-slogan">Đừng làm việc chăm chỉ, hãy làm việc thông minh</div>
+      </div>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="/" class="nav-link active">🏠 Trang chủ</a></li>
+
+      <!-- 1. KHÓA HỌC DROPDOWN -->
+      <li class="nav-item-dropdown">
+        <a href="/course.html" class="nav-link">
+          Khóa học <span class="arrow-down">▾</span>
+        </a>
+        <div class="dropdown-menu">
+          <a href="/course.html" class="dropdown-item">
+            <span class="dropdown-icon" style="background: #e0f2fe; color: #0284c7;">🎓</span>
+            <div>
+              <div class="dropdown-title">Khóa học AutoCAD 2D</div>
+              <div class="dropdown-desc">19 bài giảng Full HD từ cơ bản đến làm chủ bản vẽ</div>
+            </div>
+          </a>
+          <a href="/course.html#lessons-list-container" class="dropdown-item">
+            <span class="dropdown-icon" style="background: #fef3c7; color: #d97706;">👁</span>
+            <div>
+              <div class="dropdown-title">Học thử 5 bài đầu miễn phí</div>
+              <div class="dropdown-desc">Xem trước nội dung giáo trình & video học thử</div>
+            </div>
+          </a>
+          <a href="/learn.html?lesson=lesson-2d-1" class="dropdown-item">
+            <span class="dropdown-icon" style="background: #dcfce7; color: #16a34a;">▶</span>
+            <div>
+              <div class="dropdown-title">Phòng học trực tuyến (LMS)</div>
+              <div class="dropdown-desc">Xem video bài giảng & tài liệu thực hành mẫu</div>
+            </div>
+          </a>
+        </div>
+      </li>
+
+      <!-- 2. LISPCAD DROPDOWN -->
+      <li class="nav-item-dropdown">
+        <a href="#lispcad" class="nav-link" onclick="scrollToLisp()">
+          LispCAD <span class="arrow-down">▾</span>
+        </a>
+        <div class="dropdown-menu">
+          <a href="#lispcad" class="dropdown-item" onclick="scrollToLisp()">
+            <span class="dropdown-icon" style="background: #f0fdf4; color: #16a34a;">⚡</span>
+            <div>
+              <div class="dropdown-title">Tất cả LispCAD</div>
+              <div class="dropdown-desc">Xem toàn bộ danh sách tiện ích AutoLisp</div>
+            </div>
+          </a>
+          <a href="#lispcad" class="dropdown-item" onclick="filterLispFromNav('Vẽ nhanh')">
+            <span class="dropdown-icon" style="background: #eff6ff; color: #2563eb;">✏️</span>
+            <div>
+              <div class="dropdown-title">Lisp Vẽ Nhanh</div>
+              <div class="dropdown-desc">Đánh số thứ tự (STT), vẽ lưới trục tự động</div>
+            </div>
+          </a>
+          <a href="#lispcad" class="dropdown-item" onclick="filterLispFromNav('Dim')">
+            <span class="dropdown-icon" style="background: #fefce8; color: #ca8a04;">📏</span>
+            <div>
+              <div class="dropdown-title">Lisp Đo Kích Thước (Dim / Area)</div>
+              <div class="dropdown-desc">Ghi kích thước hàng loạt, đo diện tích m² & mm²</div>
+            </div>
+          </a>
+          <a href="#lispcad" class="dropdown-item" onclick="filterLispFromNav('Text')">
+            <span class="dropdown-icon" style="background: #fdf2f8; color: #db2777;">🔤</span>
+            <div>
+              <div class="dropdown-title">Lisp Text & Sửa Lỗi Font (FontAll)</div>
+              <div class="dropdown-desc">Chuẩn hóa font chữ, đổi font ABC sang Arial</div>
+            </div>
+          </a>
+          <a href="#lispcad" class="dropdown-item" onclick="filterLispFromNav('Block')">
+            <span class="dropdown-icon" style="background: #f5f3ff; color: #7c3aed;">📦</span>
+            <div>
+              <div class="dropdown-title">Lisp Block & Layer</div>
+              <div class="dropdown-desc">Đổi tên block hàng loạt, dọn layer thừa</div>
+            </div>
+          </a>
+        </div>
+      </li>
+
+      <!-- 3. TỔNG HỢP FILE CAD VÀ TÀI LIỆU DROPDOWN -->
+      <li class="nav-item-dropdown">
+        <a href="#tai-lieu" class="nav-link" onclick="scrollToDocuments()">
+          File CAD &amp; Tài liệu <span class="arrow-down">▾</span>
+        </a>
+        <div class="dropdown-menu">
+          <a href="#tai-lieu" class="dropdown-item" onclick="scrollToDocuments()">
+            <span class="dropdown-icon" style="background: #fee2e2; color: #dc2626;">📚</span>
+            <div>
+              <div class="dropdown-title">Giáo Trình AutoCAD 2D (PDF)</div>
+              <div class="dropdown-desc">Giáo trình 19 chương lý thuyết & thực hành</div>
+            </div>
+          </a>
+          <a href="#tai-lieu" class="dropdown-item" onclick="scrollToDocuments()">
+            <span class="dropdown-icon" style="background: #e0f2fe; color: #0284c7;">📐</span>
+            <div>
+              <div class="dropdown-title">Thư Viện 1000+ Block CAD (DWG)</div>
+              <div class="dropdown-desc">File mẫu kiến trúc, nội thất, kết cấu chuẩn</div>
+            </div>
+          </a>
+          <a href="#tai-lieu" class="dropdown-item" onclick="scrollToDocuments()">
+            <span class="dropdown-icon" style="background: #fef3c7; color: #d97706;">⚡</span>
+            <div>
+              <div class="dropdown-title">Bảng 150+ Lệnh Tắt & Phím Tắt CAD</div>
+              <div class="dropdown-desc">Sổ tay tra cứu lệnh tắt nhanh bỏ túi</div>
+            </div>
+          </a>
+          <a href="#tai-lieu" class="dropdown-item" onclick="scrollToDocuments()">
+            <span class="dropdown-icon" style="background: #f3e8ff; color: #9333ea;">📖</span>
+            <div>
+              <div class="dropdown-title">Sách Hướng Dẫn Nạp LispCAD</div>
+              <div class="dropdown-desc">Cách nạp lisp bằng APPLOAD & Startup Suite</div>
+            </div>
+          </a>
+        </div>
+      </li>
+
+      <!-- 4. HỖ TRỢ DROPDOWN -->
+      <li class="nav-item-dropdown">
+        <a href="#ho-tro" class="nav-link">
+          Hỗ trợ <span class="arrow-down">▾</span>
+        </a>
+        <div class="dropdown-menu">
+          <a href="https://zalo.me/0329778016" target="_blank" class="dropdown-item" id="nav-link-zalo">
+            <span class="dropdown-icon" style="background: #e0f2fe; color: #0284c7;">💬</span>
+            <div>
+              <div class="dropdown-title" style="color: #0284c7;">Hỗ trợ qua Zalo (0329.778.016)</div>
+              <div class="dropdown-desc">Chat trực tiếp 1-1, giải đáp thắc mắc và sửa bài</div>
+            </div>
+          </a>
+          <a href="https://www.facebook.com/" target="_blank" class="dropdown-item" id="nav-link-fb">
+            <span class="dropdown-icon" style="background: #eff6ff; color: #1877f2;">🌐</span>
+            <div>
+              <div class="dropdown-title" style="color: #1877f2;">Nhắn tin qua Facebook</div>
+              <div class="dropdown-desc">Liên hệ hỗ trợ qua Fanpage Tin Học Click</div>
+            </div>
+          </a>
+        </div>
+      </li>
+    </ul>
+
+    <div class="navbar-right">
+      <div class="search-pill">
+        <span>🔍</span>
+        <input type="text" id="search-input" placeholder="Tìm kiếm..." oninput="handleSearch(this.value)">
+      </div>
+
+      <!-- Nút Giỏ Hàng góc trên bên phải -->
+      <div class="cart-btn-wrapper" onclick="openCartDrawer()" title="Xem giỏ hàng">
+        <span class="cart-icon-svg">🛒</span>
+        <span class="cart-badge-count" id="cart-badge-count">0</span>
+      </div>
+
+      <div id="user-nav-box" style="display: flex; align-items: center; gap: 8px;">
+        <button id="btn-login-trigger" class="admin-login-btn" onclick="openAuthModal()" style="display: flex; cursor: pointer; border: 1px solid #0066cc;">
+          <span>👤</span> Đăng nhập
+        </button>
+        <div id="user-profile-badge" style="display: none; align-items: center; gap: 8px;">
+          <a href="/course.html" style="text-decoration: none; display: flex; align-items: center; gap: 6px; background: #f0f9ff; border: 1px solid #bae6fd; padding: 5px 12px; border-radius: 20px;">
+            <div style="width: 24px; height: 24px; border-radius: 50%; background: #0284c7; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800;" id="user-badge-initial">U</div>
+            <span style="font-size: 0.82rem; font-weight: 700; color: #0369a1;" id="user-badge-name">Học viên</span>
+          </a>
+          <button onclick="handleUserLogout()" style="background: none; border: none; color: #64748b; font-size: 0.78rem; cursor: pointer; text-decoration: underline;">Đăng xuất</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="site-wrapper">
+    <!-- 2. HERO BANNER FULL-WIDTH -->
+    <section class="hero-banner-full">
+      <img src="/images/banner-tinhoc-click.jpg" alt="Tin Học Click - Đừng làm việc chăm chỉ, hãy làm việc thông minh" class="banner-full-img">
+    </section>
+
+    <!-- 3. MAIN 2-COLUMN LAYOUT -->
+    <div class="main-grid-layout">
+      <!-- CỘT BÊN TRÁI: KHÓA HỌC & LISPCAD -->
+      <div class="content-column">
+        <!-- Mục 1: Khóa học AutoCAD 2D -->
+        <div id="khoa-hoc">
+          <div class="section-header-title">Khóa học AutoCAD 2D</div>
+          <div class="course-card-horizontal" id="featured-course-box">
+            <!-- Thumbnail bản vẽ CAD kèm icon A CAD -->
+            <div class="course-thumb-preview">
+              <svg width="100%" height="100%" viewBox="0 0 240 140" fill="none">
+                <rect width="240" height="140" fill="#091422"/>
+                <rect x="30" y="25" width="160" height="90" stroke="#38bdf8" stroke-width="1.5"/>
+                <line x1="30" y1="70" x2="190" y2="70" stroke="#22c55e" stroke-width="1.5"/>
+                <line x1="110" y1="25" x2="110" y2="115" stroke="#22c55e" stroke-width="1.5"/>
+                <circle cx="150" cy="50" r="16" stroke="#f59e0b" stroke-width="1.5"/>
+              </svg>
+              <div class="course-badge-cube">
+                A
+                <span>CAD</span>
+              </div>
+            </div>
+
+            <!-- Nội dung khóa học -->
+            <div class="course-content">
+              <h3>Khóa học AutoCAD 2D</h3>
+              <p>Từ cơ bản đến nâng cao, giúp bạn thành thạo AutoCAD 2D một cách dễ dàng và bài bản nhất.</p>
+              <div class="btn-group-row">
+                <button class="btn-detail-outline" onclick="window.location.href='/course.html'">
+                  👁 Xem chi tiết & Học thử
+                </button>
+                <button class="btn-add-cart-solid" onclick="handleBuyCourse()">
+                  🛒 Đăng ký học
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mục 2: LispCAD -->
+        <div id="lispcad">
+          <div class="section-header-title">LispCAD</div>
+          <div class="lisp-cards-grid" id="lisp-cards-container">
+            <!-- Được render động từ Database -->
+          </div>
+        </div>
+
+        <!-- Mục 3: TỔNG HỢP FILE CAD VÀ TÀI LIỆU -->
+        <div id="tai-lieu" style="margin-top: 36px;">
+          <div class="section-header-title">📚 TỔNG HỢP FILE CAD VÀ TÀI LIỆU</div>
+          <p style="color: #64748b; font-size: 0.95rem; margin-top: -6px; margin-bottom: 18px;">
+            Tổng hợp file bản vẽ CAD, thư viện block DWG mẫu, giáo trình và tài liệu lệnh tắt cho học viên.
+          </p>
+
+          <div class="docs-cards-grid" id="docs-cards-container">
+            <!-- Được render động từ Database -->
+          </div>
+        </div>
+      </div>
+
+      <!-- CỘT BÊN PHẢI: BANNER MUA NGAY & HỖ TRỢ -->
+      <div class="sidebar-wrapper">
+        <!-- Nút Vàng Mua Ngay Lớn -->
+        <div class="yellow-cta-banner">
+          <div class="yellow-cta-cube">
+            A
+            <span>CAD</span>
+          </div>
+          <button class="btn-big-yellow" onclick="handleBigYellowBuy()">
+            <span>🛒</span> BẤM VÀO ĐÂY ĐỂ MUA NGAY 👆
+          </button>
+        </div>
+
+        <!-- Hộp Hỗ Trợ Học Viên -->
+        <div class="support-card-box" id="ho-tro">
+          <div class="support-header">
+            <span class="support-icon">🎧</span>
+            <h4>Hỗ trợ học viên</h4>
+          </div>
+          <ul class="support-checklist">
+            <li><span>✔</span> Chat trực tuyến 24/7</li>
+            <li><span>✔</span> Hỗ trợ cài đặt, học tập</li>
+            <li><span>✔</span> Cập nhật khóa học miễn phí</li>
+          </ul>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <a id="link-zalo" href="https://zalo.me/0329778016" target="_blank" class="btn-contact-social zalo">
+              <div class="social-label-group">
+                <span style="font-size: 1.2rem;">💬</span>
+                <span>Hỗ trợ qua <strong>Zalo (0329.778.016)</strong></span>
+              </div>
+              <span>›</span>
+            </a>
+
+            <a id="link-facebook" href="https://www.facebook.com/" target="_blank" class="btn-contact-social facebook">
+              <div class="social-label-group">
+                <span style="font-size: 1.2rem;">🌐</span>
+                <span>Nhắn tin qua <strong>Facebook</strong></span>
+              </div>
+              <span>›</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. MODAL CHI TIẾT SẢN PHẨM (Tên -> Hướng dẫn -> Video -> Mua) -->
+  <div class="detail-modal-overlay" id="detail-modal">
+    <div class="detail-modal-content">
+      <span class="close-modal-x" onclick="closeDetailModal()">&times;</span>
+
+      <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px; flex-wrap: wrap;">
+        <span style="background: #e0f2fe; color: #0284c7; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700;" id="modal-category">LispCAD</span>
+        <span style="color: #0066cc; font-family: monospace; font-size: 0.95rem; font-weight: 700;" id="modal-commands">Lệnh: STT</span>
+        <span style="background: #f0fdf4; color: #16a34a; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; border: 1px solid #bbf7d0;" id="modal-downloads">📥 150 lượt tải</span>
+      </div>
+      <h2 style="font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;" id="modal-name">Tên Lisp</h2>
+      <p style="color: #64748b; font-size: 0.95rem;" id="modal-desc">Mô tả chi tiết tiện ích.</p>
+
+      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 16px 0;">
+
+      <!-- HƯỚNG DẪN SỬ DỤNG -->
+      <h4 style="color: #0f172a; font-size: 1.05rem; font-weight: 700;">📖 Hướng Dẫn Sử Dụng Chi Tiết:</h4>
+      <div class="detail-instruction-box" id="modal-instructions">
+        Bước 1: Nạp lisp vào AutoCAD bằng lệnh APPLOAD...
+      </div>
+
+      <!-- ẢNH MINH HỌA / GIF MÔ PHỎNG SẢN PHẨM -->
+      <div id="modal-image-section" style="display: none; margin-top: 16px; text-align: center;">
+        <h4 style="color: #0f172a; font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; text-align: left;">🖼️ Ảnh Minh Họa / GIF Mô Phỏng:</h4>
+        <img id="modal-image-display" src="" alt="Minh họa Lisp" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500';" style="max-width: 100%; max-height: 280px; border-radius: 8px; border: 1px solid #e2e8f0; object-fit: contain; background: #091422; display: block; margin: 0 auto;">
+      </div>
+
+      <!-- VIDEO HƯỚNG DẪN THAO TÁC -->
+      <div id="modal-video-section" style="display: none;">
+        <h4 style="color: #0f172a; font-size: 1.05rem; font-weight: 700; margin-top: 16px;">🎥 Video Hướng Dẫn Thao Tác Trực Tiếp:</h4>
+        <div class="video-wrapper">
+          <iframe id="modal-video-iframe" src="" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <!-- KHUNG MUA & GIÁ TIỀN -->
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: center; margin-top: 20px;">
+        <div style="margin-bottom: 12px;">
+          <span style="font-size: 1rem; text-decoration: line-through; color: #94a3b8; margin-right: 8px;" id="modal-oldprice">199.000đ</span>
+          <span style="font-size: 2rem; font-weight: 800; color: #dc2626;" id="modal-price">99.000đ</span>
+          <p style="font-size: 0.85rem; color: #64748b; margin-top: 2px;">Dùng vĩnh viễn trên mọi phiên bản AutoCAD</p>
+        </div>
+        <div style="display: flex; gap: 12px; justify-content: center; max-width: 420px; margin: 0 auto;">
+          <button class="btn-add-cart-solid" style="flex: 1; padding: 12px;" onclick="addCurrentModalToCart()">
+            🛒 Thêm vào giỏ
+          </button>
+          <button class="btn-detail-outline" style="flex: 1; padding: 12px; background: #0066cc; color: #fff;" onclick="buyNowFromDetail()">
+            ⚡ Mua ngay
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. CART DRAWER (GIỎ HÀNG TRƯỢT TỪ BÊN PHẢI) -->
+  <div class="cart-drawer-overlay" id="cart-drawer-overlay" onclick="closeCartDrawer(event)">
+    <div class="cart-drawer" onclick="event.stopPropagation()">
+      <div class="cart-drawer-header">
+        <h3>🛒 Giỏ Hàng Của Bạn</h3>
+        <span style="font-size: 1.5rem; cursor: pointer; color: #64748b;" onclick="closeCartDrawer()">&times;</span>
+      </div>
+
+      <div class="cart-items-list" id="cart-items-list">
+        <!-- Render danh sách sản phẩm trong giỏ -->
+      </div>
+
+      <div class="cart-drawer-footer">
+        <div class="cart-total-row">
+          <span>Tổng thanh toán:</span>
+          <span style="color: #dc2626; font-size: 1.4rem;" id="cart-total-price">0 đ</span>
+        </div>
+        <button class="btn-add-cart-solid" style="width: 100%; padding: 14px; font-size: 1.05rem; justify-content: center;" onclick="startCheckoutCart()">
+          Tiến Hành Thanh Toán (VietQR)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. POPUP THANH TOÁN VIETQR SEPAY TỰ ĐỘNG -->
+  <div class="checkout-modal-overlay" id="checkout-modal">
+    <div class="checkout-modal-content">
+      <span class="close-modal-x" style="color: #94a3b8;" onclick="closeCheckoutModal()">&times;</span>
+      
+      <!-- BƯỚC 1: ĐIỀN THÔNG TIN KHÁCH HÀNG -->
+      <div id="checkout-step-info">
+        <h3 id="checkout-title" style="color: #38bdf8; margin-bottom: 6px;">Thanh Toán Đơn Hàng</h3>
+        <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 20px;" id="checkout-subprice">Tổng tiền: 99.000 đ</p>
+
+        <form onsubmit="handleCreateOrder(event)">
+          <div class="form-group">
+            <label for="custName">Họ và tên của bạn</label>
+            <input type="text" id="custName" placeholder="Nguyễn Văn A" required>
+          </div>
+          <div class="form-group">
+            <label for="custPhone">Số điện thoại / Zalo (Để nhận file & hỗ trợ)</label>
+            <input type="tel" id="custPhone" placeholder="0912345678" required>
+          </div>
+          <div class="form-group" style="margin-top: 14px;">
+            <label style="font-weight: 700; color: #38bdf8; margin-bottom: 8px; display: block; font-size: 0.92rem;">
+              📦 Phương thức nhận file sau khi thanh toán:
+            </label>
+            <div style="display: flex; flex-direction: column; gap: 10px; background: #1e293b; padding: 12px 14px; border-radius: 10px; border: 1px solid #334155;">
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #fff; font-size: 0.92rem;">
+                <input type="radio" name="orderDeliveryMethod" value="download" checked style="width: 18px; height: 18px; accent-color: #0284c7;">
+                <span><strong>📥 Tự động tải xuống về máy ngay</strong></span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #fff; font-size: 0.92rem;">
+                <input type="radio" name="orderDeliveryMethod" value="zalo" style="width: 18px; height: 18px; accent-color: #0284c7;">
+                <span><strong>💬 Gửi file / link tải về Zalo</strong> (Theo số điện thoại ở trên)</span>
+              </label>
+            </div>
+          </div>
+          <button type="submit" class="btn-add-cart-solid" id="btn-create-order" style="width: 100%; padding: 12px; margin-top: 14px; justify-content: center;">
+            Tạo Mã VietQR Thanh Toán
+          </button>
+        </form>
+      </div>
+
+      <!-- BƯỚC 2: HIỂN THỊ VIETQR ĐỘNG & ĐANG CHỜ SEPAY -->
+      <div id="checkout-step-qr" style="display: none; text-align: center;">
+        <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e; border-radius: 8px; padding: 8px; margin-bottom: 12px;">
+          <span style="font-size: 0.8rem; color: #22c55e;">🔑 MÃ MUA RIÊNG BIỆT CỦA BẠN:</span><br>
+          <strong id="display-order-code" style="font-size: 1.35rem; color: #fff; letter-spacing: 1px;">CAD123456</strong>
+        </div>
+
+        <p style="color: #38bdf8; font-size: 0.85rem; font-weight: 600;">
+          📲 Mở app ngân hàng quét mã bên dưới (Tự động điền số tiền & nội dung):
+        </p>
+
+        <div style="background: #fff; padding: 10px; border-radius: 12px; display: inline-block; margin: 10px 0;">
+          <img id="qr-image-display" src="" alt="Mã QR VietQR" style="width: 220px; height: 220px; object-fit: contain; display: block;">
+        </div>
+
+        <table class="bank-info-table">
+          <tr>
+            <td>Ngân hàng:</td>
+            <td><strong id="display-bank">MBBank</strong></td>
+          </tr>
+          <tr>
+            <td>Số tài khoản:</td>
+            <td>
+              <strong id="display-acc" style="color: #38bdf8;"></strong>
+              <span class="copy-pill" onclick="copyText('display-acc')">Copy</span>
+            </td>
+          </tr>
+          <tr>
+            <td>Chủ tài khoản:</td>
+            <td><strong id="display-name"></strong></td>
+          </tr>
+          <tr>
+            <td>Số tiền cần chuyển:</td>
+            <td><strong id="display-amount" style="color: #4ade80; font-size: 1.15rem;"></strong></td>
+          </tr>
+          <tr>
+            <td>Nội dung CK:</td>
+            <td>
+              <strong id="display-syntax" style="color: #fbbf24;"></strong>
+              <span class="copy-pill" onclick="copyText('display-syntax')">Copy</span>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Khung kiểm tra tự động thời gian thực từ SePay -->
+        <div class="waiting-box" id="waiting-status-box">
+          <div class="waiting-header">
+            <span class="pulse-dot"></span>
+            <span id="waiting-title">ĐANG CHỜ BẠN CHUYỂN KHOẢN...</span>
+          </div>
+          <p id="waiting-desc" style="font-size: 0.82rem; color: #94a3b8; margin-top: 6px; line-height: 1.4;">
+            Hệ thống đang tự động kiểm tra giao dịch tài khoản MBBank.<br>
+            Ngay khi tiền vào tài khoản, màn hình sẽ <strong>tự động tải file về máy bạn</strong> ngay lập tức!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ĐĂNG NHẬP / ĐĂNG KÝ HỌC VIÊN -->
+  <div class="detail-modal-overlay" id="auth-modal" style="display: none;">
+    <div class="detail-modal-content" style="background: #0f172a; color: #ffffff; border: 1px solid #334155; max-width: 440px;">
+      <span class="close-modal-x" onclick="closeAuthModal()" style="color: #94a3b8;">&times;</span>
+      
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div style="width: 50px; height: 50px; border-radius: 12px; background: #0284c7; color: #fff; font-size: 1.6rem; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px;">A</div>
+        <h3 style="font-size: 1.3rem; font-weight: 800;" id="auth-modal-title">Tài Khoản Học Viên</h3>
+        <p style="color: #94a3b8; font-size: 0.85rem;" id="auth-modal-subtitle">Đăng nhập để vào học hoặc kích hoạt khóa học</p>
+      </div>
+
+      <!-- Tabs Đăng nhập / Đăng ký -->
+      <div style="display: flex; border-bottom: 1px solid #334155; margin-bottom: 20px;">
+        <button id="tab-btn-login" onclick="switchAuthTab('login')" style="flex: 1; padding: 10px; background: none; border: none; border-bottom: 2px solid #38bdf8; color: #38bdf8; font-weight: 700; cursor: pointer;">Đăng Nhập</button>
+        <button id="tab-btn-register" onclick="switchAuthTab('register')" style="flex: 1; padding: 10px; background: none; border: none; border-bottom: 2px solid transparent; color: #94a3b8; font-weight: 700; cursor: pointer;">Đăng Ký Mới</button>
+      </div>
+
+      <!-- Form Đăng Nhập -->
+      <form id="form-login" onsubmit="submitLogin(event)">
+        <div style="margin-bottom: 14px;">
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Số điện thoại hoặc Email:</label>
+          <input type="text" id="login-account" required placeholder="0329... hoặc email@gmail.com" style="width: 100%; padding: 12px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 10px; font-size: 0.95rem;">
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Mật khẩu:</label>
+          <input type="password" id="login-password" required placeholder="Nhập mật khẩu" style="width: 100%; padding: 12px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 10px; font-size: 0.95rem;">
+        </div>
+        <button type="submit" style="width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-weight: 800; font-size: 1rem; cursor: pointer;">ĐĂNG NHẬP VÀO HỌC</button>
+      </form>
+
+      <!-- Form Đăng Ký -->
+      <form id="form-register" onsubmit="submitRegister(event)" style="display: none;">
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Họ và tên của bạn:</label>
+          <input type="text" id="reg-name" required placeholder="VD: Nguyễn Văn An" style="width: 100%; padding: 11px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 10px; font-size: 0.95rem;">
+        </div>
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Số điện thoại:</label>
+          <input type="tel" id="reg-phone" required placeholder="0912..." style="width: 100%; padding: 11px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 10px; font-size: 0.95rem;">
+        </div>
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Email (để nhận tài liệu):</label>
+          <input type="email" id="reg-email" placeholder="email@gmail.com" style="width: 100%; padding: 11px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 10px; font-size: 0.95rem;">
+        </div>
+        <div style="margin-bottom: 18px;">
+          <label style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Mật khẩu đăng nhập:</label>
+          <input type="password" id="reg-password" required placeholder="Tạo mật khẩu" style="width: 100%; padding: 11px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 10px; font-size: 0.95rem;">
+        </div>
+        <button type="submit" style="width: 100%; padding: 12px; background: #0284c7; color: #fff; border: none; border-radius: 10px; font-weight: 800; font-size: 1rem; cursor: pointer;">TẠO TÀI KHOẢN HỌC VIÊN</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL XEM CHI TIẾT & TẢI TÀI LIỆU (2-3 ẢNH MINH HỌA & THANH TOÁN / TẢI FILE) -->
+  <div class="doc-detail-overlay" id="doc-detail-user-modal" style="display: none;" onclick="if(event.target===this) closeDocDetailUser()">
+    <div class="doc-detail-box">
+      <span onclick="closeDocDetailUser()" style="color: #94a3b8; position: absolute; top: 16px; right: 20px; font-size: 1.8rem; cursor: pointer; line-height: 1;">&times;</span>
+      
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;">
+        <span id="doc-detail-format-badge" class="doc-format-badge dwg">📐 DWG / ZIP</span>
+        <span id="doc-detail-category" style="color: #38bdf8; font-size: 0.85rem; font-weight: 700;">Thư viện DWG</span>
+        <span id="doc-detail-pricing-badge" style="font-size: 0.8rem; font-weight: 800; padding: 3px 8px; border-radius: 6px;">Miễn phí</span>
+        <span id="doc-detail-downloads-badge" style="font-size: 0.8rem; font-weight: 800; padding: 3px 8px; border-radius: 6px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">📥 250 lượt tải</span>
+      </div>
+      <h2 id="doc-detail-title" style="font-size: 1.35rem; font-weight: 800; color: #ffffff; margin-bottom: 8px; line-height: 1.3;">
+        Tên Tài Liệu
+      </h2>
+      <p id="doc-detail-desc" style="color: #94a3b8; font-size: 0.9rem; line-height: 1.5; margin-bottom: 16px;">
+        Mô tả nội dung tài liệu...
+      </p>
+
+      <!-- KHU VỰC 2-3 ẢNH MINH HỌA BẢN VẼ MẪU -->
+      <div id="doc-detail-gallery-section" style="margin-bottom: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h4 style="color: #38bdf8; font-size: 0.95rem; font-weight: 700; margin: 0;">
+            🖼️ Ảnh Minh Họa Bản Vẽ &amp; Mẫu Chi Tiết
+          </h4>
+          <span style="font-size: 0.78rem; color: #94a3b8;" id="doc-detail-gallery-count">3 ảnh mẫu</span>
+        </div>
+        <div class="doc-gallery-main">
+          <img id="doc-detail-main-img" src="" alt="Bản vẽ mẫu">
+        </div>
+        <div class="doc-gallery-thumbs" id="doc-detail-thumbs-container">
+          <!-- Render thumbnails -->
+        </div>
+      </div>
+
+      <!-- KHU VỰC XEM TRƯỚC / ĐỌC THỬ TÀI LIỆU PDF TRỰC TUYẾN (CANVAS CHỐNG TẢI TRỘM) -->
+      <div id="doc-detail-pdf-section" style="display: none; margin-bottom: 20px; background: #0b1320; border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 12px; padding: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+            <span style="font-size: 1.25rem;">📖</span>
+            <div>
+              <strong style="color: #38bdf8; font-size: 0.95rem; display: block;" id="doc-detail-pdf-heading">Đọc Thử File PDF (Giới Hạn Số Trang)</strong>
+              <small id="doc-detail-pdf-name" style="color: #94a3b8; font-size: 0.78rem; display: block; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></small>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button type="button" class="btn-sm btn-secondary" onclick="openFullscreenPdfPreview()" style="font-size: 0.78rem; padding: 6px 12px; display: inline-flex; align-items: center; gap: 4px; background: #1e293b; color: #fff; border: 1px solid #334155; cursor: pointer;">
+              <span>⤢</span> Phóng To Toàn Màn Hình
+            </button>
+            <button type="button" class="btn-sm btn-secondary" onclick="openPdfInNewTab()" style="font-size: 0.78rem; padding: 6px 12px; display: inline-flex; align-items: center; gap: 4px; background: #1e293b; color: #fff; border: 1px solid #334155; cursor: pointer;">
+              <span>↗</span> Mở Tab Mới
+            </button>
+          </div>
+        </div>
+
+        <!-- Thanh điều hướng lật trang & Thu phóng -->
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #131f33; padding: 8px 12px; border-radius: 8px 8px 0 0; border: 1px solid #334155; border-bottom: none; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="btn-sm btn-secondary" onclick="pdfPrevPage()" style="padding: 5px 10px; font-size: 0.8rem; background: #1e293b; color: #38bdf8; border: 1px solid #334155; cursor: pointer;">
+              ◀ Trang Trước
+            </button>
+            <span style="font-size: 0.85rem; color: #cbd5e1; font-weight: 600;">
+              Trang <span id="pdf-current-page-num" style="color: #38bdf8; font-weight: 800;">1</span> / <span id="pdf-total-page-num">11</span>
+            </span>
+            <button type="button" class="btn-sm btn-secondary" onclick="pdfNextPage()" style="padding: 5px 10px; font-size: 0.8rem; background: #1e293b; color: #38bdf8; border: 1px solid #334155; cursor: pointer;">
+              Trang Sau ▶
+            </button>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <button type="button" class="btn-sm btn-secondary" onclick="pdfZoomOut()" style="padding: 4px 8px; font-size: 0.82rem; background: #1e293b; color: #fff; border: 1px solid #334155; cursor: pointer;" title="Thu nhỏ">🔍 -</button>
+            <span id="pdf-zoom-label" style="font-size: 0.8rem; color: #94a3b8; min-width: 42px; text-align: center;">100%</span>
+            <button type="button" class="btn-sm btn-secondary" onclick="pdfZoomIn()" style="padding: 4px 8px; font-size: 0.82rem; background: #1e293b; color: #fff; border: 1px solid #334155; cursor: pointer;" title="Phóng to">🔍 +</button>
+            <button type="button" class="btn-sm btn-secondary" onclick="pdfFitWidth()" style="padding: 4px 8px; font-size: 0.8rem; background: #1e293b; color: #34d399; border: 1px solid #334155; cursor: pointer;" title="Khổ vừa khung">Vừa khung</button>
+          </div>
+        </div>
+
+        <!-- Khung hiển thị Canvas PDF sắc nét -->
+        <div id="pdf-canvas-container" style="position: relative; width: 100%; height: 500px; overflow: auto; background: #070d18; border: 1px solid #334155; border-radius: 0 0 8px 8px; display: flex; justify-content: center; align-items: flex-start; padding: 16px;">
+          <div id="doc-pdf-loading" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #091422; color: #94a3b8; font-size: 0.88rem; gap: 8px; z-index: 5;">
+            <div style="width: 32px; height: 32px; border: 3px solid #334155; border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+            <span>⏳ Đang nạp bản đọc thử 10 trang an toàn...</span>
+          </div>
+          <canvas id="doc-pdf-canvas" style="box-shadow: 0 10px 30px rgba(0,0,0,0.8); border-radius: 4px; max-width: 100%; height: auto;"></canvas>
+        </div>
+
+        <!-- Khối Paywall CTA ngay dưới khung đọc thử -->
+        <div id="doc-pdf-paywall-notice" style="margin-top: 12px; background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)); border: 1px solid rgba(225, 29, 72, 0.6); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.6rem;">🔒</span>
+            <div>
+              <div style="font-weight: 700; color: #f8fafc; font-size: 0.9rem;">
+                Bạn đang đọc thử giới hạn <span style="color: #38bdf8; font-weight: 800;" id="doc-preview-limit-badge">10 / 27 trang</span> đầu tiên
+              </div>
+              <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 2px;">
+                Bản xem trước bị khóa chức năng tải file gốc. Vui lòng thanh toán để mở khóa toàn bộ các trang và tải file gốc về máy.
+              </div>
+            </div>
+          </div>
+          <div>
+            <button type="button" id="doc-pdf-paywall-action-btn" class="btn-sm btn-primary" onclick="buyCurrentDocNow()" style="padding: 10px 22px; font-size: 0.92rem; font-weight: 800; background: linear-gradient(135deg, #e11d48 0%, #be123c 100%); border: none; box-shadow: 0 4px 14px rgba(225, 29, 72, 0.4); cursor: pointer; white-space: nowrap;">
+              ⚡ MUA NGAY ĐỂ MỞ KHÓA (<span id="doc-pdf-paywall-price-badge">49.000đ</span>)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KHU VỰC GIÁ BÁN & NÚT THANH TOÁN (KHI TÀI LIỆU CÓ PHÍ) -->
+      <div id="doc-detail-paid-box" style="display: none; background: #111d2d; border: 1px solid var(--accent-cyan); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 2px;">Giá sở hữu trọn bộ tài liệu:</div>
+            <div style="display: flex; align-items: baseline; gap: 10px;">
+              <span id="doc-detail-price-text" style="font-size: 1.5rem; font-weight: 800; color: #00e676;">49.000 đ</span>
+              <span id="doc-detail-oldprice-text" style="font-size: 0.95rem; color: #64748b; text-decoration: line-through;">99.000 đ</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button type="button" class="btn-sm btn-secondary" onclick="addCurrentDocToCart()" style="padding: 10px 16px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+              <span>🛒</span> Thêm Giỏ Hàng
+            </button>
+            <button type="button" class="btn-sm btn-primary" onclick="buyCurrentDocNow()" style="padding: 10px 20px; font-weight: 800; font-size: 0.95rem; background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);">
+              ⚡ MUA NGAY (Thanh Toán)
+            </button>
+          </div>
+        </div>
+        <div style="margin-top: 10px; font-size: 0.78rem; color: #38bdf8; display: flex; align-items: center; gap: 6px;">
+          <span>🔒</span> Sau khi thanh toán chuyển khoản VietQR thành công, toàn bộ link tải Google Drive bên dưới sẽ tự động mở khóa ngay!
+        </div>
+      </div>
+
+      <!-- KHU VỰC THÔNG BÁO MIỄN PHÍ -->
+      <div id="doc-detail-free-box" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 2px;">Giá tài liệu:</div>
+            <div style="display: flex; align-items: baseline; gap: 8px;">
+              <span style="font-size: 1.5rem; font-weight: 800; color: #00e676;">0 đ</span>
+              <span style="font-size: 0.82rem; color: #34d399; font-weight: 700;">(Miễn phí 100%)</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button type="button" class="btn-sm btn-secondary" onclick="addCurrentDocToCart()" style="padding: 10px 16px; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+              <span>🛒</span> Thêm Giỏ Hàng
+            </button>
+            <button type="button" class="btn-sm btn-primary" onclick="downloadAllCurrentDocFiles()" style="padding: 10px 18px; font-weight: 800; font-size: 0.95rem; background: #10b981; border: none; cursor: pointer;">
+              📥 Tải Toàn Bộ File (0đ)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KHU VỰC DANH SÁCH FILE & LINK GOOGLE DRIVE -->
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="color: #38bdf8; font-size: 0.95rem; font-weight: 700; margin: 0;" id="doc-detail-files-header">
+            📁 Danh Sách File Đính Kèm &amp; Link Google Drive
+          </h4>
+          <span style="font-size: 0.8rem; color: #94a3b8;" id="doc-detail-total-size">Tổng: 45.2 MB</span>
+        </div>
+        <div id="doc-detail-files-list">
+          <!-- Render từng file đính kèm -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL XEM TRƯỚC PDF TOÀN MÀN HÌNH -->
+  <div id="fullscreen-pdf-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.92); z-index: 2000; flex-direction: column; padding: 14px;" onclick="if(event.target===this) closeFullscreenPdfPreview()">
+    <div style="display: flex; justify-content: space-between; align-items: center; background: #0f172a; padding: 12px 20px; border-radius: 12px 12px 0 0; border: 1px solid #334155; border-bottom: none;">
+      <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+        <span style="font-size: 1.3rem;">📄</span>
+        <div>
+          <div id="fullscreen-pdf-title" style="color: #ffffff; font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 600px;">Xem Trước File PDF</div>
+          <small style="color: #38bdf8; font-size: 0.75rem;">Chế độ đọc thử trực tuyến</small>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button type="button" class="btn-sm btn-secondary" onclick="openPdfInNewTab()" style="padding: 7px 14px; font-size: 0.82rem; background: #1e293b; color: #fff; border: 1px solid #334155; cursor: pointer;">↗ Mở Tab Mới</button>
+        <button type="button" onclick="closeFullscreenPdfPreview()" style="background: #e11d48; color: #fff; border: none; border-radius: 8px; width: 34px; height: 34px; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Đóng">&times;</button>
+      </div>
+    </div>
+    <div style="flex: 1; position: relative; background: #1e293b; border: 1px solid #334155; border-radius: 0 0 12px 12px; overflow: hidden;">
+      <iframe id="fullscreen-pdf-iframe" src="" style="width: 100%; height: 100%; border: none;" allow="autoplay" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- TOAST THÔNG BÁO -->
+  <div class="toast-notice" id="toast-notice">
+    <span>✓</span> <span id="toast-msg">Đã thêm vào giỏ hàng!</span>
+  </div>
+
+  <script>
+    let allProducts = [];
+    let allDocuments = [];
+    let cart = JSON.parse(localStorage.getItem('cart_lispcad') || '[]');
+    let selectedProduct = null;
+    let currentOrder = null;
+    let pollInterval = null;
+    let currentUser = null;
+
+    // Helper chuyển link YouTube thành dạng Embed
+    function getYouTubeEmbedUrl(url) {
+      if (!url) return null;
+      const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+      const match = url.match(regExp);
+      return (match && match[1]) ? `https://www.youtube.com/embed/${match[1]}` : url;
+    }
+
+    // Tải sản phẩm & tài liệu từ backend
+    async function loadStore() {
+      try {
+        checkCurrentUser();
+        const res = await fetch('/api/public/store?t=' + Date.now());
+        const data = await res.json();
+        allProducts = data.products || [];
+        allDocuments = data.documents || [];
+        renderLispCards(allProducts);
+        renderDocuments(allDocuments);
+        updateCartBadge();
+
+        if (data.paymentSettings) {
+          if (data.paymentSettings.zaloLink) {
+            const z1 = document.getElementById('link-zalo');
+            if (z1) z1.href = data.paymentSettings.zaloLink;
+            const z2 = document.getElementById('nav-link-zalo');
+            if (z2) z2.href = data.paymentSettings.zaloLink;
+          }
+          if (data.paymentSettings.facebookLink) {
+            const f1 = document.getElementById('link-facebook');
+            if (f1) f1.href = data.paymentSettings.facebookLink;
+            const f2 = document.getElementById('nav-link-fb');
+            if (f2) f2.href = data.paymentSettings.facebookLink;
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Render danh sách Tài liệu & Giáo trình (Hỗ trợ Miễn phí & Có phí / Giỏ hàng)
+    let currentViewingDoc = null;
+
+    function renderDocuments(documents) {
+      const container = document.getElementById('docs-cards-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (!documents || documents.length === 0) {
+        container.innerHTML = '<p style="color: #64748b; padding: 20px 0;">Chưa có tài liệu nào được đăng tải.</p>';
+        return;
+      }
+
+      documents.forEach(doc => {
+        const card = document.createElement('div');
+        card.className = 'doc-item-card';
+
+        const formatClass = (doc.format || 'pdf').toLowerCase().includes('dwg') ? 'dwg' : 'pdf';
+        const formatIcon = formatClass === 'dwg' ? '📐' : '📄';
+        const hasPdfPreview = isPdfResource(doc.downloadUrl, doc.title, doc.format) || (doc.files && doc.files.some(f => isPdfResource(f.url, f.name, doc.format)));
+        const formatLabel = hasPdfPreview ? `${formatIcon} ${doc.format || 'PDF'} • Đọc thử` : `${formatIcon} ${doc.format || 'PDF'}`;
+        const filesCount = doc.files ? doc.files.length : (doc.downloadUrl ? 1 : 0);
+        const hasImages = doc.images && doc.images.length > 0;
+        const priceVal = Number(doc.price || 0);
+
+        let thumbHtml = '';
+        if (hasImages) {
+          thumbHtml = `
+            <div class="doc-card-thumb-area" onclick="openDocDetailUser('${doc.id}')" title="Bấm để xem chi tiết">
+              <img src="${doc.images[0]}" alt="${doc.title}">
+              <span class="doc-badge-img-count">🖼️ ${doc.images.length} ảnh bản vẽ</span>
+            </div>
+          `;
+        } else {
+          thumbHtml = `
+            <div class="doc-card-thumb-area" onclick="openDocDetailUser('${doc.id}')" title="Bấm để xem chi tiết">
+              <svg width="100%" height="100%" viewBox="0 0 200 120" fill="none">
+                <rect width="200" height="120" fill="#091422"/>
+                <line x1="0" y1="30" x2="200" y2="30" stroke="#1e293b" stroke-width="0.8"/>
+                <line x1="0" y1="60" x2="200" y2="60" stroke="#1e293b" stroke-width="0.8"/>
+                <line x1="0" y1="90" x2="200" y2="90" stroke="#1e293b" stroke-width="0.8"/>
+                <line x1="50" y1="0" x2="50" y2="120" stroke="#1e293b" stroke-width="0.8"/>
+                <line x1="100" y1="0" x2="100" y2="120" stroke="#1e293b" stroke-width="0.8"/>
+                <line x1="150" y1="0" x2="150" y2="120" stroke="#1e293b" stroke-width="0.8"/>
+                <rect x="25" y="20" width="150" height="80" rx="4" stroke="#0284c7" stroke-width="1.2" stroke-dasharray="4 2"/>
+                <rect x="35" y="30" width="55" height="40" stroke="#38bdf8" stroke-width="1.2" fill="rgba(56, 189, 248, 0.08)"/>
+                <line x1="100" y1="35" x2="160" y2="35" stroke="#94a3b8" stroke-width="1.5"/>
+                <line x1="100" y1="48" x2="150" y2="48" stroke="#64748b" stroke-width="1.2"/>
+                <line x1="100" y1="60" x2="140" y2="60" stroke="#64748b" stroke-width="1.2"/>
+                <text x="35" y="90" fill="#38bdf8" font-size="10" font-weight="700" font-family="sans-serif">${doc.category || 'TÀI LIỆU CAD'}</text>
+                <line x1="120" y1="88" x2="165" y2="88" stroke="#f59e0b" stroke-width="1.5"/>
+              </svg>
+              <span class="doc-badge-img-count" style="background: rgba(15, 23, 42, 0.85); color: #94a3b8; border-color: #334155;">📄 Bản vẽ mẫu</span>
+            </div>
+          `;
+        }
+
+        const priceHtml = `
+          <div style="display: flex; align-items: baseline; gap: 6px;">
+            <strong style="color: #00e676; font-size: 1.15rem; font-weight: 800;">${priceVal === 0 ? '0đ' : priceVal.toLocaleString() + 'đ'}</strong>
+            ${(doc.oldPrice && priceVal > 0) ? `<small style="color: #64748b; text-decoration: line-through; font-size: 0.78rem;">${Number(doc.oldPrice).toLocaleString()}đ</small>` : ''}
+          </div>
+        `;
+
+        const actionsHtml = `
+          <div class="lisp-actions-row" style="margin-top: 12px; gap: 8px;">
+            <button class="btn-detail-outline" onclick="openDocDetailUser('${doc.id}')" style="flex: 1;">
+              👁 Xem chi tiết
+            </button>
+            <button class="btn-add-cart-solid" onclick="addDocToCart('${doc.id}')" title="Thêm vào giỏ hàng" style="flex: 1;">
+              🛒 Thêm vào giỏ
+            </button>
+          </div>
+        `;
+
+        card.innerHTML = `
+          <div>
+            ${thumbHtml}
+            <div class="doc-card-header">
+              <span class="doc-format-badge ${formatClass}">${formatLabel}</span>
+              <span style="font-size: 0.75rem; color: #64748b; font-weight: 600;">${doc.category || 'Giáo trình'}</span>
+            </div>
+            <div class="doc-title-text" onclick="openDocDetailUser('${doc.id}')" style="cursor: pointer;">${doc.title}</div>
+            <div class="doc-desc-text">${doc.description || 'Tài liệu học tập và tra cứu AutoCAD 2D chuẩn.'}</div>
+          </div>
+          <div class="doc-card-footer" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <span class="doc-size-text">📦 ${doc.size || '10 MB'} (${filesCount} file)</span>
+              <span style="font-size: 0.76rem; color: #64748b; display: flex; align-items: center; gap: 3px;">
+                <span style="color: #10b981;">📥</span> <strong>${Number(doc.downloadCount || 0).toLocaleString()}</strong> lượt tải
+              </span>
+            </div>
+            ${priceHtml}
+          </div>
+          ${actionsHtml}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Chuyển link Google Drive thành link tải trực tiếp
+    function formatDriveDownloadUrl(url) {
+      if (!url) return '#';
+      const m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (m && m[1]) {
+        return `https://drive.google.com/uc?export=download&id=${m[1]}`;
+      }
+      return url;
+    }
+
+    // Mở popup xem 2-3 ảnh minh họa & danh sách nhiều file / link Drive / Thanh toán
+    function openDocDetailUser(docId) {
+      const doc = allDocuments.find(d => d.id === docId);
+      if (!doc) return;
+      currentViewingDoc = doc;
+
+      // Tính chính xác: nếu giá > 0 thì là CÓ PHÍ, chỉ khi giá == 0 mới là MIỄN PHÍ
+      const priceNum = Math.max(0, Number(doc.price) || 0);
+      const isPaid = priceNum > 0;
+      const isFree = !isPaid;
+
+      document.getElementById('doc-detail-title').innerText = doc.title;
+      document.getElementById('doc-detail-category').innerText = doc.category || 'Tài liệu CAD';
+      document.getElementById('doc-detail-desc').innerText = doc.description || '';
+      document.getElementById('doc-detail-total-size').innerText = 'Tổng dung lượng: ' + (doc.size || '10 MB');
+      document.getElementById('doc-detail-downloads-badge').innerHTML = `📥 <strong>${(Number(doc.downloadCount) || 0).toLocaleString()}</strong> lượt tải`;
+
+      const formatBadge = document.getElementById('doc-detail-format-badge');
+      const isDwg = (doc.format || '').toLowerCase().includes('dwg');
+      formatBadge.className = 'doc-format-badge ' + (isDwg ? 'dwg' : 'pdf');
+      formatBadge.innerText = (isDwg ? '📐 ' : '📄 ') + (doc.format || 'PDF');
+
+      const pricingBadge = document.getElementById('doc-detail-pricing-badge');
+      if (isFree) {
+        pricingBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+        pricingBadge.style.color = '#34d399';
+        pricingBadge.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+        pricingBadge.innerText = '🎁 Miễn phí 100% (0đ)';
+      } else {
+        pricingBadge.style.background = 'rgba(2, 132, 199, 0.15)';
+        pricingBadge.style.color = '#38bdf8';
+        pricingBadge.style.border = '1px solid rgba(2, 132, 199, 0.3)';
+        pricingBadge.innerText = '💎 Có phí: ' + priceNum.toLocaleString() + ' đ';
+      }
+
+      // Khối giá bán & mua hàng (Có phí vs Miễn phí)
+      const paidBox = document.getElementById('doc-detail-paid-box');
+      const freeBox = document.getElementById('doc-detail-free-box');
+      const filesHeader = document.getElementById('doc-detail-files-header');
+
+      if (isPaid) {
+        paidBox.style.display = 'block';
+        freeBox.style.display = 'none';
+        document.getElementById('doc-detail-price-text').innerText = priceNum.toLocaleString() + ' đ';
+        if (doc.oldPrice && Number(doc.oldPrice) > priceNum) {
+          document.getElementById('doc-detail-oldprice-text').innerText = Number(doc.oldPrice).toLocaleString() + ' đ';
+          document.getElementById('doc-detail-oldprice-text').style.display = 'inline';
+        } else {
+          document.getElementById('doc-detail-oldprice-text').style.display = 'none';
+        }
+        filesHeader.innerHTML = '📁 Danh Sách File &amp; Bản Vẽ Trong Bộ (Mở khóa sau thanh toán)';
+      } else {
+        paidBox.style.display = 'none';
+        freeBox.style.display = 'flex';
+        filesHeader.innerHTML = '📁 Danh Sách File Đính Kèm Miễn Phí (0đ)';
+      }
+
+      // Gallery 2 - 3 ảnh minh họa
+      const gallerySection = document.getElementById('doc-detail-gallery-section');
+      const thumbsContainer = document.getElementById('doc-detail-thumbs-container');
+      const mainImg = document.getElementById('doc-detail-main-img');
+      const countLabel = document.getElementById('doc-detail-gallery-count');
+
+      if (doc.images && doc.images.length > 0) {
+        gallerySection.style.display = 'block';
+        countLabel.innerText = `${doc.images.length} ảnh bản vẽ mẫu`;
+        mainImg.src = doc.images[0];
+        thumbsContainer.innerHTML = '';
+
+        doc.images.forEach((imgUrl, i) => {
+          const thumb = document.createElement('div');
+          thumb.className = 'doc-gallery-thumb-item' + (i === 0 ? ' active' : '');
+          thumb.innerHTML = `<img src="${imgUrl}" alt="Ảnh mẫu ${i + 1}">`;
+          thumb.onclick = () => {
+            mainImg.src = imgUrl;
+            document.querySelectorAll('.doc-gallery-thumb-item').forEach(el => el.classList.remove('active'));
+            thumb.classList.add('active');
+          };
+          thumbsContainer.appendChild(thumb);
+        });
+      } else {
+        gallerySection.style.display = 'none';
+      }
+
+      // Danh sách file tải về & link Drive
+      const filesContainer = document.getElementById('doc-detail-files-list');
+      filesContainer.innerHTML = '';
+
+      const files = (doc.files && doc.files.length > 0) 
+        ? doc.files 
+        : [{ name: doc.title, url: doc.downloadUrl || '', type: doc.downloadType || 'link', size: doc.size || '10 MB' }];
+
+      // Tự động nạp bản xem trước PDF nếu có
+      let defaultPdf = null;
+      if (files && files.length > 0) {
+        defaultPdf = files.find(f => isPdfResource(f.url, f.name, doc.format));
+      }
+      if (!defaultPdf && isPdfResource(doc.downloadUrl, doc.title, doc.format)) {
+        defaultPdf = { url: doc.downloadUrl, name: doc.title };
+      }
+
+      const pdfSection = document.getElementById('doc-detail-pdf-section');
+      const paywallNotice = document.getElementById('doc-pdf-paywall-notice');
+
+      if (defaultPdf || (doc.format && doc.format.toLowerCase().includes('pdf'))) {
+        const previewLimit = doc.previewPages || 10;
+        currentPdfRawUrl = `/api/public/pdf-preview-slice/${doc.id}`;
+        currentPdfPreviewUrl = `/api/public/pdf-preview-slice/${doc.id}#toolbar=0&navpanes=0`;
+        currentPdfTitle = (defaultPdf && defaultPdf.name) ? defaultPdf.name : doc.title;
+
+        pdfSection.style.display = 'block';
+        const headingEl = document.getElementById('doc-detail-pdf-heading');
+        if (headingEl) {
+          headingEl.innerHTML = `📖 Đọc Thử Giới Hạn: <span style="color: #34d399;">${previewLimit} Trang Đầu</span>`;
+        }
+        document.getElementById('doc-detail-pdf-name').innerText = '• ' + currentPdfTitle;
+        const limitBadge = document.getElementById('doc-preview-limit-badge');
+        if (limitBadge) limitBadge.innerText = `${previewLimit} trang`;
+
+        // Banner Paywall bên dưới khung đọc thử:
+        // Nếu có phí: CHỈ hiện 1 nút "⚡ MUA NGAY ĐỂ MỞ KHÓA" (Không có nút giỏ hàng, không có chữ tải file)
+        // Nếu 0đ miễn phí: Ẩn hẳn banner này đi
+        if (paywallNotice) {
+          if (isPaid) {
+            paywallNotice.style.display = 'flex';
+            const priceBadge = document.getElementById('doc-pdf-paywall-price-badge');
+            if (priceBadge) priceBadge.innerText = priceNum.toLocaleString() + 'đ';
+          } else {
+            paywallNotice.style.display = 'none';
+          }
+        }
+
+        // Nạp và hiển thị file PDF bằng Canvas sắc nét
+        loadPdfToCanvas(currentPdfRawUrl);
+
+        // Tải số trang thực tế của file PDF
+        fetch(`/api/public/pdf-doc-info/${doc.id}`)
+          .then(r => r.json())
+          .then(info => {
+            if (info && info.totalPages) {
+              const headingEl = document.getElementById('doc-detail-pdf-heading');
+              if (headingEl) {
+                headingEl.innerHTML = `📖 Đọc Thử Giới Hạn: <span style="color: #34d399;">${previewLimit} Trang Đầu</span> (File Gốc Gồm Toàn Bộ ${info.totalPages} Trang)`;
+              }
+              const limitBadge = document.getElementById('doc-preview-limit-badge');
+              if (limitBadge) limitBadge.innerText = `${previewLimit} / ${info.totalPages} trang`;
+            }
+          })
+          .catch(() => {});
+      } else {
+        pdfSection.style.display = 'none';
+      }
+
+      files.forEach((f, idx) => {
+        const row = document.createElement('div');
+        row.className = 'doc-file-download-row';
+        const isDriveLink = (f.url || '').includes('drive.google.com');
+        const dlUrl = formatDriveDownloadUrl(f.url);
+        const icon = (f.name || '').toLowerCase().includes('dwg') ? '📐' : ((f.name || '').toLowerCase().includes('pdf') ? '📄' : '📦');
+        const isThisPdf = isPdfResource(f.url, f.name, doc.format);
+
+        const previewButtonHtml = (isThisPdf && f.url)
+          ? `<button type="button" class="btn-preview-pdf" onclick="loadDocPdfPreview('${encodeURIComponent(f.url)}', '${encodeURIComponent(f.name || `Tập tin ${idx + 1}`)}')" title="Đọc thử / xem trước nội dung file PDF này">
+               <span>👁️</span> Đọc Thử PDF
+             </button>`
+          : '';
+
+        // Nút hành động cho file:
+        // Nếu có phí: hiển thị "🔒 Mua để tải"
+        // Chỉ khi 0đ mới hiển thị "Tải File (0đ)"
+        const buttonHtml = isPaid
+          ? `<button type="button" class="btn-file-dl" onclick="buyCurrentDocNow()" style="background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); cursor: pointer;">
+               <span>🔒</span> Mua để tải
+             </button>`
+          : `<a href="${dlUrl}" target="_blank" download class="btn-file-dl" onclick="trackDownloadItem('${doc.id}')">
+               <span>📥</span> Tải File (0đ)
+             </a>`;
+
+        const subText = isPaid
+          ? `<span>Dung lượng: <strong style="color: #38bdf8;">${f.size || 'N/A'}</strong></span> • <span>🔒 Mở khóa sau khi thanh toán</span>`
+          : `<span>Dung lượng: <strong style="color: #38bdf8;">${f.size || 'N/A'}</strong></span> • <span>⚡ Miễn phí 100% (0đ)</span>`;
+
+        row.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+            <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">
+              ${icon}
+            </div>
+            <div style="min-width: 0;">
+              <div style="font-weight: 700; color: #f8fafc; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${f.name || `Tập tin ${idx + 1}`}
+              </div>
+              <div style="font-size: 0.78rem; color: #94a3b8; display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+                ${subText}
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+            ${previewButtonHtml}
+            ${buttonHtml}
+          </div>
+        `;
+        filesContainer.appendChild(row);
+      });
+
+      document.getElementById('doc-detail-user-modal').style.display = 'flex';
+    }
+
+    function closeDocDetailUser() {
+      document.getElementById('doc-detail-user-modal').style.display = 'none';
+      const iframe = document.getElementById('doc-detail-pdf-iframe');
+      if (iframe) iframe.src = '';
+      currentViewingDoc = null;
+    }
+
+    // --- CÁC HÀM XỬ LÝ XEM TRƯỚC FILE PDF TRỰC TUYẾN ---
+    let currentPdfPreviewUrl = '';
+    let currentPdfRawUrl = '';
+    let currentPdfTitle = '';
+
+    function isPdfResource(url, filename, format) {
+      const str = `${url || ''} ${filename || ''} ${format || ''}`.toLowerCase();
+      if (str.includes('.pdf') || str.includes('pdf')) return true;
+      if (url && url.includes('drive.google.com') && (str.includes('pdf') || str.includes('giáo trình') || str.includes('sách') || str.includes('tài liệu'))) return true;
+      return false;
+    }
+
+    function getPdfEmbedUrl(url) {
+      if (!url) return '';
+      const m1 = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (m1 && m1[1]) {
+        return `https://drive.google.com/file/d/${m1[1]}/preview`;
+      }
+      const m2 = url.match(/id=([a-zA-Z0-9_-]+)/);
+      if (m2 && m2[1]) {
+        return `https://drive.google.com/file/d/${m2[1]}/preview`;
+      }
+      return url;
+    }
+
+    function loadDocPdfPreview(encodedUrl, encodedTitle) {
+      if (!currentViewingDoc) return;
+      const priceNum = Math.max(0, Number(currentViewingDoc.price) || 0);
+      const isPaid = priceNum > 0;
+      const isFree = !isPaid;
+      const previewLimit = currentViewingDoc.previewPages || 10;
+      currentPdfRawUrl = `/api/public/pdf-preview-slice/${currentViewingDoc.id}`;
+      currentPdfPreviewUrl = `/api/public/pdf-preview-slice/${currentViewingDoc.id}#toolbar=0&navpanes=0`;
+      currentPdfTitle = decodeURIComponent(encodedTitle);
+
+      const pdfSection = document.getElementById('doc-detail-pdf-section');
+      const paywallNotice = document.getElementById('doc-pdf-paywall-notice');
+
+      if (pdfSection) {
+        pdfSection.style.display = 'block';
+        const headingEl = document.getElementById('doc-detail-pdf-heading');
+        if (headingEl) {
+          headingEl.innerHTML = `📖 Đọc Thử Giới Hạn: <span style="color: #34d399;">${previewLimit} Trang Đầu</span>`;
+        }
+        document.getElementById('doc-detail-pdf-name').innerText = '• ' + currentPdfTitle;
+        const limitBadge = document.getElementById('doc-preview-limit-badge');
+        if (limitBadge) limitBadge.innerText = `${previewLimit} trang`;
+
+        // Paywall banner: Chỉ hiển thị nút Mua ngay khi có phí
+        if (paywallNotice) {
+          if (isPaid) {
+            paywallNotice.style.display = 'flex';
+            const priceBadge = document.getElementById('doc-pdf-paywall-price-badge');
+            if (priceBadge) priceBadge.innerText = priceNum.toLocaleString() + 'đ';
+          } else {
+            paywallNotice.style.display = 'none';
+          }
+        }
+
+        // Nạp và hiển thị file PDF bằng Canvas sắc nét
+        loadPdfToCanvas(currentPdfRawUrl);
+
+        // Tải số trang thực tế của file PDF
+        fetch(`/api/public/pdf-doc-info/${currentViewingDoc.id}`)
+          .then(r => r.json())
+          .then(info => {
+            if (info && info.totalPages) {
+              const headingEl = document.getElementById('doc-detail-pdf-heading');
+              if (headingEl) {
+                headingEl.innerHTML = `📖 Đọc Thử Giới Hạn: <span style="color: #34d399;">${previewLimit} Trang Đầu</span> (File Gốc Gồm Toàn Bộ ${info.totalPages} Trang)`;
+              }
+              const limitBadge = document.getElementById('doc-preview-limit-badge');
+              if (limitBadge) limitBadge.innerText = `${previewLimit} / ${info.totalPages} trang`;
+            }
+          })
+          .catch(() => {});
+        pdfSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    // ==============================================================
+    // TRÌNH ĐỌC PDF BẰNG HTML5 CANVAS (BẢO VỆ CHỐNG TẢI TRỘM FILE GỐC)
+    // ==============================================================
+    let pdfDocInstance = null;
+    let pdfCurrentPage = 1;
+    let pdfTotalPages = 1;
+    let pdfScale = 1.0;
+    let isRenderingPage = false;
+    let pendingPage = null;
+
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    async function loadPdfToCanvas(url) {
+      const loader = document.getElementById('doc-pdf-loading');
+      if (loader) loader.style.display = 'flex';
+      try {
+        if (!window.pdfjsLib) {
+          throw new Error('pdfjsLib chưa tải');
+        }
+        const loadingTask = pdfjsLib.getDocument(url);
+        pdfDocInstance = await loadingTask.promise;
+        pdfTotalPages = pdfDocInstance.numPages;
+        pdfCurrentPage = 1;
+        document.getElementById('pdf-total-page-num').innerText = pdfTotalPages;
+        await renderPdfPage(pdfCurrentPage);
+      } catch (err) {
+        console.error('Lỗi nạp Canvas PDF:', err);
+        const container = document.getElementById('pdf-canvas-container');
+        if (container) {
+          container.innerHTML = `<iframe src="${url}#toolbar=0" style="width: 100%; height: 100%; border: none;"></iframe>`;
+        }
+      } finally {
+        if (loader) loader.style.display = 'none';
+      }
+    }
+
+    async function renderPdfPage(num) {
+      if (!pdfDocInstance) return;
+      isRenderingPage = true;
+      try {
+        const page = await pdfDocInstance.getPage(num);
+        const canvas = document.getElementById('doc-pdf-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const viewport = page.getViewport({ scale: pdfScale });
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        const renderContext = {
+          canvasContext: ctx,
+          viewport: viewport
+        };
+        await page.render(renderContext).promise;
+        document.getElementById('pdf-current-page-num').innerText = num;
+        document.getElementById('pdf-zoom-label').innerText = Math.round(pdfScale * 100) + '%';
+      } catch (e) {
+        console.error('Lỗi render trang:', e);
+      } finally {
+        isRenderingPage = false;
+        if (pendingPage !== null) {
+          const next = pendingPage;
+          pendingPage = null;
+          renderPdfPage(next);
+        }
+      }
+    }
+
+    function queueRenderPage(num) {
+      if (isRenderingPage) {
+        pendingPage = num;
+      } else {
+        renderPdfPage(num);
+      }
+    }
+
+    function pdfPrevPage() {
+      if (pdfCurrentPage <= 1) return;
+      pdfCurrentPage--;
+      queueRenderPage(pdfCurrentPage);
+    }
+
+    function pdfNextPage() {
+      if (pdfCurrentPage >= pdfTotalPages) return;
+      pdfCurrentPage++;
+      queueRenderPage(pdfCurrentPage);
+    }
+
+    function pdfZoomIn() {
+      if (pdfScale >= 2.5) return;
+      pdfScale += 0.2;
+      queueRenderPage(pdfCurrentPage);
+    }
+
+    function pdfZoomOut() {
+      if (pdfScale <= 0.6) return;
+      pdfScale -= 0.2;
+      queueRenderPage(pdfCurrentPage);
+    }
+
+    function pdfFitWidth() {
+      const container = document.getElementById('pdf-canvas-container');
+      if (!container || !pdfDocInstance) return;
+      pdfDocInstance.getPage(pdfCurrentPage).then(page => {
+        const vp = page.getViewport({ scale: 1.0 });
+        const availableWidth = container.clientWidth - 40;
+        pdfScale = Math.max(0.5, Math.min(2.0, availableWidth / vp.width));
+        queueRenderPage(pdfCurrentPage);
+      });
+    }
+
+    function openFullscreenPdfPreview() {
+      if (!currentViewingDoc) return;
+      const previewLimit = currentViewingDoc.previewPages || 10;
+      document.getElementById('fullscreen-pdf-title').innerText = (currentPdfTitle || 'Bản Đọc Thử PDF') + ` (Giới hạn đọc thử ${previewLimit} trang đầu)`;
+      document.getElementById('fullscreen-pdf-iframe').src = `/api/public/pdf-preview-slice/${currentViewingDoc.id}#toolbar=0&navpanes=0`;
+      document.getElementById('fullscreen-pdf-modal').style.display = 'flex';
+    }
+
+    function closeFullscreenPdfPreview() {
+      document.getElementById('fullscreen-pdf-modal').style.display = 'none';
+      document.getElementById('fullscreen-pdf-iframe').src = '';
+    }
+
+    function openPdfInNewTab() {
+      if (currentViewingDoc) {
+        window.open(`/api/public/pdf-preview-slice/${currentViewingDoc.id}#toolbar=0&navpanes=0`, '_blank');
+      } else if (currentPdfPreviewUrl) {
+        window.open(currentPdfPreviewUrl, '_blank');
+      }
+    }
+
+    // Xử lý giỏ hàng & mua ngay cho Tài liệu
+    function addDocToCart(docId) {
+      const doc = allDocuments.find(d => d.id === docId);
+      if (!doc) return;
+      const exists = cart.find(item => item.id === docId);
+      if (!exists) {
+        cart.push({
+          id: doc.id,
+          name: doc.title,
+          price: Number(doc.price) || 0
+        });
+        localStorage.setItem('cart_lispcad', JSON.stringify(cart));
+        updateCartBadge();
+        showToast(`Đã thêm "${doc.title}" vào giỏ hàng!`);
+      } else {
+        showToast(`"${doc.title}" đã có trong giỏ hàng!`);
+      }
+    }
+
+    function trackDownloadItem(id) {
+      if (!id) return;
+      fetch('/api/public/track-download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      }).then(r => r.json()).then(res => {
+        if (res.success && res.downloadCount) {
+          const item = allProducts.find(x => x.id === id) || allDocuments.find(x => x.id === id);
+          if (item) item.downloadCount = res.downloadCount;
+          const badge = document.getElementById('doc-detail-downloads-badge');
+          if (badge && currentViewingDoc && currentViewingDoc.id === id) {
+            badge.innerHTML = `📥 <strong>${res.downloadCount.toLocaleString()}</strong> lượt tải`;
+          }
+        }
+      }).catch(() => {});
+    }
+
+    // Tải toàn bộ file của tài liệu đang xem (Miễn phí)
+    function downloadAllCurrentDocFiles() {
+      if (!currentViewingDoc) return;
+      trackDownloadItem(currentViewingDoc.id);
+      const files = (currentViewingDoc.files && currentViewingDoc.files.length > 0)
+        ? currentViewingDoc.files
+        : [{ url: currentViewingDoc.downloadUrl || '' }];
+
+      let opened = 0;
+      files.forEach(f => {
+        if (f.url) {
+          const dl = formatDriveDownloadUrl(f.url);
+          window.open(dl, '_blank');
+          opened++;
+        }
+      });
+      if (opened > 0) {
+        showToast(`Đang mở tải ${opened} tập tin...`);
+      } else {
+        showToast('Chưa có liên kết tải cho tài liệu này.');
+      }
+    }
+
+    function addCurrentDocToCart() {
+      if (currentViewingDoc) {
+        addDocToCart(currentViewingDoc.id);
+        closeDocDetailUser();
+      }
+    }
+
+    function buyCurrentDocNow() {
+      if (!currentViewingDoc) return;
+      const docToBuy = currentViewingDoc;
+      closeDocDetailUser();
+      openCheckoutModal([{
+        id: docToBuy.id,
+        name: docToBuy.title,
+        price: Number(docToBuy.price) || 0
+      }]);
+    }
+
+    // Điều hướng nhanh từ Thanh menu trên cùng
+    function filterLispFromNav(category) {
+      scrollToLisp();
+      const filtered = allProducts.filter(p => 
+        p.id !== 'prod_course_2d' && 
+        p.category !== 'Khóa học' && 
+        !(p.name && p.name.toLowerCase().includes('khóa học')) && 
+        (!category || p.category === category)
+      );
+      renderLispCards(filtered);
+    }
+
+    function scrollToLisp() {
+      const el = document.getElementById('lispcad');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      renderLispCards(allProducts);
+    }
+
+    function scrollToDocuments() {
+      const el = document.getElementById('tai-lieu');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Render danh sách LispCAD ở cột trái (chỉ hiển thị Lisp, loại trừ Khóa học)
+    function renderLispCards(products) {
+      const container = document.getElementById('lisp-cards-container');
+      container.innerHTML = '';
+
+      // Lọc các sản phẩm thuộc danh mục LispCAD (tách riêng, không đưa Khóa học vào LispCAD)
+      const lispItems = products.filter(p => 
+        p.id !== 'prod_course_2d' && 
+        p.category !== 'Khóa học' && 
+        !(p.name && p.name.toLowerCase().includes('khóa học'))
+      );
+
+      lispItems.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'lisp-item-card';
+
+        const thumbHtml = p.imageUrl
+          ? `<img src="${p.imageUrl}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500';">`
+          : `<svg width="100%" height="100%" viewBox="0 0 180 100" fill="none">
+              <rect width="180" height="100" fill="#091422"/>
+              <line x1="20" y1="50" x2="160" y2="50" stroke="#00d2ff" stroke-width="1.5" stroke-dasharray="4 2"/>
+              <rect x="35" y="25" width="50" height="50" stroke="#38bdf8" stroke-width="1.5"/>
+              <text x="95" y="45" fill="#f8fafc" font-size="11" font-family="sans-serif">${p.commands || 'LispCAD'}</text>
+              <line x1="35" y1="85" x2="145" y2="85" stroke="#f59e0b" stroke-width="1.5"/>
+            </svg>`;
+
+        card.innerHTML = `
+          <div class="lisp-thumb-area">
+            ${thumbHtml}
+            <div class="lisp-cube-badge">
+              L
+              <span>LISP</span>
+            </div>
+          </div>
+
+          <div class="lisp-item-body">
+            <div class="lisp-item-title">${p.name}</div>
+            <div class="lisp-item-desc">${p.description || 'Tiện ích AutoLisp tự động hóa.'}</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; margin-bottom: 2px;">
+              <div class="lisp-item-price" style="margin: 0;">${Number(p.price).toLocaleString()}đ</div>
+              <div style="font-size: 0.78rem; color: #64748b; display: flex; align-items: center; gap: 4px; background: #f1f5f9; padding: 2px 8px; border-radius: 12px; font-weight: 600;">
+                <span style="color: #0284c7;">📥</span> <span><strong>${Number(p.downloadCount || 0).toLocaleString()}</strong> lượt tải</span>
+              </div>
+            </div>
+
+            <div class="lisp-actions-row">
+              <button class="btn-detail-outline" onclick="openDetailModal('${p.id}')">
+                👁 Xem chi tiết
+              </button>
+              <button class="btn-add-cart-solid" onclick="addToCart('${p.id}')">
+                🛒 Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // ==========================================
+    // QUẢN LÝ GIỎ HÀNG (CART)
+    // ==========================================
+    function addToCart(productId) {
+      const prod = allProducts.find(p => p.id === productId);
+      if (!prod) return;
+
+      const exists = cart.find(item => item.id === productId);
+      if (!exists) {
+        cart.push({
+          id: prod.id,
+          name: prod.name,
+          price: prod.price
+        });
+        localStorage.setItem('cart_lispcad', JSON.stringify(cart));
+        updateCartBadge();
+        showToast(`Đã thêm "${prod.name}" vào giỏ hàng!`);
+      } else {
+        showToast(`"${prod.name}" đã có trong giỏ hàng!`);
+      }
+    }
+
+    function updateCartBadge() {
+      const badge = document.getElementById('cart-badge-count');
+      badge.innerText = cart.length;
+    }
+
+    function openCartDrawer() {
+      const list = document.getElementById('cart-items-list');
+      const totalText = document.getElementById('cart-total-price');
+      list.innerHTML = '';
+
+      if (cart.length === 0) {
+        list.innerHTML = '<p style="text-align: center; color: #64748b; margin-top: 40px;">Giỏ hàng của bạn đang trống.</p>';
+        totalText.innerText = '0 đ';
+      } else {
+        let total = 0;
+        cart.forEach((item, idx) => {
+          total += Number(item.price);
+          const row = document.createElement('div');
+          row.className = 'cart-item-row';
+          row.innerHTML = `
+            <div>
+              <div class="cart-item-title">${item.name}</div>
+              <div class="cart-item-price">${Number(item.price).toLocaleString()} đ</div>
+            </div>
+            <button class="cart-item-remove" onclick="removeFromCart(${idx})" title="Xóa khỏi giỏ">&times;</button>
+          `;
+          list.appendChild(row);
+        });
+        totalText.innerText = total.toLocaleString() + ' đ';
+      }
+
+      document.getElementById('cart-drawer-overlay').style.display = 'flex';
+    }
+
+    function closeCartDrawer(e) {
+      document.getElementById('cart-drawer-overlay').style.display = 'none';
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      localStorage.setItem('cart_lispcad', JSON.stringify(cart));
+      updateCartBadge();
+      openCartDrawer();
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast-notice');
+      document.getElementById('toast-msg').innerText = msg;
+      toast.style.display = 'flex';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 2500);
+    }
+
+    // Bấm Nút Vàng Mua Ngay ở cột phải
+    function handleBigYellowBuy() {
+      if (cart.length > 0) {
+        openCartDrawer();
+      } else {
+        // Mặc định chọn bộ STT hoặc khóa học
+        openDetailModal('prod_lisp_stt');
+      }
+    }
+
+    // ==========================================
+    // MODAL CHI TIẾT SẢN PHẨM
+    // ==========================================
+    function openDetailModal(productId) {
+      selectedProduct = allProducts.find(p => p.id === productId);
+      if (!selectedProduct) return;
+
+      document.getElementById('modal-name').innerText = selectedProduct.name;
+      document.getElementById('modal-category').innerText = selectedProduct.category || 'LispCAD';
+      document.getElementById('modal-commands').innerText = 'Lệnh: ' + (selectedProduct.commands || 'N/A');
+      document.getElementById('modal-downloads').innerHTML = `📥 <strong>${(Number(selectedProduct.downloadCount) || 0).toLocaleString()}</strong> lượt tải`;
+      document.getElementById('modal-desc').innerText = selectedProduct.description || '';
+      document.getElementById('modal-instructions').innerText = selectedProduct.instructions || 'Chưa có hướng dẫn sử dụng chi tiết.';
+
+      document.getElementById('modal-price').innerText = Number(selectedProduct.price).toLocaleString() + 'đ';
+      if (selectedProduct.oldPrice) {
+        document.getElementById('modal-oldprice').innerText = Number(selectedProduct.oldPrice).toLocaleString() + 'đ';
+        document.getElementById('modal-oldprice').style.display = 'inline';
+      } else {
+        document.getElementById('modal-oldprice').style.display = 'none';
+      }
+
+      const embedUrl = getYouTubeEmbedUrl(selectedProduct.videoUrl);
+      const videoSection = document.getElementById('modal-video-section');
+      const videoIframe = document.getElementById('modal-video-iframe');
+
+      if (embedUrl) {
+        videoIframe.src = embedUrl;
+        videoSection.style.display = 'block';
+      } else {
+        videoIframe.src = '';
+        videoSection.style.display = 'none';
+      }
+
+      // Hiển thị ảnh minh họa / GIF
+      const imgSection = document.getElementById('modal-image-section');
+      const imgDisplay = document.getElementById('modal-image-display');
+      if (selectedProduct.imageUrl) {
+        imgDisplay.src = selectedProduct.imageUrl;
+        imgSection.style.display = 'block';
+      } else {
+        imgDisplay.src = '';
+        imgSection.style.display = 'none';
+      }
+
+      document.getElementById('detail-modal').style.display = 'flex';
+    }
+
+    function closeDetailModal() {
+      document.getElementById('modal-video-iframe').src = '';
+      document.getElementById('detail-modal').style.display = 'none';
+    }
+
+    function addCurrentModalToCart() {
+      if (selectedProduct) {
+        addToCart(selectedProduct.id);
+        closeDetailModal();
+      }
+    }
+
+    function buyNowFromDetail() {
+      closeDetailModal();
+      openCheckoutModal([selectedProduct]);
+    }
+
+    // ==========================================
+    // CHECKOUT THANH TOÁN VIETQR SEPAY
+    // ==========================================
+    let checkoutItems = [];
+
+    function startCheckoutCart() {
+      if (cart.length === 0) return alert('Giỏ hàng đang trống!');
+      const hasCourse = cart.some(it => it.id === 'prod_course_2d');
+      if (hasCourse && !currentUser) {
+        alert('Giỏ hàng có Khóa học AutoCAD 2D. Vui lòng đăng nhập tài khoản học viên để tự động kích hoạt bài giảng!');
+        openAuthModal();
+        return;
+      }
+      closeCartDrawer();
+      openCheckoutModal(cart);
+    }
+
+    function handleBuyCourse() {
+      const course = allProducts.find(p => p.id === 'prod_course_2d' || p.category === 'Khóa học' || (p.name && p.name.toLowerCase().includes('khóa học')));
+      if (!course) {
+        // Dự phòng nếu chưa kịp nạp
+        openCheckoutModal([{
+          id: 'prod_course_2d',
+          name: 'Khóa học AutoCAD 2D Từ Cơ Bản Đến Nâng Cao',
+          price: 299000
+        }]);
+        return;
+      }
+
+      if (!currentUser) {
+        alert('Khóa học AutoCAD 2D yêu cầu bạn đăng nhập tài khoản học viên để tự động kích hoạt bài giảng sau khi thanh toán. Vui lòng đăng nhập hoặc tạo tài khoản nhanh!');
+        openAuthModal();
+        return;
+      }
+
+      openCheckoutModal([course]);
+    }
+
+    function openCheckoutModal(items) {
+      const hasCourse = items.some(it => it.id === 'prod_course_2d' || it.category === 'Khóa học' || (it.name && it.name.toLowerCase().includes('khóa học')));
+      if (hasCourse && !currentUser) {
+        alert('Khóa học AutoCAD 2D yêu cầu bạn đăng nhập tài khoản học viên để tự động kích hoạt bài giảng sau khi thanh toán. Vui lòng đăng nhập hoặc tạo tài khoản nhanh!');
+        openAuthModal();
+        return;
+      }
+
+      checkoutItems = items;
+      const total = checkoutItems.reduce((sum, it) => sum + Number(it.price), 0);
+
+      document.getElementById('checkout-title').innerText = items.length === 1 ? `Mua: ${items[0].name}` : `Thanh toán Giỏ hàng (${items.length} món)`;
+      document.getElementById('checkout-subprice').innerText = `Tổng số tiền: ${total.toLocaleString()} đ`;
+
+      if (currentUser) {
+        document.getElementById('custName').value = currentUser.name || '';
+        document.getElementById('custPhone').value = currentUser.phone || '';
+      }
+
+      document.getElementById('checkout-step-info').style.display = 'block';
+      document.getElementById('checkout-step-qr').style.display = 'none';
+      document.getElementById('checkout-modal').style.display = 'flex';
+    }
+
+    function closeCheckoutModal() {
+      if (pollInterval) clearInterval(pollInterval);
+      document.getElementById('checkout-modal').style.display = 'none';
+    }
+
+    async function handleCreateOrder(e) {
+      e.preventDefault();
+      const custName = document.getElementById('custName').value.trim();
+      const custPhone = document.getElementById('custPhone').value.trim();
+      const deliveryMethodEl = document.querySelector('input[name="orderDeliveryMethod"]:checked');
+      const deliveryMethod = deliveryMethodEl ? deliveryMethodEl.value : 'download';
+
+      const btn = document.getElementById('btn-create-order');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Đang tạo mã VietQR...';
+
+      try {
+        const res = await fetch('/api/public/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            cartItems: checkoutItems,
+            customerName: custName,
+            customerPhone: custPhone,
+            customerEmail: currentUser ? currentUser.email : '',
+            userId: currentUser ? currentUser.id : null,
+            deliveryMethod: deliveryMethod
+          })
+        });
+
+        currentOrder = await res.json();
+        if (currentOrder.success) {
+          document.getElementById('checkout-step-info').style.display = 'none';
+          document.getElementById('checkout-step-qr').style.display = 'block';
+
+          document.getElementById('display-order-code').innerText = currentOrder.orderCode;
+          document.getElementById('qr-image-display').src = currentOrder.qrUrl;
+          document.getElementById('display-bank').innerText = currentOrder.bankName;
+          document.getElementById('display-acc').innerText = currentOrder.accountNumber;
+          document.getElementById('display-name').innerText = currentOrder.accountHolder;
+          document.getElementById('display-amount').innerText = Number(currentOrder.amount).toLocaleString() + ' đ';
+          document.getElementById('display-syntax').innerText = currentOrder.transferContent;
+
+          // Bắt đầu lắng nghe tự động SePay
+          startAutoCheckingPayment(currentOrder.orderCode);
+        } else {
+          alert(currentOrder.error || 'Có lỗi xảy ra');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Tạo Mã VietQR Thanh Toán';
+      }
+    }
+
+    // Modal Đăng Nhập / Đăng Ký Học Viên
+    function openAuthModal() {
+      document.getElementById('auth-modal').style.display = 'flex';
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal').style.display = 'none';
+    }
+
+    function switchAuthTab(type) {
+      if (type === 'login') {
+        document.getElementById('form-login').style.display = 'block';
+        document.getElementById('form-register').style.display = 'none';
+        document.getElementById('tab-btn-login').style.borderColor = '#38bdf8';
+        document.getElementById('tab-btn-login').style.color = '#38bdf8';
+        document.getElementById('tab-btn-register').style.borderColor = 'transparent';
+        document.getElementById('tab-btn-register').style.color = '#94a3b8';
+      } else {
+        document.getElementById('form-login').style.display = 'none';
+        document.getElementById('form-register').style.display = 'block';
+        document.getElementById('tab-btn-login').style.borderColor = 'transparent';
+        document.getElementById('tab-btn-login').style.color = '#94a3b8';
+        document.getElementById('tab-btn-register').style.borderColor = '#38bdf8';
+        document.getElementById('tab-btn-register').style.color = '#38bdf8';
+      }
+    }
+
+    async function submitLogin(e) {
+      e.preventDefault();
+      const account = document.getElementById('login-account').value;
+      const pass = document.getElementById('login-password').value;
+
+      try {
+        const res = await fetch('/api/user/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ emailOrPhone: account, password: pass })
+        });
+        const data = await res.json();
+        if (data.success) {
+          currentUser = data.user;
+          closeAuthModal();
+          updateUserNav();
+          alert(`Đăng nhập thành công! Chào mừng ${currentUser.name}`);
+        } else {
+          alert(data.error || 'Đăng nhập không thành công');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ!');
+      }
+    }
+
+    async function submitRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value;
+      const phone = document.getElementById('reg-phone').value;
+      const email = document.getElementById('reg-email').value;
+      const password = document.getElementById('reg-password').value;
+
+      try {
+        const res = await fetch('/api/user/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone, email, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          currentUser = data.user;
+          closeAuthModal();
+          updateUserNav();
+          alert(`Tạo tài khoản thành công! Chào mừng học viên ${currentUser.name}`);
+        } else {
+          alert(data.error || 'Không thể tạo tài khoản');
+        }
+      } catch (err) {
+        alert('Lỗi kết nối máy chủ!');
+      }
+    }
+
+    async function handleUserLogout() {
+      await fetch('/api/user/logout', { method: 'POST' });
+      currentUser = null;
+      updateUserNav();
+      window.location.reload();
+    }
+
+    async function checkCurrentUser() {
+      try {
+        const res = await fetch('/api/user/me');
+        const data = await res.json();
+        currentUser = data.user;
+        updateUserNav();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function updateUserNav() {
+      const btn = document.getElementById('btn-login-trigger');
+      const badge = document.getElementById('user-profile-badge');
+      if (currentUser) {
+        btn.style.display = 'none';
+        badge.style.display = 'flex';
+        document.getElementById('user-badge-name').innerText = currentUser.name;
+        document.getElementById('user-badge-initial').innerText = (currentUser.name || 'U').charAt(0).toUpperCase();
+      } else {
+        btn.style.display = 'flex';
+        badge.style.display = 'none';
+      }
+    }
+
+    function startAutoCheckingPayment(orderCode) {
+      if (pollInterval) clearInterval(pollInterval);
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/public/check-order/${orderCode}`);
+          const data = await res.json();
+          if (data.isPaid) {
+            clearInterval(pollInterval);
+            // Xóa giỏ hàng khi thanh toán thành công
+            cart = [];
+            localStorage.setItem('cart_lispcad', JSON.stringify(cart));
+            updateCartBadge();
+
+            const box = document.getElementById('waiting-status-box');
+            if (box) box.classList.add('paid');
+            document.getElementById('waiting-title').innerText = '✓ ĐÃ NHẬN TIỀN THÀNH CÔNG!';
+            document.getElementById('waiting-desc').innerHTML = '<strong style="color: #4ade80; font-size: 1rem;">Giao dịch MBBank hoàn tất! Đang chuyển đến trang nhận file...</strong>';
+            const deliv = data.deliveryMethod || 'download';
+            setTimeout(() => {
+              window.location.href = `/success.html?orderCode=${orderCode}&delivery=${deliv}`;
+            }, 1000);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }, 2000);
+    }
+
+    function copyText(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text);
+      alert('Đã sao chép: ' + text);
+    }
+
+    // Tìm kiếm nhanh
+    function handleSearch(term) {
+      const query = term.toLowerCase().trim();
+      if (!query) {
+        renderLispCards(allProducts);
+        return;
+      }
+      const filtered = allProducts.filter(p => 
+        p.name.toLowerCase().includes(query) || 
+        (p.commands && p.commands.toLowerCase().includes(query)) ||
+        (p.description && p.description.toLowerCase().includes(query))
+      );
+      renderLispCards(filtered);
+    }
+
+    // Xử lý giữ menu dropdown mượt mà, không bị tắt đột ngột khi di chuyển chuột
+    document.querySelectorAll('.nav-item-dropdown').forEach(dropdown => {
+      let closeTimer = null;
+
+      dropdown.addEventListener('mouseenter', () => {
+        if (closeTimer) {
+          clearTimeout(closeTimer);
+          closeTimer = null;
+        }
+        dropdown.classList.add('is-open');
+      });
+
+      dropdown.addEventListener('mouseleave', () => {
+        closeTimer = setTimeout(() => {
+          dropdown.classList.remove('is-open');
+        }, 280); // Độ trễ 280ms giúp người dùng lia chuột qua lại thoải mái
+      });
+
+      const navLink = dropdown.querySelector(':scope > a');
+      if (navLink) {
+        navLink.addEventListener('click', (e) => {
+          const isOpen = dropdown.classList.contains('is-open');
+          document.querySelectorAll('.nav-item-dropdown').forEach(d => {
+            if (d !== dropdown) d.classList.remove('is-open');
+          });
+          if (!isOpen) {
+            dropdown.classList.add('is-open');
+          }
+        });
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-item-dropdown')) {
+        document.querySelectorAll('.nav-item-dropdown').forEach(d => d.classList.remove('is-open'));
+      }
+    });
+
+    // Khởi động
+    loadStore();
+    window.addEventListener('focus', loadStore);
+  </script>
+</body>
+</html>

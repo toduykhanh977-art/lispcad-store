@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thanh Toán Thành Công - Nhận File LispCAD</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .delivery-tab-container {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0 16px 0;
+      background: #0f172a;
+      padding: 6px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+    }
+    .delivery-tab-btn {
+      flex: 1;
+      padding: 12px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      background: transparent;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .delivery-tab-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+    }
+    .delivery-tab-btn:hover:not(.active) {
+      color: #ffffff;
+      background: #1e293b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="success-card" style="max-width: 580px; margin: 40px auto; background: #1e293b; color: #fff; padding: 32px 24px; border-radius: 16px; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+      
+      <!-- TRẠNG THÁI ĐANG KIỂM TRA -->
+      <div id="loading-state">
+        <div class="spinner" style="width: 44px; height: 44px; margin: 20px auto; border-top-color: #38bdf8;"></div>
+        <h2 style="font-size: 1.3rem;">Đang kiểm tra giao dịch...</h2>
+        <p style="color: #94a3b8; margin-top: 8px; font-size: 0.9rem;">Vui lòng đợi giây lát trong khi hệ thống xác nhận thanh toán.</p>
+      </div>
+
+      <!-- TRẠNG THÁI THÀNH CÔNG -->
+      <div id="success-state" style="display: none;">
+        <div class="success-icon" style="width: 64px; height: 64px; background: #16a34a; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 16px auto;">✓</div>
+        <h2 style="color: #fff; margin-bottom: 8px; font-size: 1.5rem;">Thanh Toán Thành Công!</h2>
+        <p style="color: #94a3b8; margin-bottom: 6px; font-size: 0.95rem;">
+          Sản phẩm: <strong id="product-name-text" style="color: #38bdf8;"></strong>
+        </p>
+        <p style="color: #94a3b8; margin-bottom: 16px; font-size: 0.95rem;">
+          Mã đơn hàng: <strong id="order-code-text" style="color: #fbbf24;"></strong>
+        </p>
+
+        <!-- 2 LỰA CHỌN NHẬN FILE -->
+        <div class="delivery-tab-container">
+          <button id="tab-btn-download" class="delivery-tab-btn active" onclick="switchDeliveryMode('download')">
+            📥 Tự Động Tải Về Máy
+          </button>
+          <button id="tab-btn-zalo" class="delivery-tab-btn" onclick="switchDeliveryMode('zalo')">
+            💬 Gửi File Qua Zalo
+          </button>
+        </div>
+
+        <!-- NỘI DUNG LỰA CHỌN 1: TẢI TRỰC TIẾP VỀ MÁY -->
+        <div id="box-download-mode" style="background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center;">
+          <a id="download-btn" href="#" class="btn-buy" style="display: block; text-decoration: none; max-width: 100%; margin: 0 auto 12px auto; background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%); color: #fff; font-weight: 800; font-size: 1.05rem; padding: 14px 20px; border-radius: 10px; box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);">
+            📥 Bấm Vào Đây Để Tải File Ngay
+          </a>
+          <p id="auto-download-note" style="font-size: 0.85rem; color: #4ade80;">
+            ⚡ Trình duyệt sẽ tự động bắt đầu tải file về máy bạn sau vài giây...
+          </p>
+        </div>
+
+        <!-- NỘI DUNG LỰA CHỌN 2: GỬI QUA ZALO -->
+        <div id="box-zalo-mode" style="display: none; background: rgba(0, 104, 255, 0.08); border: 1px solid rgba(0, 104, 255, 0.35); border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center;">
+          <div style="font-size: 2.2rem; margin-bottom: 8px;">📲</div>
+          <h3 style="color: #60a5fa; font-size: 1.15rem; margin-bottom: 6px;">Đã Ghi Nhận Yêu Cầu Gửi File Qua Zalo</h3>
+          <p style="color: #e2e8f0; font-size: 0.95rem; margin-bottom: 12px;">
+            Số điện thoại Zalo của bạn: <strong id="customer-phone-display" style="color: #fbbf24; font-size: 1.15rem;"></strong>
+          </p>
+          <p style="color: #94a3b8; font-size: 0.85rem; line-height: 1.5; margin-bottom: 16px;">
+            Shop sẽ gửi link tải trực tiếp vào Zalo số điện thoại trên của bạn.<br>
+            Bạn cũng có thể bấm nút bên dưới để <strong>mở Zalo chat với Shop nhận file ngay tức thì</strong>:
+          </p>
+          <a id="zalo-chat-btn" href="#" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #0068ff; color: #fff; text-decoration: none; font-weight: 800; font-size: 1rem; padding: 14px 28px; border-radius: 10px; box-shadow: 0 4px 14px rgba(0, 104, 255, 0.4);">
+            💬 Bấm Vào Đây Để Mở Zalo Nhận File Ngay
+          </a>
+          <div style="margin-top: 14px;">
+            <a id="secondary-download-btn" href="#" style="color: #94a3b8; font-size: 0.82rem; text-decoration: underline;">
+              Hoặc bấm vào đây nếu bạn muốn tải trực tiếp về máy luôn
+            </a>
+          </div>
+        </div>
+
+        <!-- HƯỚNG DẪN NẠP LISP -->
+        <div class="guide-box" style="background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 16px; margin-bottom: 20px; text-align: left;">
+          <h4 style="color: #38bdf8; font-size: 0.95rem; margin-bottom: 8px;">💡 Hướng Dẫn Nạp Lisp Vào AutoCAD (1 Phút):</h4>
+          <ol style="color: #cbd5e1; font-size: 0.85rem; padding-left: 18px; line-height: 1.6;">
+            <li>Mở phần mềm <strong>AutoCAD</strong>.</li>
+            <li>Gõ lệnh <code>APPLOAD</code> (hoặc gõ tắt <code>AP</code>) trên bàn phím rồi nhấn <strong>Enter</strong>.</li>
+            <li>Chọn file Lisp vừa tải về, sau đó bấm <strong>Load</strong>.</li>
+            <li><em>(Mẹo quan trọng)</em>: Để Lisp tự nạp mỗi khi mở CAD, bấm vào nút <strong>Contents...</strong> ở mục <strong>Startup Suite</strong> (hình chiếc cặp) và thêm file Lisp vào.</li>
+          </ol>
+        </div>
+
+        <a href="/" style="color: #94a3b8; font-size: 0.9rem; text-decoration: underline;">
+          ← Quay lại trang chủ
+        </a>
+      </div>
+
+      <!-- TRẠNG THÁI CHỜ XÁC NHẬN -->
+      <div id="pending-state" style="display: none; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 16px;">⏳</div>
+        <h2 style="color: #ffb74d;">Đang Chờ Xác Nhận Thanh Toán</h2>
+        <p style="color: #94a3b8; margin: 16px 0; font-size: 0.9rem; line-height: 1.5;">
+          Đơn hàng <strong id="pending-order-code" style="color: #38bdf8;"></strong> đã được ghi nhận.<br>
+          Hệ thống đang tự động xác nhận chuyển khoản. Vui lòng giữ nguyên trang này trong giây lát...
+        </p>
+        <button class="btn-sm btn-secondary" onclick="location.reload()" style="padding: 10px 20px; margin-top: 10px;">
+          🔄 Tải Lại Trang Để Kiểm Tra
+        </button>
+      </div>
+
+      <!-- TRẠNG THÁI LỖI -->
+      <div id="error-state" style="display: none; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 16px;">⚠️</div>
+        <h2 style="color: #ef4444;">Không Tìm Thấy Đơn Hàng</h2>
+        <p id="error-msg" style="color: #94a3b8; margin: 16px 0;">Không tìm thấy thông tin đơn hàng này.</p>
+        <a href="/" class="btn-buy" style="text-decoration: none; max-width: 260px; margin: 0 auto; background: #0284c7; color: #fff; padding: 12px 20px; border-radius: 8px; display: inline-block;">
+          Quay lại trang chủ
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderCode = urlParams.get('orderCode');
+    const paramDelivery = urlParams.get('delivery'); // 'download' hoặc 'zalo'
+
+    const loadingState = document.getElementById('loading-state');
+    const successState = document.getElementById('success-state');
+    const pendingState = document.getElementById('pending-state');
+    const errorState = document.getElementById('error-state');
+
+    const orderCodeText = document.getElementById('order-code-text');
+    const productNameText = document.getElementById('product-name-text');
+    const downloadBtn = document.getElementById('download-btn');
+    const secondaryDownloadBtn = document.getElementById('secondary-download-btn');
+    const errorMsg = document.getElementById('error-msg');
+    const customerPhoneDisplay = document.getElementById('customer-phone-display');
+    const zaloChatBtn = document.getElementById('zalo-chat-btn');
+
+    let currentOrderData = null;
+
+    if (!orderCode) {
+      loadingState.style.display = 'none';
+      errorState.style.display = 'block';
+      errorMsg.innerText = 'Thiếu mã đơn hàng trong liên kết.';
+    } else {
+      orderCodeText.innerText = '#' + orderCode;
+      checkOrderStatus(orderCode);
+    }
+
+    function switchDeliveryMode(mode) {
+      const tabDownload = document.getElementById('tab-btn-download');
+      const tabZalo = document.getElementById('tab-btn-zalo');
+      const boxDownload = document.getElementById('box-download-mode');
+      const boxZalo = document.getElementById('box-zalo-mode');
+
+      if (mode === 'zalo') {
+        tabZalo.classList.add('active');
+        tabDownload.classList.remove('active');
+        boxZalo.style.display = 'block';
+        boxDownload.style.display = 'none';
+      } else {
+        tabDownload.classList.add('active');
+        tabZalo.classList.remove('active');
+        boxDownload.style.display = 'block';
+        boxZalo.style.display = 'none';
+      }
+    }
+
+    async function checkOrderStatus(code) {
+      try {
+        const res = await fetch(`/api/public/check-order/${code}`);
+        const data = await res.json();
+        currentOrderData = data;
+
+        loadingState.style.display = 'none';
+
+        if (data.isPaid) {
+          successState.style.display = 'block';
+          productNameText.innerText = data.productName || 'LispCAD';
+
+          const downloadUrl = `/download/${code}`;
+          downloadBtn.href = downloadUrl;
+          secondaryDownloadBtn.href = downloadUrl;
+
+          // Thiết lập thông tin Zalo
+          const phone = data.customerPhone || 'Số của bạn';
+          customerPhoneDisplay.innerText = phone;
+
+          // Thiết lập link Zalo mở chat trực tiếp với Admin
+          let adminZalo = data.adminZalo || 'https://zalo.me/0329778016';
+          let adminPhone = '0329778016';
+          const matchPhone = adminZalo.match(/\d+/);
+          if (matchPhone) adminPhone = matchPhone[0];
+
+          const prefillText = encodeURIComponent(`Chào shop Tin Học Click, tôi vừa thanh toán thành công đơn hàng #${code} (${data.productName}). SĐT của tôi: ${phone}. Gửi link tải qua Zalo giúp tôi nhé!`);
+          zaloChatBtn.href = `https://zalo.me/${adminPhone}?text=${prefillText}`;
+
+          // Kiểm tra khách chọn hình thức nào (từ URL hoặc từ đơn hàng)
+          const chosenMode = paramDelivery || data.deliveryMethod || 'download';
+          switchDeliveryMode(chosenMode);
+
+          // Nếu là chế độ tải về máy: Tự động kích hoạt tải sau 1.5 giây
+          if (chosenMode === 'download') {
+            setTimeout(() => {
+              window.location.href = downloadUrl;
+            }, 1500);
+          }
+        } else if (data.status === 'PENDING_CONFIRMATION' || data.status === 'PENDING') {
+          pendingState.style.display = 'block';
+          document.getElementById('pending-order-code').innerText = '#' + code;
+          // Tự động kiểm tra lại sau mỗi 2 giây
+          setTimeout(() => checkOrderStatus(code), 2500);
+        } else {
+          errorState.style.display = 'block';
+          errorMsg.innerText = 'Đơn hàng chưa hoàn tất thanh toán.';
+        }
+      } catch (err) {
+        loadingState.style.display = 'none';
+        errorState.style.display = 'block';
+        errorMsg.innerText = 'Có lỗi khi kiểm tra đơn hàng.';
+      }
+    }
+  </script>
+</body>
+</html>
