@@ -28,6 +28,42 @@ const upload = multer({ storage });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+// Route phục vụ file upload: kiểm tra ổ đĩa local, nếu không có tự kéo từ MongoDB Atlas về
+app.get("/uploads/:filename", async (req, res, next) => {
+  const filename = req.params.filename;
+  const localPath = path.join(UPLOAD_DIR, filename);
+
+  const ext = path.extname(filename).toLowerCase();
+  let mimeType = "image/png";
+  if (ext === ".jpg" || ext === ".jpeg") mimeType = "image/jpeg";
+  else if (ext === ".gif") mimeType = "image/gif";
+  else if (ext === ".svg") mimeType = "image/svg+xml";
+  else if (ext === ".pdf") mimeType = "application/pdf";
+  else if (ext === ".lsp") mimeType = "text/plain";
+
+  if (fs.existsSync(localPath)) {
+    res.setHeader("Content-Type", mimeType);
+    res.setHeader("Cache-Control", "public, max-age=31536000");
+    return fs.createReadStream(localPath).pipe(res);
+  }
+
+  if (filesCollection) {
+    try {
+      const fileDoc = await filesCollection.findOne({ filename });
+      if (fileDoc && fileDoc.data) {
+        res.setHeader("Content-Type", fileDoc.contentType || fileDoc.mimetype || mimeType);
+        res.setHeader("Cache-Control", "public, max-age=31536000");
+        try { fs.writeFileSync(localPath, fileDoc.data.buffer || fileDoc.data); } catch (e) {}
+        return res.send(fileDoc.data.buffer || fileDoc.data);
+      }
+    } catch (e) {
+      console.error("Lỗi lấy file từ MongoDB:", e.message);
+    }
+  }
+
+  next();
+});
+
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/files", express.static(path.join(__dirname, "files")));
 
@@ -38,7 +74,29 @@ const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://toduykhanh977_db_u
 let mongoClient = null;
 let mongoDb = null;
 let storeCollection = null;
+let filesCollection = null;
 let dbCache = null;
+
+async function persistFileToMongo(file) {
+  if (!file || !filesCollection) return;
+  try {
+    const dataBuffer = fs.readFileSync(file.path);
+    await filesCollection.replaceOne(
+      { filename: file.filename },
+      {
+        filename: file.filename,
+        mimetype: file.mimetype || "image/png",
+        data: dataBuffer,
+        size: file.size,
+        uploadedAt: new Date()
+      },
+      { upsert: true }
+    );
+    console.log(`☁️ [MongoDB] Đã lưu file vĩnh viễn: ${file.filename}`);
+  } catch (err) {
+    console.error("Lỗi lưu file lên MongoDB:", err.message);
+  }
+}
 
 function readDbFromFile() {
   try {
@@ -69,6 +127,7 @@ async function initMongo() {
     await mongoClient.connect();
     mongoDb = mongoClient.db("lispcad");
     storeCollection = mongoDb.collection("store_state");
+    filesCollection = mongoDb.collection("uploaded_files");
     console.log("🚀 [MongoDB Atlas] Kết nối đám mây thành công!");
 
     // Đồng bộ dữ liệu mới nhất từ MongoDB Atlas về bộ nhớ cache
@@ -116,6 +175,23 @@ function writeDb(data) {
       .catch(err => console.error("❌ [MongoDB Atlas] Lỗi lưu đám mây:", err.message));
   }
 }
+
+// API Khôi phục / Nạp toàn bộ dữ liệu từ file backup JSON
+app.post("/api/admin/restore-db", requireAdmin, (req, res) => {
+  const incoming = req.body;
+  if (!incoming || typeof incoming !== "object") {
+    return res.status(400).json({ error: "Dữ liệu backup không hợp lệ" });
+  }
+  const db = readDb();
+  if (incoming.products) db.products = incoming.products;
+  if (incoming.documents) db.documents = incoming.documents;
+  if (incoming.courses) db.courses = incoming.courses;
+  if (incoming.lessons) db.lessons = incoming.lessons;
+  if (incoming.paymentSettings) db.paymentSettings = incoming.paymentSettings;
+  if (incoming.users) db.users = incoming.users;
+  writeDb(db);
+  res.json({ success: true, message: "Đã khôi phục dữ liệu thành công lên đám mây MongoDB Atlas!" });
+});
 
 // Middleware xác thực Admin
 function requireAdmin(req, res, next) {
@@ -195,7 +271,7 @@ app.get("/api/public/store", (req, res) => {
 
 // Khách chọn mua sản phẩm hoặc mua giỏ hàng -> Tạo đơn hàng
 app.post("/api/public/create-order", (req, res) => {
-  const { productId, cartItems, customerName, customerPhone, customerEmail, userId } = req.body;
+  const { productId, cartItems, customerName, customerPhone, customerEmail, userId, deliveryMethod } = req.body;
   const db = readDb();
 
   let orderItems = [];
@@ -219,7 +295,17 @@ app.post("/api/public/create-order", (req, res) => {
     orderTitle = orderItems.length === 1 ? orderItems[0].name : `Giỏ hàng (${orderItems.length} sản phẩm & tài liệu CAD)`;
   } else {
     // Mua lẻ 1 sản phẩm / tài liệu
-    const product = allAvailableItems.find(p => p.id === productId);
+    let product = allAvailableItems.find(p => p.id === productId);
+    if (!product && (productId === "prod_course_2d" || productId === "course_2d")) {
+      product = allAvailableItems.find(p => p.id === "prod_course_2d" || p.category === "Khóa học" || (p.name && p.name.includes("Khóa học")));
+    }
+    if (!product && (productId === "prod_course_2d" || productId === "course_2d")) {
+      product = {
+        id: "prod_course_2d",
+        name: "Khóa học AutoCAD 2D Từ Cơ Bản Đến Nâng Cao",
+        price: 299000
+      };
+    }
     if (!product) {
       return res.status(404).json({ error: "Không tìm thấy sản phẩm này" });
     }
@@ -246,6 +332,7 @@ app.post("/api/public/create-order", (req, res) => {
     customerName: customerName || "Khách hàng",
     customerPhone: customerPhone || "",
     customerEmail: customerEmail || "",
+    deliveryMethod: deliveryMethod === "zalo" ? "zalo" : "download",
     status: "PENDING", // PENDING hoặc PAID
     createdAt: new Date().toISOString()
   };
@@ -357,7 +444,11 @@ app.get("/api/public/check-order/:orderCode", (req, res) => {
     isPaid: isPaid,
     productName: order.productName,
     amount: order.amount,
-    downloadUrl: isPaid ? `/download/${order.orderCode}` : null
+    customerName: order.customerName,
+    customerPhone: order.customerPhone,
+    deliveryMethod: order.deliveryMethod || "download",
+    downloadUrl: isPaid ? `/download/${order.orderCode}` : null,
+    adminZalo: (db.paymentSettings && db.paymentSettings.zaloLink) || "https://zalo.me/0329778016"
   });
 });
 
@@ -376,6 +467,18 @@ app.get("/download/:orderCode", (req, res) => {
   if (!product) {
     return res.status(404).send("Sản phẩm không tồn tại.");
   }
+
+  // Tăng lượt tải của sản phẩm hoặc các món trong đơn hàng
+  product.downloadCount = (Number(product.downloadCount) || 0) + 1;
+  if (order.items && Array.isArray(order.items)) {
+    order.items.forEach(it => {
+      const dbIt = allAvailableItems.find(p => p.id === it.id);
+      if (dbIt && dbIt !== product) {
+        dbIt.downloadCount = (Number(dbIt.downloadCount) || 0) + 1;
+      }
+    });
+  }
+  writeDb(db);
 
   // Lấy link tải từ downloadUrl hoặc file đầu tiên trong files
   const dlUrl = product.downloadUrl || (product.files && product.files[0] ? product.files[0].url : "");
@@ -408,6 +511,21 @@ app.get("/download/:orderCode", (req, res) => {
   } else {
     return res.status(404).send("File LispCAD chưa được đính kèm trên hệ thống.");
   }
+});
+
+// API ghi nhận lượt tải cho sản phẩm / tài liệu (khi khách bấm tải file)
+app.post("/api/public/track-download", (req, res) => {
+  const { id } = req.body;
+  if (!id) return res.status(400).json({ error: "Thiếu ID" });
+  const db = readDb();
+  const allAvailableItems = [...(db.products || []), ...(db.documents || [])];
+  const item = allAvailableItems.find(x => x.id === id);
+  if (item) {
+    item.downloadCount = (Number(item.downloadCount) || 0) + 1;
+    writeDb(db);
+    return res.json({ success: true, downloadCount: item.downloadCount });
+  }
+  res.status(404).json({ error: "Không tìm thấy" });
 });
 
 // ==========================================
@@ -464,6 +582,7 @@ app.post("/api/admin/payment", requireAdmin, upload.single("qrImage"), (req, res
   // Nếu có upload ảnh QR mới
   if (req.file) {
     db.paymentSettings.qrImageUrl = `/uploads/${req.file.filename}`;
+    persistFileToMongo(req.file);
   }
 
   writeDb(db);
@@ -494,7 +613,7 @@ app.post("/api/admin/product", requireAdmin, upload.fields([{ name: "lispFile", 
 
   if (!product) {
     product = {
-      id: "prod_" + Date.now(),
+      id: id || ("prod_" + Date.now()),
       createdAt: new Date().toISOString()
     };
     db.products.unshift(product);
@@ -510,10 +629,17 @@ app.post("/api/admin/product", requireAdmin, upload.fields([{ name: "lispFile", 
   product.videoUrl = videoUrl || "";
   product.downloadType = downloadType || "local";
   product.isActive = isActive === "true" || isActive === true;
+  if (req.body.downloadCount !== undefined && req.body.downloadCount !== "") {
+    product.downloadCount = parseInt(req.body.downloadCount) || 0;
+  } else if (product.downloadCount === undefined) {
+    product.downloadCount = 0;
+  }
 
   // Xử lý ảnh minh họa / GIF
   if (req.files && req.files['imageFile'] && req.files['imageFile'][0]) {
-    product.imageUrl = `/uploads/${req.files['imageFile'][0].filename}`;
+    const imgFile = req.files['imageFile'][0];
+    product.imageUrl = `/uploads/${imgFile.filename}`;
+    persistFileToMongo(imgFile);
   } else if (imageUrl !== undefined) {
     product.imageUrl = (imageUrl || "").trim();
   }
@@ -522,7 +648,9 @@ app.post("/api/admin/product", requireAdmin, upload.fields([{ name: "lispFile", 
   if (downloadType === "link") {
     product.downloadUrl = downloadUrl || "";
   } else if (req.files && req.files['lispFile'] && req.files['lispFile'][0]) {
-    product.downloadUrl = `/uploads/${req.files['lispFile'][0].filename}`;
+    const lspFile = req.files['lispFile'][0];
+    product.downloadUrl = `/uploads/${lspFile.filename}`;
+    persistFileToMongo(lspFile);
   } else if (!product.downloadUrl) {
     product.downloadUrl = "/files/AutoCAD_Pro_Toolbox.lsp";
   }
@@ -561,6 +689,11 @@ app.post("/api/admin/document", requireAdmin, upload.any(), (req, res) => {
   doc.size = size || "10 MB";
   doc.author = author || "Tin Học Click";
   doc.description = description || "";
+  if (req.body.downloadCount !== undefined && req.body.downloadCount !== "") {
+    doc.downloadCount = parseInt(req.body.downloadCount) || 0;
+  } else if (doc.downloadCount === undefined) {
+    doc.downloadCount = 0;
+  }
 
   // Giới hạn số trang đọc thử (Mặc định 10 trang)
   doc.previewPages = req.body.previewPages ? Math.max(1, parseInt(req.body.previewPages)) : 10;
@@ -577,6 +710,10 @@ app.post("/api/admin/document", requireAdmin, upload.any(), (req, res) => {
     if (existingImages) parsedExistingImages = JSON.parse(existingImages);
   } catch (e) {
     parsedExistingImages = [];
+  }
+
+  if (req.files && Array.isArray(req.files)) {
+    req.files.forEach(f => persistFileToMongo(f));
   }
 
   const uploadedImageFiles = (req.files || []).filter(f => f.fieldname === 'docImages' || (f.mimetype && f.mimetype.startsWith('image/')));
@@ -979,15 +1116,53 @@ app.get("/api/course/lessons", (req, res) => {
     };
   });
 
+  const courseProd = (db.products || []).find(p => p.id === "prod_course_2d" || p.category === "Khóa học" || (p.name && p.name.includes("Khóa học")));
+
   res.json({
     success: true,
     courseTitle: "Khóa học AutoCAD 2D",
+    coursePrice: courseProd ? Number(courseProd.price) : 299000,
+    courseOldPrice: courseProd ? Number(courseProd.oldPrice) : 590000,
+    courseId: courseProd ? courseProd.id : "prod_course_2d",
     hasEnrolled: hasEnrolled,
     isAdmin: isAdmin,
     currentUser: currentUser ? { name: currentUser.name, phone: currentUser.phone } : null,
     totalLessons: lessons.length,
     lessons: lessons
   });
+});
+
+// Cập nhật học phí Khóa học AutoCAD 2D từ trang Admin
+app.post("/api/admin/course-price", requireAdmin, (req, res) => {
+  const db = readDb();
+  const { price, oldPrice } = req.body;
+  if (!db.products) db.products = [];
+  let course = db.products.find(p => p.id === "prod_course_2d" || p.category === "Khóa học" || (p.name && p.name.includes("Khóa học")));
+  if (!course) {
+    course = {
+      id: "prod_course_2d",
+      name: "Khóa học AutoCAD 2D Từ Cơ Bản Đến Nâng Cao",
+      category: "Khóa học",
+      price: Number(price) || 299000,
+      oldPrice: Number(oldPrice) || 590000,
+      description: "Khóa học video bài giảng AutoCAD 2D bài bản từ cơ bản đến nâng cao, thực chiến bản vẽ kỹ thuật.",
+      commands: "ACAD 2D",
+      instructions: "Khóa học trực tuyến kèm bộ giáo trình và file bài tập thực hành. Học viên được hỗ trợ trọn đời.",
+      downloadType: "local",
+      downloadUrl: "/files/AutoCAD_Pro_Toolbox.lsp",
+      isActive: true,
+      imageUrl: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600",
+      createdAt: new Date().toISOString()
+    };
+    db.products.push(course);
+  } else {
+    course.id = "prod_course_2d";
+    course.category = "Khóa học";
+    if (price !== undefined) course.price = Number(price);
+    if (oldPrice !== undefined) course.oldPrice = Number(oldPrice);
+  }
+  writeDb(db);
+  res.json({ success: true, course });
 });
 
 // Xem chi tiết 1 bài học
