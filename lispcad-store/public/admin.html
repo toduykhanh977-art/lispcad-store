@@ -314,6 +314,52 @@
 
             <button type="submit" class="btn-buy" style="max-width: 250px; margin-top: 20px;">Lưu Cài Đặt</button>
           </form>
+
+          <!-- CÀI ĐẶT THÔNG BÁO GMAIL TỰ ĐỘNG -->
+          <div style="margin-top: 32px; padding-top: 24px; border-top: 2px dashed #e2e8f0;">
+            <h3 style="margin-top: 0; color: #0f172a; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+              📩 Thông Báo Đơn Hàng &amp; Lượt Tải Về Gmail Tự Động
+            </h3>
+            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 16px;">
+              Hệ thống tự động gửi email kèm <strong>tên chính xác sản phẩm / File CAD / Tài liệu</strong> về Gmail của bạn khi có khách chuyển tiền thành công hoặc bấm tải file đã mua.
+            </p>
+            <form id="form-email-settings" onsubmit="saveEmailSettings(event)" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 18px;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+                <div class="form-group">
+                  <label for="notifyEmail">Gmail nhận thông báo</label>
+                  <input type="email" id="notifyEmail" value="khanhksxd30@gmail.com" placeholder="khanhksxd30@gmail.com" required>
+                </div>
+                <div class="form-group">
+                  <label for="smtpUser">Gmail dùng để gửi (thường giống mail nhận)</label>
+                  <input type="email" id="smtpUser" value="khanhksxd30@gmail.com" placeholder="khanhksxd30@gmail.com" required>
+                </div>
+                <div class="form-group">
+                  <label for="smtpAppPassword">Mật khẩu ứng dụng Gmail (16 ký tự)</label>
+                  <input type="password" id="smtpAppPassword" placeholder="VD: abcd efgh ijkl mnop (để trống nếu giữ nguyên)">
+                  <small style="display: block; color: #64748b; margin-top: 4px; font-size: 0.78rem;">
+                    Lấy tại: Google Tài khoản → Bảo mật → Xác minh 2 bước → Mật khẩu ứng dụng.
+                  </small>
+                </div>
+              </div>
+
+              <div style="display: flex; flex-wrap: wrap; gap: 18px; margin-top: 12px; color: #0f172a; font-size: 0.9rem;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" id="emailEnabled" checked style="width: auto;"> Bật thông báo Gmail tự động
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" id="notifyOnPaid" checked style="width: auto;"> Báo khi khách chuyển tiền thành công
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" id="notifyOnDownload" checked style="width: auto;"> Báo khi khách tải file đã mua về
+                </label>
+              </div>
+
+              <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
+                <button type="submit" class="btn-buy" style="max-width: 230px; margin: 0;">Lưu Cấu Hình Email</button>
+                <button type="button" class="btn-sm" onclick="testEmailSettings()" style="background: #0284c7; color: #fff; padding: 10px 18px;">📧 Gửi Email Test Thử</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
 
@@ -970,6 +1016,7 @@
         }
         globalData = await res.json();
         renderPaymentSettings(globalData.paymentSettings);
+        renderEmailSettings(globalData.emailSettings);
         renderProducts(globalData.products);
         renderAdminDocuments(globalData.documents);
         renderAdminLessons(globalData.lessons);
@@ -1053,6 +1100,63 @@
       if (data.success) {
         alert('Đã lưu thông tin thanh toán & mã QR thành công!');
         loadDashboardData();
+      }
+    }
+
+    function renderEmailSettings(settings) {
+      if (!settings) return;
+      if (document.getElementById('notifyEmail')) document.getElementById('notifyEmail').value = settings.notifyEmail || 'khanhksxd30@gmail.com';
+      if (document.getElementById('smtpUser')) document.getElementById('smtpUser').value = settings.smtpUser || settings.notifyEmail || 'khanhksxd30@gmail.com';
+      if (document.getElementById('smtpAppPassword')) {
+        document.getElementById('smtpAppPassword').value = '';
+        document.getElementById('smtpAppPassword').placeholder = settings.smtpAppPassword
+          ? 'Đã lưu mật khẩu ứng dụng (nhập mới nếu muốn đổi)'
+          : 'VD: abcd efgh ijkl mnop';
+      }
+      if (document.getElementById('emailEnabled')) document.getElementById('emailEnabled').checked = settings.enabled !== false;
+      if (document.getElementById('notifyOnPaid')) document.getElementById('notifyOnPaid').checked = settings.notifyOnPaid !== false;
+      if (document.getElementById('notifyOnDownload')) document.getElementById('notifyOnDownload').checked = settings.notifyOnDownload !== false;
+    }
+
+    async function saveEmailSettings(e) {
+      e.preventDefault();
+      const payload = {
+        notifyEmail: document.getElementById('notifyEmail').value.trim(),
+        smtpUser: document.getElementById('smtpUser').value.trim(),
+        smtpAppPassword: document.getElementById('smtpAppPassword').value.trim(),
+        enabled: document.getElementById('emailEnabled').checked,
+        notifyOnPaid: document.getElementById('notifyOnPaid').checked,
+        notifyOnDownload: document.getElementById('notifyOnDownload').checked
+      };
+      try {
+        const res = await fetch('/api/admin/email-settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Đã lưu cấu hình thông báo Gmail thành công!');
+          loadDashboardData();
+        } else {
+          alert(data.error || 'Không thể lưu cấu hình Email');
+        }
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    async function testEmailSettings() {
+      try {
+        const res = await fetch('/api/admin/email-test', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ ' + data.message);
+        } else {
+          alert('❌ ' + (data.error || 'Gửi email test thất bại'));
+        }
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
       }
     }
 
