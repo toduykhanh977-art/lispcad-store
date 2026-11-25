@@ -212,11 +212,13 @@ function getEmailConfig(db) {
   const notifyEmail = (saved.notifyEmail || process.env.NOTIFY_EMAIL || "khanhksxd30@gmail.com").trim();
   const smtpUser = (saved.smtpUser || process.env.SMTP_USER || notifyEmail).trim();
   const smtpAppPassword = (saved.smtpAppPassword || process.env.SMTP_PASS || "").replace(/\s+/g, "");
+  const webhookEmailUrl = (saved.webhookEmailUrl || process.env.EMAIL_WEBHOOK_URL || "").trim();
   return {
     enabled: saved.enabled !== false,
     notifyEmail,
     smtpUser,
     smtpAppPassword,
+    webhookEmailUrl,
     notifyOnPaid: saved.notifyOnPaid !== false,
     notifyOnDownload: saved.notifyOnDownload !== false
   };
@@ -242,14 +244,45 @@ async function sendAdminNotificationEmail(db, { subject, html }) {
   if (!cfg.enabled) {
     return { sent: false, reason: "Thông báo Email đang tắt" };
   }
+
+  // Ưu tiên 1: Gửi qua Google Apps Script Webhook (HTTPS cổng 443 - không bao giờ bị Render Free chặn)
+  if (cfg.webhookEmailUrl) {
+    try {
+      const resp = await fetch(cfg.webhookEmailUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: cfg.notifyEmail,
+          subject,
+          html
+        })
+      });
+      const text = await resp.text();
+      if (resp.ok) {
+        console.log(`📧 [Email Webhook] Đã gửi thông báo tới ${cfg.notifyEmail}: ${subject}`);
+        return { sent: true };
+      }
+      console.error("❌ [Email Webhook] Lỗi HTTP:", resp.status, text);
+      return { sent: false, reason: `Webhook lỗi ${resp.status}: ${text}` };
+    } catch (err) {
+      console.error("❌ [Email Webhook] Lỗi kết nối:", err.message);
+      return { sent: false, reason: err.message };
+    }
+  }
+
+  // Ưu tiên 2: Gửi qua SMTP Gmail (dành cho localhost hoặc Render gói trả phí)
   if (!cfg.notifyEmail || !cfg.smtpUser || !cfg.smtpAppPassword) {
-    console.log("⚠️ [Email] Chưa cấu hình Mật khẩu ứng dụng Gmail (SMTP_PASS), bỏ qua gửi mail:", subject);
-    return { sent: false, reason: "Chưa cấu hình Mật khẩu ứng dụng Gmail (16 ký tự)" };
+    console.log("⚠️ [Email] Chưa cấu hình Link Google Apps Script hoặc Mật khẩu ứng dụng Gmail:", subject);
+    return { sent: false, reason: "Chưa cấu hình Link Google Apps Script (khuyên dùng trên Render Free)" };
   }
 
   try {
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      family: 4,
+      connectionTimeout: 10000,
       auth: {
         user: cfg.smtpUser,
         pass: cfg.smtpAppPassword
@@ -708,12 +741,15 @@ app.get("/api/admin/data", requireAdmin, (req, res) => {
 // Cập nhật cấu hình Email thông báo Gmail
 app.post("/api/admin/email-settings", requireAdmin, (req, res) => {
   const db = readDb();
-  const { enabled, notifyEmail, smtpUser, smtpAppPassword, notifyOnPaid, notifyOnDownload } = req.body;
+  const { enabled, notifyEmail, smtpUser, smtpAppPassword, webhookEmailUrl, notifyOnPaid, notifyOnDownload } = req.body;
   if (!db.emailSettings) db.emailSettings = {};
 
   db.emailSettings.enabled = enabled !== false && enabled !== "false";
   db.emailSettings.notifyEmail = (notifyEmail || "khanhksxd30@gmail.com").trim();
   db.emailSettings.smtpUser = (smtpUser || db.emailSettings.notifyEmail).trim();
+  if (webhookEmailUrl !== undefined) {
+    db.emailSettings.webhookEmailUrl = String(webhookEmailUrl).trim();
+  }
   if (smtpAppPassword !== undefined && smtpAppPassword !== "") {
     db.emailSettings.smtpAppPassword = String(smtpAppPassword).replace(/\s+/g, "");
   }
@@ -728,10 +764,10 @@ app.post("/api/admin/email-settings", requireAdmin, (req, res) => {
 app.post("/api/admin/email-test", requireAdmin, async (req, res) => {
   const db = readDb();
   const cfg = getEmailConfig(db);
-  if (!cfg.smtpAppPassword) {
+  if (!cfg.webhookEmailUrl && !cfg.smtpAppPassword) {
     return res.status(400).json({
       success: false,
-      error: "Chưa nhập Mật khẩu ứng dụng Gmail (16 ký tự). Vui lòng nhập và bấm Lưu cấu hình trước khi test!"
+      error: "Chưa dán Link Google Apps Script (hoặc Mật khẩu ứng dụng Gmail). Vui lòng nhập và bấm Lưu cấu hình trước khi test!"
     });
   }
   const result = await sendAdminNotificationEmail(db, {
