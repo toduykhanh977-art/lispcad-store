@@ -1239,6 +1239,7 @@
           <td>${p.downloadType === 'link' ? '<a href="' + p.downloadUrl + '" target="_blank" style="color: var(--accent-cyan);">Đường link</a>' : 'File nội bộ'}</td>
           <td>${p.isActive ? '<span class="status-badge status-paid">Đang bán</span>' : '<span class="status-badge status-pending">Đã ẩn</span>'}</td>
           <td>
+            <button class="btn-sm" style="background: #0ea5e9; color: #fff;" onclick="copyShareLinkAdmin('lisp', '${p.id}')" title="Copy link chia sẻ">🔗 Link</button>
             <button class="btn-sm btn-secondary" onclick="editProductById('${p.id}')">Sửa</button>
             <button class="btn-sm btn-danger" onclick="deleteProduct('${p.id}')">Xóa</button>
           </td>
@@ -1506,6 +1507,7 @@
           </td>
           <td>${filesSummaryHtml}</td>
           <td>
+            <button class="btn-sm" style="background: #0ea5e9; color: #fff;" onclick="event.stopPropagation(); copyShareLinkAdmin('doc', '${d.id}')" title="Copy link chia sẻ">🔗 Link</button>
             <button class="btn-sm btn-secondary" onclick="event.stopPropagation(); editDocById('${d.id}')">Sửa</button>
             <button class="btn-sm btn-danger" onclick="event.stopPropagation(); deleteDoc('${d.id}')">Xóa</button>
           </td>
@@ -1514,6 +1516,20 @@
         tr.onclick = () => editDocById(d.id);
         tbody.appendChild(tr);
       });
+    }
+
+    async function copyShareLinkAdmin(type, id) {
+      const url = `${window.location.origin}/?${type}=${encodeURIComponent(id)}`;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url);
+          alert('✅ Đã copy link chia sẻ:\n' + url + '\n\nBạn chỉ cần dán (Ctrl+V) gửi cho mọi người tải!');
+        } else {
+          window.prompt('Copy link chia sẻ bên dưới:', url);
+        }
+      } catch (e) {
+        window.prompt('Copy link chia sẻ bên dưới:', url);
+      }
     }
 
     // --- QUẢN LÝ 2-3 ẢNH MINH HỌA ---
