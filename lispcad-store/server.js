@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
 const cookieParser = require("cookie-parser");
+const nodemailer = require("nodemailer");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -203,9 +204,147 @@ function requireAdmin(req, res, next) {
   return res.status(401).json({ error: "Chưa đăng nhập quyền Admin" });
 }
 
+// ==========================================
+// HỆ THỐNG GỬI EMAIL THÔNG BÁO TỰ ĐỘNG (GMAIL)
+// ==========================================
+function getEmailConfig(db) {
+  const saved = (db && db.emailSettings) ? db.emailSettings : {};
+  const notifyEmail = (saved.notifyEmail || process.env.NOTIFY_EMAIL || "khanhksxd30@gmail.com").trim();
+  const smtpUser = (saved.smtpUser || process.env.SMTP_USER || notifyEmail).trim();
+  const smtpAppPassword = (saved.smtpAppPassword || process.env.SMTP_PASS || "").replace(/\s+/g, "");
+  return {
+    enabled: saved.enabled !== false,
+    notifyEmail,
+    smtpUser,
+    smtpAppPassword,
+    notifyOnPaid: saved.notifyOnPaid !== false,
+    notifyOnDownload: saved.notifyOnDownload !== false
+  };
+}
+
+function getOrderItemNames(order) {
+  if (order && Array.isArray(order.items) && order.items.length > 0) {
+    return order.items.map(it => it.name || it.title || it.id).filter(Boolean).join(", ");
+  }
+  return (order && order.productName) ? order.productName : "Sản phẩm CAD";
+}
+
+function formatVietnamTime(dateInput) {
+  try {
+    return new Date(dateInput || Date.now()).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
+  } catch (e) {
+    return new Date().toLocaleString("vi-VN");
+  }
+}
+
+async function sendAdminNotificationEmail(db, { subject, html }) {
+  const cfg = getEmailConfig(db);
+  if (!cfg.enabled) {
+    return { sent: false, reason: "Thông báo Email đang tắt" };
+  }
+  if (!cfg.notifyEmail || !cfg.smtpUser || !cfg.smtpAppPassword) {
+    console.log("⚠️ [Email] Chưa cấu hình Mật khẩu ứng dụng Gmail (SMTP_PASS), bỏ qua gửi mail:", subject);
+    return { sent: false, reason: "Chưa cấu hình Mật khẩu ứng dụng Gmail (16 ký tự)" };
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: cfg.smtpUser,
+        pass: cfg.smtpAppPassword
+      }
+    });
+
+    await transporter.sendMail({
+      from: `"AutoCAD Tin Học Click" <${cfg.smtpUser}>`,
+      to: cfg.notifyEmail,
+      subject,
+      html
+    });
+    console.log(`📧 [Email] Đã gửi thông báo tới ${cfg.notifyEmail}: ${subject}`);
+    return { sent: true };
+  } catch (err) {
+    console.error("❌ [Email] Lỗi gửi Gmail:", err.message);
+    return { sent: false, reason: err.message };
+  }
+}
+
+function notifyOrderPaid(order, db) {
+  const cfg = getEmailConfig(db);
+  if (!cfg.notifyOnPaid) return;
+  const itemNames = getOrderItemNames(order);
+  const itemsListHtml = (order.items && order.items.length > 0)
+    ? order.items.map(it => `<li><strong>${it.name || it.title}</strong> — ${Number(it.price || 0).toLocaleString()}đ</li>`).join("")
+    : `<li><strong>${order.productName}</strong> — ${Number(order.amount || 0).toLocaleString()}đ</li>`;
+
+  const subject = `[Đã Thanh Toán] ${itemNames} - Đơn #${order.orderCode}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;">
+      <div style="background: #0284c7; color: #ffffff; padding: 16px 20px;">
+        <h2 style="margin: 0; font-size: 18px;">💰 KHÁCH HÀNG ĐÃ CHUYỂN TIỀN THÀNH CÔNG</h2>
+      </div>
+      <div style="padding: 20px; color: #0f172a; line-height: 1.6;">
+        <p style="margin-top: 0;">Hệ thống vừa ghi nhận thanh toán thành công cho đơn hàng <strong>#${order.orderCode}</strong>:</p>
+        <div style="background: #f0f9ff; border-left: 4px solid #0284c7; padding: 12px 15px; margin: 14px 0; border-radius: 4px;">
+          <div style="font-size: 13px; color: #0369a1; font-weight: bold; margin-bottom: 4px;">SẢN PHẨM / FILE CAD / TÀI LIỆU KHÁCH MUA:</div>
+          <ul style="margin: 4px 0 0 18px; padding: 0;">${itemsListHtml}</ul>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+          <tr><td style="padding: 6px 0; color: #64748b; width: 150px;">Tổng số tiền:</td><td style="padding: 6px 0; font-weight: bold; color: #dc2626;">${Number(order.amount || 0).toLocaleString()}đ</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Tên khách hàng:</td><td style="padding: 6px 0; font-weight: bold;">${order.customerName || "Khách hàng"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Số điện thoại:</td><td style="padding: 6px 0;">${order.customerPhone || "Không có"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Email khách:</td><td style="padding: 6px 0;">${order.customerEmail || "Không có"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Hình thức nhận:</td><td style="padding: 6px 0;">${order.deliveryMethod === "zalo" ? "Nhận qua Zalo" : "Tải trực tiếp trên Web"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Thời gian:</td><td style="padding: 6px 0;">${formatVietnamTime()}</td></tr>
+        </table>
+      </div>
+    </div>
+  `;
+  sendAdminNotificationEmail(db, { subject, html });
+}
+
+function notifyOrderDownloaded(order, product, db) {
+  const cfg = getEmailConfig(db);
+  if (!cfg.notifyOnDownload) return;
+  const itemNames = getOrderItemNames(order);
+  const downloadedTitle = (product && (product.name || product.title)) ? (product.name || product.title) : itemNames;
+  const totalDl = product ? (Number(product.downloadCount) || 1) : 1;
+
+  const subject = `[Khách Đã Tải File] ${downloadedTitle} - Đơn #${order.orderCode}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;">
+      <div style="background: #16a34a; color: #ffffff; padding: 16px 20px;">
+        <h2 style="margin: 0; font-size: 18px;">📥 KHÁCH HÀNG VỪA TẢI FILE ĐÃ MUA VỀ</h2>
+      </div>
+      <div style="padding: 20px; color: #0f172a; line-height: 1.6;">
+        <p style="margin-top: 0;">Khách hàng của đơn <strong>#${order.orderCode}</strong> vừa bấm tải file về máy:</p>
+        <div style="background: #f0fdf4; border-left: 4px solid #16a34a; padding: 12px 15px; margin: 14px 0; border-radius: 4px;">
+          <div style="font-size: 13px; color: #15803d; font-weight: bold; margin-bottom: 4px;">TÊN FILE CAD / LISP / TÀI LIỆU VỪA TẢI:</div>
+          <div style="font-size: 16px; font-weight: bold; color: #0f172a;">${downloadedTitle}</div>
+          ${order.items && order.items.length > 1 ? `<div style="font-size: 13px; color: #475569; margin-top: 6px;">Đơn gồm: ${itemNames}</div>` : ""}
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+          <tr><td style="padding: 6px 0; color: #64748b; width: 150px;">Mã đơn hàng:</td><td style="padding: 6px 0; font-weight: bold;">#${order.orderCode}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Tên khách hàng:</td><td style="padding: 6px 0; font-weight: bold;">${order.customerName || "Khách hàng"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Số điện thoại:</td><td style="padding: 6px 0;">${order.customerPhone || "Không có"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Email khách:</td><td style="padding: 6px 0;">${order.customerEmail || "Không có"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Tổng lượt tải SP:</td><td style="padding: 6px 0; font-weight: bold; color: #0284c7;">${totalDl.toLocaleString()} lượt</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Thời gian tải:</td><td style="padding: 6px 0;">${formatVietnamTime()}</td></tr>
+        </table>
+      </div>
+    </div>
+  `;
+  sendAdminNotificationEmail(db, { subject, html });
+}
+
 // Helper tự động kích hoạt Khóa học khi đơn hàng được thanh toán (PAID)
 function completeOrderPaid(order, db) {
+  const wasPaid = order.status === "PAID";
   order.status = "PAID";
+  if (!wasPaid) {
+    notifyOrderPaid(order, db);
+  }
   const hasCourse = (order.items && order.items.some(it => it.id === "prod_course_2d")) || order.productId === "prod_course_2d";
   if (hasCourse) {
     if (!db.users) db.users = [];
@@ -479,6 +618,7 @@ app.get("/download/:orderCode", (req, res) => {
     });
   }
   writeDb(db);
+  notifyOrderDownloaded(order, product, db);
 
   // Lấy link tải từ downloadUrl hoặc file đầu tiên trong files
   const dlUrl = product.downloadUrl || (product.files && product.files[0] ? product.files[0].url : "");
@@ -556,12 +696,63 @@ app.get("/api/admin/data", requireAdmin, (req, res) => {
   const db = readDb();
   res.json({
     paymentSettings: db.paymentSettings,
+    emailSettings: getEmailConfig(db),
     products: db.products || [],
     documents: db.documents || [],
     orders: db.orders || [],
     lessons: db.lessons || [],
     users: db.users || []
   });
+});
+
+// Cập nhật cấu hình Email thông báo Gmail
+app.post("/api/admin/email-settings", requireAdmin, (req, res) => {
+  const db = readDb();
+  const { enabled, notifyEmail, smtpUser, smtpAppPassword, notifyOnPaid, notifyOnDownload } = req.body;
+  if (!db.emailSettings) db.emailSettings = {};
+
+  db.emailSettings.enabled = enabled !== false && enabled !== "false";
+  db.emailSettings.notifyEmail = (notifyEmail || "khanhksxd30@gmail.com").trim();
+  db.emailSettings.smtpUser = (smtpUser || db.emailSettings.notifyEmail).trim();
+  if (smtpAppPassword !== undefined && smtpAppPassword !== "") {
+    db.emailSettings.smtpAppPassword = String(smtpAppPassword).replace(/\s+/g, "");
+  }
+  db.emailSettings.notifyOnPaid = notifyOnPaid !== false && notifyOnPaid !== "false";
+  db.emailSettings.notifyOnDownload = notifyOnDownload !== false && notifyOnDownload !== "false";
+
+  writeDb(db);
+  res.json({ success: true, emailSettings: getEmailConfig(db) });
+});
+
+// Gửi Email Test thử nghiệm từ Admin
+app.post("/api/admin/email-test", requireAdmin, async (req, res) => {
+  const db = readDb();
+  const cfg = getEmailConfig(db);
+  if (!cfg.smtpAppPassword) {
+    return res.status(400).json({
+      success: false,
+      error: "Chưa nhập Mật khẩu ứng dụng Gmail (16 ký tự). Vui lòng nhập và bấm Lưu cấu hình trước khi test!"
+    });
+  }
+  const result = await sendAdminNotificationEmail(db, {
+    subject: "[Kiểm Tra Kết Nối] Hệ thống thông báo đơn hàng & lượt tải đã hoạt động!",
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #cbd5e1; border-radius: 8px; max-width: 560px;">
+        <h2 style="color: #0284c7; margin-top: 0;">✅ Kết nối Gmail thành công!</h2>
+        <p>Từ bây giờ, mỗi khi có khách hàng:</p>
+        <ul>
+          <li><strong>Chuyển tiền thành công</strong> (tự động hoặc duyệt tay)</li>
+          <li><strong>Bấm tải file đã mua</strong> về máy</li>
+        </ul>
+        <p>Hệ thống sẽ tự động gửi thông báo kèm <strong>tên chính xác sản phẩm / File CAD / Tài liệu</strong> về địa chỉ <strong>${cfg.notifyEmail}</strong>.</p>
+        <p style="color: #64748b; font-size: 12px;">Thời gian test: ${formatVietnamTime()}</p>
+      </div>
+    `
+  });
+  if (result.sent) {
+    return res.json({ success: true, message: `Đã gửi email test thành công tới ${cfg.notifyEmail}!` });
+  }
+  return res.status(500).json({ success: false, error: `Không gửi được email: ${result.reason}` });
 });
 
 // Cập nhật cấu hình thanh toán & Upload ảnh QR
