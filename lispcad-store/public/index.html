@@ -102,36 +102,29 @@
 
       <!-- 3. TỔNG HỢP FILE CAD VÀ TÀI LIỆU DROPDOWN -->
       <li class="nav-item-dropdown">
-        <a href="#tai-lieu" class="nav-link" onclick="scrollToDocuments()">
+        <a href="#tai-lieu" class="nav-link" onclick="scrollToDocTab('all')">
           File CAD &amp; Tài liệu <span class="arrow-down">▾</span>
         </a>
         <div class="dropdown-menu">
-          <a href="#tai-lieu" class="dropdown-item" onclick="scrollToDocuments()">
-            <span class="dropdown-icon" style="background: #fee2e2; color: #dc2626;">📚</span>
-            <div>
-              <div class="dropdown-title">Giáo Trình AutoCAD 2D (PDF)</div>
-              <div class="dropdown-desc">Giáo trình 19 chương lý thuyết & thực hành</div>
-            </div>
-          </a>
-          <a href="#tai-lieu" class="dropdown-item" onclick="scrollToDocuments()">
+          <a href="#tai-lieu" class="dropdown-item" onclick="scrollToDocTab('filecad')">
             <span class="dropdown-icon" style="background: #e0f2fe; color: #0284c7;">📐</span>
             <div>
-              <div class="dropdown-title">Thư Viện 1000+ Block CAD (DWG)</div>
-              <div class="dropdown-desc">File mẫu kiến trúc, nội thất, kết cấu chuẩn</div>
+              <div class="dropdown-title">File CAD (Bản vẽ PDF &amp; RAR)</div>
+              <div class="dropdown-desc">Xem trước bản vẽ PDF, tải bộ file CAD nén RAR đầy đủ</div>
             </div>
           </a>
-          <a href="#tai-lieu" class="dropdown-item" onclick="scrollToDocuments()">
+          <a href="#tai-lieu" class="dropdown-item" onclick="scrollToDocTab('document')">
+            <span class="dropdown-icon" style="background: #fee2e2; color: #dc2626;">📚</span>
+            <div>
+              <div class="dropdown-title">Tài liệu &amp; Giáo trình</div>
+              <div class="dropdown-desc">Giáo trình AutoCAD 2D, sổ tay lệnh tắt, sách hướng dẫn</div>
+            </div>
+          </a>
+          <a href="#tai-lieu" class="dropdown-item" onclick="scrollToDocTab('document')">
             <span class="dropdown-icon" style="background: #fef3c7; color: #d97706;">⚡</span>
             <div>
-              <div class="dropdown-title">Bảng 150+ Lệnh Tắt & Phím Tắt CAD</div>
+              <div class="dropdown-title">Bảng 150+ Lệnh Tắt &amp; Phím Tắt CAD</div>
               <div class="dropdown-desc">Sổ tay tra cứu lệnh tắt nhanh bỏ túi</div>
-            </div>
-          </a>
-          <a href="#tai-lieu" class="dropdown-item" onclick="scrollToDocuments()">
-            <span class="dropdown-icon" style="background: #f3e8ff; color: #9333ea;">📖</span>
-            <div>
-              <div class="dropdown-title">Sách Hướng Dẫn Nạp LispCAD</div>
-              <div class="dropdown-desc">Cách nạp lisp bằng APPLOAD & Startup Suite</div>
             </div>
           </a>
         </div>
@@ -243,9 +236,16 @@
 
         <!-- Mục 3: TỔNG HỢP FILE CAD VÀ TÀI LIỆU -->
         <div id="tai-lieu" style="margin-top: 36px;">
-          <div class="section-header-title">📚 TỔNG HỢP FILE CAD VÀ TÀI LIỆU</div>
-          <p style="color: #64748b; font-size: 0.95rem; margin-top: -6px; margin-bottom: 18px;">
-            Tổng hợp file bản vẽ CAD, thư viện block DWG mẫu, giáo trình và tài liệu lệnh tắt cho học viên.
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 10px;">
+            <div class="section-header-title" style="margin-bottom: 0;">📚 TỔNG HỢP FILE CAD VÀ TÀI LIỆU</div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="doc-section-tabs">
+              <button type="button" class="doc-tab-btn active" data-tab="all" onclick="switchDocTab('all')" style="padding: 7px 16px; border-radius: 20px; border: 1px solid #0284c7; background: #0284c7; color: #fff; font-weight: 700; font-size: 0.85rem; cursor: pointer;">Tất cả</button>
+              <button type="button" class="doc-tab-btn" data-tab="filecad" onclick="switchDocTab('filecad')" style="padding: 7px 16px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #0f172a; font-weight: 700; font-size: 0.85rem; cursor: pointer;">📐 File CAD</button>
+              <button type="button" class="doc-tab-btn" data-tab="document" onclick="switchDocTab('document')" style="padding: 7px 16px; border-radius: 20px; border: 1px solid #cbd5e1; background: #fff; color: #0f172a; font-weight: 700; font-size: 0.85rem; cursor: pointer;">📚 Tài liệu</button>
+            </div>
+          </div>
+          <p style="color: #64748b; font-size: 0.95rem; margin-top: 0; margin-bottom: 18px;">
+            Chọn xem riêng <strong>📐 File CAD</strong> (bản vẽ PDF xem trước &amp; file RAR) hoặc <strong>📚 Tài liệu</strong> (giáo trình, sổ tay, thư viện mẫu).
           </p>
 
           <div class="docs-cards-grid" id="docs-cards-container">
@@ -769,20 +769,51 @@
       }
     }
 
-    // Render danh sách Tài liệu & Giáo trình (Hỗ trợ Miễn phí & Có phí / Giỏ hàng)
+    // Render danh sách File CAD & Tài liệu (Hỗ trợ chia tab File CAD riêng / Tài liệu riêng)
     let currentViewingDoc = null;
+    let currentDocTab = 'all';
+
+    function isFileCadItem(doc) {
+      return doc && (doc.itemType === 'filecad' || doc.category === 'File CAD');
+    }
+
+    function switchDocTab(tab) {
+      currentDocTab = tab || 'all';
+      document.querySelectorAll('.doc-tab-btn').forEach(btn => {
+        const isActive = btn.getAttribute('data-tab') === currentDocTab;
+        btn.style.background = isActive ? '#0284c7' : '#fff';
+        btn.style.color = isActive ? '#fff' : '#0f172a';
+        btn.style.borderColor = isActive ? '#0284c7' : '#cbd5e1';
+      });
+      renderDocuments(allDocuments);
+    }
+
+    function scrollToDocTab(tab) {
+      switchDocTab(tab);
+      const el = document.getElementById('tai-lieu');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
 
     function renderDocuments(documents) {
       const container = document.getElementById('docs-cards-container');
       if (!container) return;
       container.innerHTML = '';
 
-      if (!documents || documents.length === 0) {
-        container.innerHTML = '<p style="color: #64748b; padding: 20px 0;">Chưa có tài liệu nào được đăng tải.</p>';
+      const filtered = (documents || []).filter(doc => {
+        if (currentDocTab === 'filecad') return isFileCadItem(doc);
+        if (currentDocTab === 'document') return !isFileCadItem(doc);
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        const emptyLabel = currentDocTab === 'filecad'
+          ? 'Chưa có File CAD nào được đăng tải.'
+          : (currentDocTab === 'document' ? 'Chưa có tài liệu nào được đăng tải.' : 'Chưa có File CAD hoặc tài liệu nào được đăng tải.');
+        container.innerHTML = `<p style="color: #64748b; padding: 20px 0;">${emptyLabel}</p>`;
         return;
       }
 
-      documents.forEach(doc => {
+      filtered.forEach(doc => {
         const card = document.createElement('div');
         card.className = 'doc-item-card';
 
@@ -984,7 +1015,8 @@
       const paywallNotice = document.getElementById('doc-pdf-paywall-notice');
 
       if (defaultPdf || (doc.format && doc.format.toLowerCase().includes('pdf'))) {
-        const previewLimit = doc.previewPages || 10;
+        const isFullPreview = Number(doc.previewPages) === -1;
+        const previewLimit = isFullPreview ? -1 : (doc.previewPages || 10);
         currentPdfRawUrl = `/api/public/pdf-preview-slice/${doc.id}`;
         currentPdfPreviewUrl = `/api/public/pdf-preview-slice/${doc.id}#toolbar=0&navpanes=0`;
         currentPdfTitle = (defaultPdf && defaultPdf.name) ? defaultPdf.name : doc.title;
@@ -992,17 +1024,18 @@
         pdfSection.style.display = 'block';
         const headingEl = document.getElementById('doc-detail-pdf-heading');
         if (headingEl) {
-          headingEl.innerHTML = `📖 Đọc Thử Giới Hạn: <span style="color: #34d399;">${previewLimit} Trang Đầu</span>`;
+          headingEl.innerHTML = isFullPreview
+            ? `📖 Xem Trước PDF: <span style="color: #34d399;">Xem Hết Toàn Bộ Trang</span>`
+            : `📖 Đọc Thử Giới Hạn: <span style="color: #34d399;">${previewLimit} Trang Đầu</span>`;
         }
         document.getElementById('doc-detail-pdf-name').innerText = '• ' + currentPdfTitle;
         const limitBadge = document.getElementById('doc-preview-limit-badge');
-        if (limitBadge) limitBadge.innerText = `${previewLimit} trang`;
+        if (limitBadge) limitBadge.innerText = isFullPreview ? 'Toàn bộ trang' : `${previewLimit} trang`;
 
         // Banner Paywall bên dưới khung đọc thử:
-        // Nếu có phí: CHỈ hiện 1 nút "⚡ MUA NGAY ĐỂ MỞ KHÓA" (Không có nút giỏ hàng, không có chữ tải file)
-        // Nếu 0đ miễn phí: Ẩn hẳn banner này đi
+        // Nếu có phí và không phải chế độ xem hết: hiện nút MUA NGAY; nếu xem hết hoặc miễn phí: ẩn banner giới hạn trang
         if (paywallNotice) {
-          if (isPaid) {
+          if (isPaid && !isFullPreview) {
             paywallNotice.style.display = 'flex';
             const priceBadge = document.getElementById('doc-pdf-paywall-price-badge');
             if (priceBadge) priceBadge.innerText = priceNum.toLocaleString() + 'đ';
@@ -1021,10 +1054,12 @@
             if (info && info.totalPages) {
               const headingEl = document.getElementById('doc-detail-pdf-heading');
               if (headingEl) {
-                headingEl.innerHTML = `📖 Đọc Thử Giới Hạn: <span style="color: #34d399;">${previewLimit} Trang Đầu</span> (File Gốc Gồm Toàn Bộ ${info.totalPages} Trang)`;
+                headingEl.innerHTML = isFullPreview
+                  ? `📖 Xem Trước PDF: <span style="color: #34d399;">Xem Hết Toàn Bộ ${info.totalPages} Trang</span>`
+                  : `📖 Đọc Thử Giới Hạn: <span style="color: #34d399;">${previewLimit} Trang Đầu</span> (File Gốc Gồm Toàn Bộ ${info.totalPages} Trang)`;
               }
               const limitBadge = document.getElementById('doc-preview-limit-badge');
-              if (limitBadge) limitBadge.innerText = `${previewLimit} / ${info.totalPages} trang`;
+              if (limitBadge) limitBadge.innerText = isFullPreview ? `${info.totalPages} / ${info.totalPages} trang` : `${previewLimit} / ${info.totalPages} trang`;
             }
           })
           .catch(() => {});
@@ -1287,8 +1322,9 @@
 
     function openFullscreenPdfPreview() {
       if (!currentViewingDoc) return;
+      const isFull = Number(currentViewingDoc.previewPages) === -1;
       const previewLimit = currentViewingDoc.previewPages || 10;
-      document.getElementById('fullscreen-pdf-title').innerText = (currentPdfTitle || 'Bản Đọc Thử PDF') + ` (Giới hạn đọc thử ${previewLimit} trang đầu)`;
+      document.getElementById('fullscreen-pdf-title').innerText = (currentPdfTitle || 'Bản Đọc Thử PDF') + (isFull ? ' (Xem Toàn Bộ Trang)' : ` (Giới hạn đọc thử ${previewLimit} trang đầu)`);
       document.getElementById('fullscreen-pdf-iframe').src = `/api/public/pdf-preview-slice/${currentViewingDoc.id}#toolbar=0&navpanes=0`;
       document.getElementById('fullscreen-pdf-modal').style.display = 'flex';
     }

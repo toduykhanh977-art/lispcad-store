@@ -610,6 +610,20 @@ app.get("/api/public/check-order/:orderCode", (req, res) => {
     }
   }
 
+  let downloadFiles = [];
+  if (isPaid) {
+    const allItems = [...(db.products || []), ...(db.documents || [])];
+    const prod = allItems.find(p => p.id === order.productId);
+    if (prod && Array.isArray(prod.files) && prod.files.length > 0) {
+      downloadFiles = prod.files.map((f, idx) => ({
+        name: f.name || `File ${idx + 1}`,
+        url: `/download/${order.orderCode}?fileIndex=${idx}`
+      }));
+    } else if (prod) {
+      downloadFiles = [{ name: prod.name || prod.title || order.productName, url: `/download/${order.orderCode}` }];
+    }
+  }
+
   res.json({
     orderCode: order.orderCode,
     status: order.status,
@@ -620,6 +634,7 @@ app.get("/api/public/check-order/:orderCode", (req, res) => {
     customerPhone: order.customerPhone,
     deliveryMethod: order.deliveryMethod || "download",
     downloadUrl: isPaid ? `/download/${order.orderCode}` : null,
+    downloadFiles,
     adminZalo: (db.paymentSettings && db.paymentSettings.zaloLink) || "https://zalo.me/0329778016"
   });
 });
@@ -653,9 +668,13 @@ app.get("/download/:orderCode", (req, res) => {
   writeDb(db);
   notifyOrderDownloaded(order, product, db);
 
-  // Lấy link tải từ downloadUrl hoặc file đầu tiên trong files
-  const dlUrl = product.downloadUrl || (product.files && product.files[0] ? product.files[0].url : "");
-  const dlType = product.downloadType || (product.files && product.files[0] ? product.files[0].type : "link");
+  // Lấy link tải từ fileIndex (nếu có nhiều file như PDF + RAR) hoặc file đầu tiên
+  const fileIndex = req.query.fileIndex !== undefined ? parseInt(req.query.fileIndex) : 0;
+  const chosenFile = (product.files && product.files.length > 0)
+    ? (product.files[fileIndex] || product.files[0])
+    : null;
+  const dlUrl = (chosenFile && chosenFile.url) ? chosenFile.url : (product.downloadUrl || "");
+  const dlType = (chosenFile && chosenFile.type) ? chosenFile.type : (product.downloadType || "link");
 
   // Nếu là link ngoài (Google Drive, OneDrive, v.v.)
   if (dlType === "link" && dlUrl) {
@@ -899,7 +918,7 @@ app.delete("/api/admin/product/:id", requireAdmin, (req, res) => {
 app.post("/api/admin/document", requireAdmin, upload.any(), (req, res) => {
   const db = readDb();
   if (!db.documents) db.documents = [];
-  const { id, title, category, format, size, author, description, isFree, price, oldPrice, previewPages, existingImages, filesJson } = req.body;
+  const { id, title, itemType, category, format, size, author, description, isFree, price, oldPrice, previewPages, previewAll, existingImages, filesJson } = req.body;
 
   let doc = db.documents.find(d => d.id === id);
   if (!doc) {
@@ -911,7 +930,8 @@ app.post("/api/admin/document", requireAdmin, upload.any(), (req, res) => {
   }
 
   doc.title = title || "Tài liệu AutoCAD";
-  doc.category = category || "Giáo trình";
+  doc.itemType = (itemType === "filecad" || category === "File CAD") ? "filecad" : "document";
+  doc.category = category || (doc.itemType === "filecad" ? "File CAD" : "Giáo trình");
   doc.format = format || "PDF";
   doc.size = size || "10 MB";
   doc.author = author || "Tin Học Click";
@@ -922,8 +942,13 @@ app.post("/api/admin/document", requireAdmin, upload.any(), (req, res) => {
     doc.downloadCount = 0;
   }
 
-  // Giới hạn số trang đọc thử (Mặc định 10 trang)
-  doc.previewPages = req.body.previewPages ? Math.max(1, parseInt(req.body.previewPages)) : 10;
+  // Giới hạn số trang đọc thử (-1 = xem hết toàn bộ trang, mặc định 10 trang)
+  const rawPreview = parseInt(req.body.previewPages);
+  if (previewAll === "true" || previewAll === true || rawPreview === -1) {
+    doc.previewPages = -1;
+  } else {
+    doc.previewPages = rawPreview > 0 ? rawPreview : 10;
+  }
 
   // Giá bán & Thiết lập có phí / miễn phí
   const isFreeFlag = (isFree === 'true' || isFree === true || Number(price) === 0);
@@ -983,9 +1008,33 @@ app.post("/api/admin/document", requireAdmin, upload.any(), (req, res) => {
   res.json({ success: true, document: doc });
 });
 
+// Helper tìm URL Google Drive của file PDF (ưu tiên file PDF, bỏ qua file RAR/ZIP)
+function findPdfDriveUrl(doc) {
+  if (doc.files && doc.files.length > 0) {
+    const driveFiles = doc.files.filter(f => f.url && f.url.includes("drive.google.com"));
+    if (driveFiles.length > 0) {
+      const explicitPdf = driveFiles.find(f =>
+        (f.name && f.name.toLowerCase().includes("pdf")) ||
+        (f.url && f.url.toLowerCase().includes(".pdf"))
+      );
+      if (explicitPdf) return explicitPdf.url;
+      const nonArchive = driveFiles.find(f => {
+        const n = (f.name || "").toLowerCase();
+        return !n.includes(".rar") && !n.includes(".zip") && !n.includes("rar") && !n.includes(".dwg");
+      });
+      if (nonArchive) return nonArchive.url;
+      return driveFiles[0].url;
+    }
+  }
+  if (doc.downloadUrl && doc.downloadUrl.includes("drive.google.com")) {
+    return doc.downloadUrl;
+  }
+  return null;
+}
+
 // ==============================================================
 // API CẮT & XEM TRƯỚC GIỚI HẠN SỐ TRANG CHO FILE PDF (PREVIEW LIMIT)
-// Khách chỉ được xem N trang đầu, không cho tải file gốc
+// Khách chỉ được xem N trang đầu (hoặc xem hết nếu previewPages === -1)
 // ==============================================================
 app.get("/api/public/pdf-preview-slice/:docId", async (req, res) => {
   try {
@@ -997,7 +1046,8 @@ app.get("/api/public/pdf-preview-slice/:docId", async (req, res) => {
     }
 
     const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
-    const previewPagesLimit = Math.max(1, parseInt(doc.previewPages) || 10);
+    const isFullPreview = Number(doc.previewPages) === -1;
+    const previewPagesLimit = isFullPreview ? 99999 : Math.max(1, parseInt(doc.previewPages) || 10);
 
     // Tìm file PDF nguồn
     let sourceBuffer = null;
@@ -1019,14 +1069,7 @@ app.get("/api/public/pdf-preview-slice/:docId", async (req, res) => {
 
     // Nếu có link Google Drive, tự động tải và cache file PDF thật từ Google Drive
     if (!sourceBuffer) {
-      let gdriveUrl = null;
-      if (doc.files && doc.files.length > 0) {
-        const driveItem = doc.files.find(f => f.url && f.url.includes('drive.google.com'));
-        if (driveItem) gdriveUrl = driveItem.url;
-      }
-      if (!gdriveUrl && doc.downloadUrl && doc.downloadUrl.includes('drive.google.com')) {
-        gdriveUrl = doc.downloadUrl;
-      }
+      const gdriveUrl = findPdfDriveUrl(doc);
 
       if (gdriveUrl) {
         const match = gdriveUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || gdriveUrl.match(/id=([a-zA-Z0-9_-]+)/);
@@ -1123,14 +1166,7 @@ app.get("/api/public/pdf-doc-info/:docId", async (req, res) => {
     try {
       const { PDFDocument } = require("pdf-lib");
       let buf = null;
-      let gdriveUrl = null;
-      if (doc.files && doc.files.length > 0) {
-        const driveItem = doc.files.find(f => f.url && f.url.includes('drive.google.com'));
-        if (driveItem) gdriveUrl = driveItem.url;
-      }
-      if (!gdriveUrl && doc.downloadUrl && doc.downloadUrl.includes('drive.google.com')) {
-        gdriveUrl = doc.downloadUrl;
-      }
+      const gdriveUrl = findPdfDriveUrl(doc);
       if (gdriveUrl) {
         const match = gdriveUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || gdriveUrl.match(/id=([a-zA-Z0-9_-]+)/);
         if (match && match[1]) {
@@ -1150,10 +1186,12 @@ app.get("/api/public/pdf-doc-info/:docId", async (req, res) => {
       }
     } catch (e) {}
 
+    const isFullPreview = Number(doc.previewPages) === -1;
     res.json({
       id: doc.id,
       title: doc.title,
-      previewPages: doc.previewPages || 10,
+      previewPages: isFullPreview ? -1 : (doc.previewPages || 10),
+      previewAll: isFullPreview,
       totalPages: totalPages,
       price: doc.price || 0,
       isFree: doc.isFree

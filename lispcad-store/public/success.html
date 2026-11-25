@@ -210,6 +210,19 @@
           downloadBtn.href = downloadUrl;
           secondaryDownloadBtn.href = downloadUrl;
 
+          // Nếu sản phẩm / File CAD có nhiều file (VD: PDF + RAR), hiển thị thêm nút tải từng file
+          if (Array.isArray(data.downloadFiles) && data.downloadFiles.length > 1) {
+            const boxDl = document.getElementById('box-download');
+            if (boxDl && !document.getElementById('multi-file-downloads')) {
+              const listDiv = document.createElement('div');
+              listDiv.id = 'multi-file-downloads';
+              listDiv.style.cssText = 'margin-top: 14px; display: flex; flex-direction: column; gap: 8px; text-align: left;';
+              listDiv.innerHTML = '<div style="font-size: 0.85rem; color: #94a3b8; font-weight: 700;">📦 Bộ file đi kèm trong đơn hàng của bạn:</div>' +
+                data.downloadFiles.map(f => `<a href="${f.url}" class="btn-buy" style="text-decoration: none; display: block; text-align: center; padding: 10px 14px; font-size: 0.9rem; background: #0284c7;">⬇️ Tải: ${f.name}</a>`).join('');
+              boxDl.appendChild(listDiv);
+            }
+          }
+
           // Thiết lập thông tin Zalo
           const phone = data.customerPhone || 'Số của bạn';
           customerPhoneDisplay.innerText = phone;
