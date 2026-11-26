@@ -662,6 +662,20 @@
           <small style="color: var(--text-muted); font-size: 0.78rem;">Số lượt tải sẽ tự động tăng mỗi khi khách hàng thanh toán/tải file, bạn cũng có thể tùy chỉnh tại đây.</small>
         </div>
 
+        <div class="form-group" style="background: rgba(56, 189, 248, 0.08); border: 1px dashed #0284c7; border-radius: 10px; padding: 12px 14px; margin-top: 15px;">
+          <label style="color: var(--accent-cyan); font-weight: 700; display: block; margin-bottom: 8px;">🔐 Yêu Cầu Bản Quyền (Khóa 1 Máy):</label>
+          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              <input type="radio" name="prodRequireLicense" value="false" checked style="width: auto;">
+              <span>Không yêu cầu (Tải file bình thường)</span>
+            </label>
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              <input type="radio" name="prodRequireLicense" value="true" style="width: auto;">
+              <strong style="color: #fbbf24;">Có yêu cầu bản quyền (Hiện Mã kích hoạt &amp; hướng dẫn APPLOAD sau thanh toán)</strong>
+            </label>
+          </div>
+        </div>
+
         <div class="form-group" style="margin-top: 15px;">
           <label style="cursor: pointer;">
             <input type="checkbox" id="prod-active" checked> <strong>Hiển thị bán trên trang chủ</strong>
@@ -1275,6 +1289,7 @@
       document.getElementById('current-file-label').innerText = '';
       document.getElementById('prod-downloads').value = 120;
       document.getElementById('prod-active').checked = true;
+      document.querySelector('input[name="prodRequireLicense"][value="false"]').checked = true;
 
       // Reset ảnh minh họa
       document.getElementById('prod-image-file').value = '';
@@ -1301,6 +1316,8 @@
       document.getElementById('prod-videourl').value = p.videoUrl || '';
       document.getElementById('prod-downloads').value = p.downloadCount !== undefined ? p.downloadCount : 0;
       document.getElementById('prod-active').checked = p.isActive;
+      const reqLicVal = p.requireLicense ? 'true' : 'false';
+      document.querySelector(`input[name="prodRequireLicense"][value="${reqLicVal}"]`).checked = true;
 
       // Nạp ảnh minh họa hiện tại
       document.getElementById('prod-image-file').value = '';
@@ -1380,6 +1397,8 @@
       form.append('videoUrl', document.getElementById('prod-videourl').value);
       form.append('downloadCount', document.getElementById('prod-downloads').value || 0);
       form.append('isActive', document.getElementById('prod-active').checked);
+      const reqLicChecked = document.querySelector('input[name="prodRequireLicense"]:checked');
+      form.append('requireLicense', reqLicChecked ? reqLicChecked.value : 'false');
 
       // Ảnh minh họa / GIF
       const imgFileInput = document.getElementById('prod-image-file');

@@ -619,6 +619,18 @@ app.get("/api/public/check-order/:orderCode", (req, res) => {
   }
 
   const isPaid = order.status === "PAID";
+  let requireLicense = false;
+  const allItems = [...(db.products || []), ...(db.documents || [])];
+  if (order.items && Array.isArray(order.items) && order.items.length > 0) {
+    requireLicense = order.items.some(it => {
+      const dbIt = allItems.find(x => x.id === it.id);
+      return dbIt && dbIt.requireLicense === true;
+    });
+  } else {
+    const prod = allItems.find(x => x.id === order.productId);
+    requireLicense = !!(prod && prod.requireLicense === true);
+  }
+
   if (isPaid) {
     const hasCourse = (order.items && order.items.some(it => it.id === "prod_course_2d")) || order.productId === "prod_course_2d";
     if (hasCourse && !req.session.user) {
@@ -631,7 +643,6 @@ app.get("/api/public/check-order/:orderCode", (req, res) => {
 
   let downloadFiles = [];
   if (isPaid) {
-    const allItems = [...(db.products || []), ...(db.documents || [])];
     const prod = allItems.find(p => p.id === order.productId);
     if (prod && Array.isArray(prod.files) && prod.files.length > 0) {
       downloadFiles = prod.files.map((f, idx) => ({
@@ -652,6 +663,7 @@ app.get("/api/public/check-order/:orderCode", (req, res) => {
     customerName: order.customerName,
     customerPhone: order.customerPhone,
     deliveryMethod: order.deliveryMethod || "download",
+    requireLicense: requireLicense,
     downloadUrl: isPaid ? `/download/${order.orderCode}` : null,
     downloadFiles,
     adminZalo: (db.paymentSettings && db.paymentSettings.zaloLink) || "https://zalo.me/0329778016"
@@ -893,6 +905,7 @@ app.post("/api/admin/product", requireAdmin, upload.fields([{ name: "lispFile", 
   product.instructions = instructions || "";
   product.videoUrl = videoUrl || "";
   product.downloadType = downloadType || "local";
+  product.requireLicense = (req.body.requireLicense === "true" || req.body.requireLicense === true);
   product.isActive = isActive === "true" || isActive === true;
   if (req.body.downloadCount !== undefined && req.body.downloadCount !== "") {
     product.downloadCount = parseInt(req.body.downloadCount) || 0;
