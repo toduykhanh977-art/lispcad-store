@@ -1211,6 +1211,56 @@ app.delete("/api/admin/document/:id", requireAdmin, (req, res) => {
   res.json({ success: true });
 });
 
+// ==============================================================
+// API KÍCH HOẠT & KHÓA BẢN QUYỀN LISPCAD THEO 1 MÁY DUY NHẤT (MACHINE ID)
+// ==============================================================
+function handleActivateLisp(req, res) {
+  const orderCodeRaw = (req.body && req.body.orderCode) || (req.query && req.query.orderCode) || "";
+  const machineIdRaw = (req.body && req.body.machineId) || (req.query && req.query.machineId) || "";
+  const format = (req.query && req.query.format) || (req.body && req.body.format) || "json";
+
+  const orderCode = String(orderCodeRaw).trim().toUpperCase();
+  const machineId = String(machineIdRaw).trim();
+
+  const reply = (ok, statusCode, status, message, extra = {}) => {
+    if (format === "text") {
+      return res.status(statusCode).type("text/plain; charset=utf-8").send(ok ? "OK" : `DENIED:${message}`);
+    }
+    return res.status(statusCode).json({ ok, status, message, ...extra });
+  };
+
+  if (!orderCode || !machineId) {
+    return reply(false, 400, "MISSING_PARAMS", "Thieu ma don hang hoac ma may tinh!");
+  }
+
+  const db = readDb();
+  const order = (db.orders || []).find(o => String(o.orderCode || "").toUpperCase() === orderCode);
+  if (!order) {
+    return reply(false, 404, "NOT_FOUND", "Ma don hang khong ton tai tren he thong!");
+  }
+  if (order.status !== "PAID") {
+    return reply(false, 403, "UNPAID", "Don hang nay chua thanh toan thanh cong!");
+  }
+
+  if (!order.activatedMachineId) {
+    order.activatedMachineId = machineId;
+    order.activatedAt = new Date().toISOString();
+    writeDb(db);
+    console.log(`🔐 [License] Kích hoạt lần đầu đơn #${order.orderCode} cho máy: ${machineId}`);
+    return reply(true, 200, "ACTIVATED", "Kich hoat ban quyen 1 may thanh cong!", { machineId });
+  }
+
+  if (order.activatedMachineId === machineId) {
+    return reply(true, 200, "VERIFIED", "Ban quyen hop le!", { machineId });
+  }
+
+  console.log(`⛔ [License] Từ chối đơn #${order.orderCode}: đã khóa máy ${order.activatedMachineId}, thử chạy trên ${machineId}`);
+  return reply(false, 403, "MACHINE_MISMATCH", "Ma don hang nay da duoc kich hoat tren 1 may tinh khac!");
+}
+
+app.get("/api/public/activate-lisp", handleActivateLisp);
+app.post("/api/public/activate-lisp", handleActivateLisp);
+
 // Admin bấm duyệt đơn thủ công
 app.post("/api/admin/order/approve", requireAdmin, (req, res) => {
   const { orderCode } = req.body;
@@ -1224,6 +1274,20 @@ app.post("/api/admin/order/approve", requireAdmin, (req, res) => {
   completeOrderPaid(order, db);
   writeDb(db);
   res.json({ success: true, message: "Đã duyệt đơn hàng thành công!" });
+});
+
+// Admin reset khóa mã máy (cho phép khách kích hoạt lại trên máy mới)
+app.post("/api/admin/order/reset-machine", requireAdmin, (req, res) => {
+  const { orderCode } = req.body;
+  const db = readDb();
+  const order = (db.orders || []).find(o => o.orderCode === orderCode);
+  if (!order) {
+    return res.status(404).json({ error: "Không tìm thấy đơn hàng" });
+  }
+  order.activatedMachineId = null;
+  order.activatedAt = null;
+  writeDb(db);
+  res.json({ success: true, message: `Đã reset mã máy cho đơn #${order.orderCode}!` });
 });
 
 // Xóa đơn hàng

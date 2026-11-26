@@ -107,6 +107,10 @@
 
         <!-- HƯỚNG DẪN NẠP LISP -->
         <div class="guide-box" style="background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 16px; margin-bottom: 20px; text-align: left;">
+          <div style="background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 0.85rem; color: #e2e8f0;">
+            🔐 <strong>Mã kích hoạt bản quyền (dùng cho 1 máy):</strong> <code id="license-order-code-box" style="color: #38bdf8; font-weight: 800; font-size: 0.95rem;"></code>
+            <br><small style="color: #94a3b8;">Nếu Lisp hỏi Mã đơn hàng khi nạp lần đầu, bạn nhập đúng mã này (mỗi đơn kích hoạt cố định cho 1 máy tính).</small>
+          </div>
           <h4 style="color: #38bdf8; font-size: 0.95rem; margin-bottom: 8px;">💡 Hướng Dẫn Nạp Lisp Vào AutoCAD (1 Phút):</h4>
           <ol style="color: #cbd5e1; font-size: 0.85rem; padding-left: 18px; line-height: 1.6;">
             <li>Mở phần mềm <strong>AutoCAD</strong>.</li>
@@ -205,6 +209,8 @@
         if (data.isPaid) {
           successState.style.display = 'block';
           productNameText.innerText = data.productName || 'LispCAD';
+          const licBox = document.getElementById('license-order-code-box');
+          if (licBox) licBox.innerText = code;
 
           const downloadUrl = `/download/${code}`;
           downloadBtn.href = downloadUrl;
