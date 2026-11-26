@@ -64,6 +64,23 @@
           Mã đơn hàng: <strong id="order-code-text" style="color: #fbbf24;"></strong>
         </p>
 
+        <!-- KHỐI LƯU Ý BẢN QUYỀN & NÚT COPY MÃ ĐƠN HÀNG (NỔI BẬT NGAY KHI THANH TOÁN XONG) -->
+        <div style="background: linear-gradient(135deg, rgba(2, 132, 199, 0.16) 0%, rgba(15, 23, 42, 0.95) 100%); border: 1.5px solid #38bdf8; border-radius: 12px; padding: 16px 18px; margin-bottom: 18px; text-align: left;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <div style="font-size: 0.78rem; color: #38bdf8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">🔐 Mã Kích Hoạt Bản Quyền (Mã Đơn Hàng)</div>
+              <div id="license-order-code-box" style="font-family: Consolas, monospace; font-size: 1.45rem; font-weight: 900; color: #fbbf24; letter-spacing: 1px; margin-top: 2px;">---</div>
+            </div>
+            <button type="button" id="btn-copy-order-code" onclick="copyOrderCodeForLisp()" style="background: #0284c7; color: #ffffff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 800; font-size: 0.88rem; cursor: pointer; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);">
+              📋 Copy Mã Đơn Hàng
+            </button>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #fbbf24; padding: 10px 12px; border-radius: 6px; font-size: 0.85rem; color: #e2e8f0; line-height: 1.55;">
+            <strong>📌 Lưu ý quan trọng:</strong> Sau khi tải file về và nạp (<code>APPLOAD</code>) LispCAD vào AutoCAD lần đầu tiên, phần mềm sẽ hiện ô yêu cầu nhập <strong>Mã đơn hàng</strong>. Bạn chỉ cần <strong>dán đúng mã vừa copy ở trên</strong> vào là kích hoạt và dùng được ngay!<br>
+            <span style="color: #94a3b8; font-size: 0.8rem;">*(Mỗi đơn hàng được cấp bản quyền cố định cho <strong>01 máy tính duy nhất</strong>. Nếu sau này bạn đổi máy tính mới, hãy nhắn Zalo <strong>0329.778.016</strong> để Shop hỗ trợ mở khóa lại miễn phí).*</span>
+          </div>
+        </div>
+
         <!-- 2 LỰA CHỌN NHẬN FILE -->
         <div class="delivery-tab-container">
           <button id="tab-btn-download" class="delivery-tab-btn active" onclick="switchDeliveryMode('download')">
@@ -107,16 +124,13 @@
 
         <!-- HƯỚNG DẪN NẠP LISP -->
         <div class="guide-box" style="background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 16px; margin-bottom: 20px; text-align: left;">
-          <div style="background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 0.85rem; color: #e2e8f0;">
-            🔐 <strong>Mã kích hoạt bản quyền (dùng cho 1 máy):</strong> <code id="license-order-code-box" style="color: #38bdf8; font-weight: 800; font-size: 0.95rem;"></code>
-            <br><small style="color: #94a3b8;">Nếu Lisp hỏi Mã đơn hàng khi nạp lần đầu, bạn nhập đúng mã này (mỗi đơn kích hoạt cố định cho 1 máy tính).</small>
-          </div>
-          <h4 style="color: #38bdf8; font-size: 0.95rem; margin-bottom: 8px;">💡 Hướng Dẫn Nạp Lisp Vào AutoCAD (1 Phút):</h4>
+          <h4 style="color: #38bdf8; font-size: 0.95rem; margin-bottom: 8px;">💡 Hướng Dẫn Nạp Lisp Vào AutoCAD &amp; Kích Hoạt (1 Phút):</h4>
           <ol style="color: #cbd5e1; font-size: 0.85rem; padding-left: 18px; line-height: 1.6;">
-            <li>Mở phần mềm <strong>AutoCAD</strong>.</li>
-            <li>Gõ lệnh <code>APPLOAD</code> (hoặc gõ tắt <code>AP</code>) trên bàn phím rồi nhấn <strong>Enter</strong>.</li>
-            <li>Chọn file Lisp vừa tải về, sau đó bấm <strong>Load</strong>.</li>
-            <li><em>(Mẹo quan trọng)</em>: Để Lisp tự nạp mỗi khi mở CAD, bấm vào nút <strong>Contents...</strong> ở mục <strong>Startup Suite</strong> (hình chiếc cặp) và thêm file Lisp vào.</li>
+            <li>Bấm nút <strong>📋 Copy Mã Đơn Hàng</strong> ở khung phía trên để lưu sẵn mã kích hoạt.</li>
+            <li>Mở phần mềm <strong>AutoCAD</strong>, gõ lệnh <code>APPLOAD</code> (hoặc gõ tắt <code>AP</code>) rồi nhấn <strong>Enter</strong>.</li>
+            <li>Chọn file Lisp vừa tải về và bấm <strong>Load</strong>.</li>
+            <li>Khi AutoCAD hiện ô hỏi <strong>Mã đơn hàng</strong>, bạn <strong>dán (Ctrl + V)</strong> mã vừa copy vào rồi nhấn <strong>Enter</strong> để kích hoạt bản quyền 1 máy và sử dụng ngay.</li>
+            <li><em>(Mẹo hay)</em>: Để Lisp tự động nạp mỗi lần mở AutoCAD, bấm nút <strong>Contents...</strong> ở mục <strong>Startup Suite</strong> (hình chiếc cặp) và thêm file Lisp vào.</li>
           </ol>
         </div>
 
@@ -177,6 +191,27 @@
     } else {
       orderCodeText.innerText = '#' + orderCode;
       checkOrderStatus(orderCode);
+    }
+
+    function copyOrderCodeForLisp() {
+      const codeEl = document.getElementById('license-order-code-box');
+      const btn = document.getElementById('btn-copy-order-code');
+      const code = (codeEl && codeEl.innerText) ? codeEl.innerText.trim() : orderCode;
+      if (!code) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          if (btn) {
+            btn.innerHTML = '✅ Đã Copy Mã!';
+            btn.style.background = '#16a34a';
+            setTimeout(() => {
+              btn.innerHTML = '📋 Copy Mã Đơn Hàng';
+              btn.style.background = '#0284c7';
+            }, 2500);
+          }
+        }).catch(() => window.prompt('Copy mã đơn hàng:', code));
+      } else {
+        window.prompt('Copy mã đơn hàng:', code);
+      }
     }
 
     function switchDeliveryMode(mode) {
