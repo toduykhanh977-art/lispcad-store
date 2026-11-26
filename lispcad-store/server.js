@@ -492,8 +492,27 @@ app.post("/api/public/create-order", (req, res) => {
     orderTitle = product.name || product.title;
   }
 
-  // Sinh mã đơn 6 số ngẫu nhiên
-  const orderCode = "CAD" + Math.floor(100000 + Math.random() * 900000);
+  // Sinh mã đơn theo Tên khách (không dấu) + 4 số cuối SĐT (VD: TO DUY KHANH + 0329778016 => KHANH8016)
+  const cleanNameParts = String(customerName || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .toUpperCase()
+    .trim()
+    .split(/\s+/)
+    .map(w => w.replace(/[^A-Z0-9]/g, ""))
+    .filter(Boolean);
+  const firstName = cleanNameParts.length > 0 ? cleanNameParts[cleanNameParts.length - 1] : "CAD";
+  const digits = String(customerPhone || "").replace(/\D/g, "");
+  const last4 = digits.length >= 4 ? digits.slice(-4) : String(Math.floor(1000 + Math.random() * 9000));
+  const baseCode = `${firstName}${last4}`;
+  let orderCode = baseCode;
+  let suffix = 2;
+  while ((db.orders || []).some(o => String(o.orderCode || "").toUpperCase() === orderCode)) {
+    orderCode = `${baseCode}${suffix}`;
+    suffix++;
+  }
   const order = {
     orderCode: orderCode,
     productId: orderItems[0].id,
