@@ -441,9 +441,56 @@ app.get("/api/public/store", (req, res) => {
   });
 });
 
+// ==========================================
+// HỆ THỐNG MÃ GIẢM GIÁ (COUPON / VOUCHER)
+// ==========================================
+function evaluateCoupon(db, rawCode, originalAmount) {
+  const code = String(rawCode || "").trim().toUpperCase();
+  if (!code) return { valid: false, message: "Vui lòng nhập mã giảm giá!" };
+  const coupon = (db.coupons || []).find(c => String(c.code || "").toUpperCase() === code);
+  if (!coupon) return { valid: false, message: "Mã giảm giá không tồn tại!" };
+  if (coupon.isActive === false) return { valid: false, message: "Mã giảm giá này đang tạm khóa!" };
+  const maxUses = Number(coupon.maxUses) || 0;
+  const usedCount = Number(coupon.usedCount) || 0;
+  if (maxUses > 0 && usedCount >= maxUses) {
+    return { valid: false, message: "Mã giảm giá này đã hết lượt sử dụng!" };
+  }
+
+  const base = Math.max(0, Number(originalAmount) || 0);
+  let discountAmount = 0;
+  if (coupon.type === "percent") {
+    const pct = Math.min(100, Math.max(0, Number(coupon.value) || 0));
+    discountAmount = Math.round((base * pct) / 100);
+  } else {
+    discountAmount = Math.min(base, Math.max(0, Number(coupon.value) || 0));
+  }
+  const finalAmount = Math.max(0, base - discountAmount);
+  const label = coupon.type === "percent"
+    ? `Giảm ${Number(coupon.value)}%`
+    : `Giảm ${Number(coupon.value).toLocaleString()}đ`;
+  return { valid: true, coupon, discountAmount, finalAmount, label };
+}
+
+app.post("/api/public/validate-coupon", (req, res) => {
+  const { code, amount } = req.body;
+  const db = readDb();
+  const result = evaluateCoupon(db, code, amount);
+  if (!result.valid) {
+    return res.status(400).json({ valid: false, message: result.message });
+  }
+  res.json({
+    valid: true,
+    code: result.coupon.code,
+    label: result.label,
+    discountAmount: result.discountAmount,
+    finalAmount: result.finalAmount,
+    message: `Áp dụng thành công (${result.label})!`
+  });
+});
+
 // Khách chọn mua sản phẩm hoặc mua giỏ hàng -> Tạo đơn hàng
 app.post("/api/public/create-order", (req, res) => {
-  const { productId, cartItems, customerName, customerPhone, customerEmail, userId, deliveryMethod } = req.body;
+  const { productId, cartItems, customerName, customerPhone, customerEmail, userId, deliveryMethod, couponCode } = req.body;
   const db = readDb();
 
   let orderItems = [];
@@ -492,6 +539,20 @@ app.post("/api/public/create-order", (req, res) => {
     orderTitle = product.name || product.title;
   }
 
+  // Áp dụng mã giảm giá nếu khách có nhập
+  let appliedCouponCode = "";
+  let discountAmount = 0;
+  if (couponCode && String(couponCode).trim()) {
+    const check = evaluateCoupon(db, couponCode, totalAmount);
+    if (!check.valid) {
+      return res.status(400).json({ error: check.message });
+    }
+    appliedCouponCode = check.coupon.code;
+    discountAmount = check.discountAmount;
+    totalAmount = check.finalAmount;
+    check.coupon.usedCount = (Number(check.coupon.usedCount) || 0) + 1;
+  }
+
   // Sinh mã đơn theo Tên khách (không dấu) + 4 số cuối SĐT (VD: TO DUY KHANH + 0329778016 => KHANH8016)
   const cleanNameParts = String(customerName || "")
     .normalize("NFD")
@@ -519,6 +580,8 @@ app.post("/api/public/create-order", (req, res) => {
     productName: orderTitle,
     items: orderItems,
     amount: totalAmount,
+    discountAmount: discountAmount,
+    couponCode: appliedCouponCode || null,
     userId: userId || null,
     customerName: customerName || "Khách hàng",
     customerPhone: customerPhone || "",
@@ -527,6 +590,20 @@ app.post("/api/public/create-order", (req, res) => {
     status: "PENDING", // PENDING hoặc PAID
     createdAt: new Date().toISOString()
   };
+
+  // Nếu sau khi áp mã giảm giá tổng tiền = 0đ -> tự động duyệt PAID và mở file ngay lập tức!
+  if (totalAmount <= 0) {
+    completeOrderPaid(order, db);
+    db.orders.unshift(order);
+    writeDb(db);
+    return res.json({
+      success: true,
+      isPaid: true,
+      orderCode: order.orderCode,
+      amount: 0,
+      productName: order.productName
+    });
+  }
 
   db.orders.unshift(order);
   writeDb(db);
@@ -784,8 +861,56 @@ app.get("/api/admin/data", requireAdmin, (req, res) => {
     documents: db.documents || [],
     orders: db.orders || [],
     lessons: db.lessons || [],
-    users: db.users || []
+    users: db.users || [],
+    coupons: db.coupons || []
   });
+});
+
+// Tạo / Cập nhật Mã Giảm Giá
+app.post("/api/admin/coupon", requireAdmin, (req, res) => {
+  const { code, type, value, maxUses, note } = req.body;
+  const cleanCode = String(code || "").trim().toUpperCase().replace(/\s+/g, "");
+  if (!cleanCode) return res.status(400).json({ error: "Vui lòng nhập mã giảm giá!" });
+
+  const db = readDb();
+  if (!db.coupons) db.coupons = [];
+  let coupon = db.coupons.find(c => c.code === cleanCode);
+  if (!coupon) {
+    coupon = {
+      code: cleanCode,
+      usedCount: 0,
+      isActive: true,
+      createdAt: new Date().toISOString()
+    };
+    db.coupons.unshift(coupon);
+  }
+  coupon.type = type === "fixed" ? "fixed" : "percent";
+  coupon.value = Math.max(0, Number(value) || 0);
+  coupon.maxUses = Math.max(0, parseInt(maxUses) || 0);
+  coupon.note = note || "";
+
+  writeDb(db);
+  res.json({ success: true, coupon });
+});
+
+// Bật / Tắt Mã Giảm Giá
+app.post("/api/admin/coupon/:code/toggle", requireAdmin, (req, res) => {
+  const code = String(req.params.code || "").toUpperCase();
+  const db = readDb();
+  const coupon = (db.coupons || []).find(c => c.code === code);
+  if (!coupon) return res.status(404).json({ error: "Không tìm thấy mã" });
+  coupon.isActive = coupon.isActive === false ? true : false;
+  writeDb(db);
+  res.json({ success: true, isActive: coupon.isActive });
+});
+
+// Xóa Mã Giảm Giá
+app.delete("/api/admin/coupon/:code", requireAdmin, (req, res) => {
+  const code = String(req.params.code || "").toUpperCase();
+  const db = readDb();
+  db.coupons = (db.coupons || []).filter(c => c.code !== code);
+  writeDb(db);
+  res.json({ success: true });
 });
 
 // Cập nhật cấu hình Email thông báo Gmail

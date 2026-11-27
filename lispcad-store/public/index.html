@@ -396,6 +396,14 @@
             <label for="custPhone">Số điện thoại / Zalo (Để nhận file & hỗ trợ)</label>
             <input type="tel" id="custPhone" placeholder="0912345678" required>
           </div>
+          <div class="form-group" style="margin-top: 12px;">
+            <label for="checkout-coupon-input" style="color: #fbbf24; font-weight: 700;">🎟️ Mã giảm giá (Nếu có):</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="checkout-coupon-input" placeholder="Nhập mã (VD: KHACHCU100)" style="flex: 1; text-transform: uppercase; font-weight: 700;">
+              <button type="button" onclick="applyCheckoutCoupon()" style="padding: 0 16px; border-radius: 8px; border: none; background: #0284c7; color: #fff; font-weight: 700; cursor: pointer; white-space: nowrap;">Áp dụng</button>
+            </div>
+            <div id="checkout-coupon-msg" style="font-size: 0.8rem; margin-top: 5px;"></div>
+          </div>
           <div class="form-group" style="margin-top: 14px;">
             <label style="font-weight: 700; color: #38bdf8; margin-bottom: 8px; display: block; font-size: 0.92rem;">
               📦 Phương thức nhận file sau khi thanh toán:
@@ -1698,6 +1706,9 @@
       openCheckoutModal([course]);
     }
 
+    let checkoutOriginalTotal = 0;
+    let appliedCheckoutCoupon = '';
+
     function openCheckoutModal(items) {
       const hasCourse = items.some(it => it.id === 'prod_course_2d' || it.category === 'Khóa học' || (it.name && it.name.toLowerCase().includes('khóa học')));
       if (hasCourse && !currentUser) {
@@ -1708,6 +1719,13 @@
 
       checkoutItems = items;
       const total = checkoutItems.reduce((sum, it) => sum + Number(it.price), 0);
+      checkoutOriginalTotal = total;
+      appliedCheckoutCoupon = '';
+
+      if (document.getElementById('checkout-coupon-input')) document.getElementById('checkout-coupon-input').value = '';
+      if (document.getElementById('checkout-coupon-msg')) document.getElementById('checkout-coupon-msg').innerHTML = '';
+      const submitBtn = document.getElementById('btn-create-order');
+      if (submitBtn) submitBtn.innerHTML = total === 0 ? '✅ Xác Nhận Nhận File Ngay (0đ)' : 'Tạo Mã VietQR Thanh Toán';
 
       document.getElementById('checkout-title').innerText = items.length === 1 ? `Mua: ${items[0].name}` : `Thanh toán Giỏ hàng (${items.length} món)`;
       document.getElementById('checkout-subprice').innerText = `Tổng số tiền: ${total.toLocaleString()} đ`;
@@ -1727,6 +1745,39 @@
       document.getElementById('checkout-modal').style.display = 'none';
     }
 
+    async function applyCheckoutCoupon() {
+      const code = (document.getElementById('checkout-coupon-input').value || '').trim().toUpperCase();
+      const msgEl = document.getElementById('checkout-coupon-msg');
+      if (!code) {
+        appliedCheckoutCoupon = '';
+        document.getElementById('checkout-subprice').innerText = `Tổng tiền: ${checkoutOriginalTotal.toLocaleString()} đ`;
+        document.getElementById('btn-create-order').innerHTML = checkoutOriginalTotal === 0 ? '✅ Xác Nhận Nhận File Ngay (0đ)' : 'Tạo Mã VietQR Thanh Toán';
+        msgEl.innerHTML = '';
+        return;
+      }
+      try {
+        const res = await fetch('/api/public/validate-coupon', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, amount: checkoutOriginalTotal })
+        });
+        const data = await res.json();
+        if (data.valid) {
+          appliedCheckoutCoupon = data.code;
+          msgEl.innerHTML = `<span style="color: #4ade80; font-weight: 700;">✅ ${data.message}</span>`;
+          document.getElementById('checkout-subprice').innerHTML = `Tổng tiền: <span style="text-decoration: line-through; color: #64748b;">${checkoutOriginalTotal.toLocaleString()} đ</span> <strong style="color: #4ade80; font-size: 1.05rem;">${Number(data.finalAmount).toLocaleString()} đ</strong>`;
+          document.getElementById('btn-create-order').innerHTML = data.finalAmount === 0 ? '✅ Xác Nhận Nhận File Miễn Phí (0đ)' : 'Tạo Mã VietQR Thanh Toán';
+        } else {
+          appliedCheckoutCoupon = '';
+          msgEl.innerHTML = `<span style="color: #f87171; font-weight: 700;">❌ ${data.message || 'Mã không hợp lệ'}</span>`;
+          document.getElementById('checkout-subprice').innerText = `Tổng tiền: ${checkoutOriginalTotal.toLocaleString()} đ`;
+          document.getElementById('btn-create-order').innerHTML = 'Tạo Mã VietQR Thanh Toán';
+        }
+      } catch (e) {
+        msgEl.innerHTML = '<span style="color: #f87171;">Lỗi kiểm tra mã giảm giá</span>';
+      }
+    }
+
     async function handleCreateOrder(e) {
       e.preventDefault();
       const custName = document.getElementById('custName').value.trim();
@@ -1736,7 +1787,7 @@
 
       const btn = document.getElementById('btn-create-order');
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Đang tạo mã VietQR...';
+      btn.innerHTML = '<span class="spinner"></span> Đang xử lý đơn hàng...';
 
       try {
         const res = await fetch('/api/public/create-order', {
@@ -1748,11 +1799,18 @@
             customerPhone: custPhone,
             customerEmail: currentUser ? currentUser.email : '',
             userId: currentUser ? currentUser.id : null,
-            deliveryMethod: deliveryMethod
+            deliveryMethod: deliveryMethod,
+            couponCode: appliedCheckoutCoupon || (document.getElementById('checkout-coupon-input') ? document.getElementById('checkout-coupon-input').value.trim() : '')
           })
         });
 
         currentOrder = await res.json();
+        if (currentOrder.success && currentOrder.isPaid) {
+          cart = [];
+          saveCart();
+          window.location.href = `/success.html?orderCode=${currentOrder.orderCode}&delivery=${deliveryMethod}`;
+          return;
+        }
         if (currentOrder.success) {
           document.getElementById('checkout-step-info').style.display = 'none';
           document.getElementById('checkout-step-qr').style.display = 'block';

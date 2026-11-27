@@ -242,6 +242,7 @@
         <button class="tab-btn" onclick="switchTab('tab-lessons')">🎓 Quản Lý Khóa Học 2D</button>
         <button class="tab-btn" onclick="switchTab('tab-students')">👥 Quản Lý Học Viên</button>
         <button class="tab-btn" onclick="switchTab('tab-orders')">📑 Danh Sách Đơn Hàng</button>
+        <button class="tab-btn" onclick="switchTab('tab-coupons')">🎟️ Mã Giảm Giá</button>
         <button class="tab-btn" onclick="switchTab('tab-password')">🔒 Đổi Mật Khẩu</button>
       </div>
 
@@ -530,6 +531,61 @@
               <tbody id="orders-table-body">
                 <!-- Danh sách đơn hàng -->
               </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB MÃ GIẢM GIÁ (COUPON / VOUCHER) -->
+      <div id="tab-coupons" class="panel">
+        <div class="admin-card">
+          <h3 style="margin-bottom: 8px; color: var(--accent-cyan);">🎟️ Tạo &amp; Quản Lý Mã Giảm Giá</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 18px;">
+            Tạo mã giảm giá <strong>100% (0đ)</strong> để cấp cho khách cũ đã chuyển khoản trước đây, hoặc mã giảm theo % / số tiền VNĐ tùy ý bạn quyết định.
+          </p>
+
+          <form onsubmit="saveCouponAdmin(event)" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; margin-bottom: 22px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px;">
+              <div class="form-group" style="margin: 0;">
+                <label for="coupon-code">Mã Code (Viết liền, in hoa)</label>
+                <input type="text" id="coupon-code" required placeholder="VD: KHACHCU100" style="text-transform: uppercase; font-weight: 800;">
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label for="coupon-type">Loại Giảm Giá</label>
+                <select id="coupon-type" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1;">
+                  <option value="percent">Giảm theo Phần trăm (%)</option>
+                  <option value="fixed">Giảm theo Số tiền (VNĐ)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label for="coupon-value">Mức Giảm (% hoặc VNĐ)</label>
+                <input type="number" id="coupon-value" required min="1" value="100" placeholder="VD: 100">
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label for="coupon-max-uses">Số Lượt Dùng (0 = Không giới hạn)</label>
+                <input type="number" id="coupon-max-uses" min="0" value="1" placeholder="VD: 1">
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label for="coupon-note">Ghi Chú</label>
+                <input type="text" id="coupon-note" placeholder="VD: Bù cho anh Nam đã CK">
+              </div>
+            </div>
+            <button type="submit" class="btn-buy" style="max-width: 240px; margin-top: 14px;">+ Lưu / Tạo Mã Giảm Giá</button>
+          </form>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mã Code</th>
+                  <th>Mức Giảm</th>
+                  <th>Lượt Dùng</th>
+                  <th>Ghi Chú</th>
+                  <th>Trạng Thái</th>
+                  <th>Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="coupons-table-body"></tbody>
             </table>
           </div>
         </div>
@@ -1068,6 +1124,7 @@
         renderAdminLessons(globalData.lessons);
         renderStudents(globalData.users);
         renderOrders(globalData.orders);
+        renderAdminCoupons(globalData.coupons || []);
 
         // Hiển thị học phí khóa học 2D
         const courseProd = (globalData.products || []).find(p => p.id === 'prod_course_2d' || p.category === 'Khóa học' || (p.name && p.name.includes('Khóa học')));
@@ -1971,6 +2028,73 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderCode })
       });
+      const data = await res.json();
+      if (data.success) loadDashboardData();
+    }
+
+    function renderAdminCoupons(coupons) {
+      const tbody = document.getElementById('coupons-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      if (!coupons || coupons.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Chưa có mã giảm giá nào. Hãy tạo mã ở khung phía trên!</td></tr>';
+        return;
+      }
+      coupons.forEach(c => {
+        const discountLabel = c.type === 'percent' ? `<strong>-${Number(c.value)}%</strong>` : `<strong>-${Number(c.value).toLocaleString()}đ</strong>`;
+        const usesLabel = Number(c.maxUses) > 0 ? `${Number(c.usedCount || 0)} / ${c.maxUses}` : `${Number(c.usedCount || 0)} / ∞`;
+        const isActive = c.isActive !== false;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><code style="background: #0f172a; color: #fbbf24; padding: 4px 10px; border-radius: 6px; font-weight: 900; font-size: 0.92rem;">${c.code}</code></td>
+          <td style="color: #16a34a;">${discountLabel}</td>
+          <td><strong>${usesLabel}</strong></td>
+          <td style="color: #475569; font-size: 0.85rem;">${c.note || ''}</td>
+          <td>${isActive ? '<span class="status-badge status-paid">Đang bật</span>' : '<span class="status-badge status-pending">Tạm khóa</span>'}</td>
+          <td>
+            <button class="btn-sm" style="background: #0284c7; color: #fff;" onclick="navigator.clipboard && navigator.clipboard.writeText('${c.code}').then(() => alert('✅ Đã copy mã: ${c.code}'))">📋 Copy</button>
+            <button class="btn-sm btn-secondary" onclick="toggleCouponAdmin('${c.code}')">${isActive ? 'Khóa' : 'Mở'}</button>
+            <button class="btn-sm btn-danger" onclick="deleteCouponAdmin('${c.code}')">Xóa</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function saveCouponAdmin(e) {
+      e.preventDefault();
+      const payload = {
+        code: document.getElementById('coupon-code').value.trim().toUpperCase(),
+        type: document.getElementById('coupon-type').value,
+        value: Number(document.getElementById('coupon-value').value) || 0,
+        maxUses: Number(document.getElementById('coupon-max-uses').value) || 0,
+        note: document.getElementById('coupon-note').value.trim()
+      };
+      const res = await fetch('/api/admin/coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('✅ Đã lưu mã giảm giá: ' + data.coupon.code);
+        document.getElementById('coupon-code').value = '';
+        document.getElementById('coupon-note').value = '';
+        loadDashboardData();
+      } else {
+        alert(data.error || 'Lỗi lưu mã giảm giá');
+      }
+    }
+
+    async function toggleCouponAdmin(code) {
+      const res = await fetch('/api/admin/coupon/' + encodeURIComponent(code) + '/toggle', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) loadDashboardData();
+    }
+
+    async function deleteCouponAdmin(code) {
+      if (!confirm('Xóa mã giảm giá ' + code + '?')) return;
+      const res = await fetch('/api/admin/coupon/' + encodeURIComponent(code), { method: 'DELETE' });
       const data = await res.json();
       if (data.success) loadDashboardData();
     }
