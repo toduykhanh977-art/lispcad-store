@@ -419,6 +419,44 @@ function completeOrderPaid(order, db) {
 // 1. API DÀNH CHO KHÁCH HÀNG (PUBLIC)
 // ==========================================
 
+// ==========================================
+// API CLOUD FONT SERVER CHO FONTFIX / FONTSYNC (LỆNH CF)
+// ==========================================
+let cachedFontIndex = null;
+function getFontIndex() {
+  if (cachedFontIndex) return cachedFontIndex;
+  const idxPath = path.join(__dirname, "data", "font-index.json");
+  if (fs.existsSync(idxPath)) {
+    try {
+      cachedFontIndex = JSON.parse(fs.readFileSync(idxPath, "utf8"));
+      return cachedFontIndex;
+    } catch (e) {
+      console.error("❌ Lỗi đọc font-index.json:", e.message);
+    }
+  }
+  return {};
+}
+
+app.get("/api/fonts", (req, res) => {
+  const fontIndex = getFontIndex();
+  const rawName = String(req.query.name || "").trim();
+  if (!rawName) {
+    return res.json({ ok: true, totalKeys: Object.keys(fontIndex).length });
+  }
+
+  const keyExact = rawName.toLowerCase();
+  const keyBase = keyExact.replace(/\.(shx|ttf|ttc|otf)$/i, "");
+  const relPath = fontIndex[keyExact] || fontIndex[keyBase];
+
+  if (!relPath) {
+    return res.status(404).send("Font not found: " + rawName);
+  }
+
+  const cdnUrl = "https://raw.githubusercontent.com/toduykhanh977-art/autocad-fonts-cloud/main/" +
+    relPath.split("/").map(encodeURIComponent).join("/");
+  return res.redirect(302, cdnUrl);
+});
+
 // Lấy thông tin cửa hàng & danh sách LispCAD đang bán
 app.get("/api/public/store", (req, res) => {
   const db = readDb();
