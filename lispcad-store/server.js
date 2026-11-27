@@ -482,27 +482,48 @@ app.get("/api/public/store", (req, res) => {
 // ==========================================
 // HỆ THỐNG MÃ GIẢM GIÁ (COUPON / VOUCHER)
 // ==========================================
-function evaluateCoupon(db, rawCode, originalAmount) {
+function evaluateCoupon(db, rawCode, originalAmount, cartItems = []) {
   const code = String(rawCode || "").trim().toUpperCase();
   if (!code) return { valid: false, message: "Vui lòng nhập mã giảm giá!" };
   const coupon = (db.coupons || []).find(c => String(c.code || "").toUpperCase() === code);
   if (!coupon) return { valid: false, message: "Mã giảm giá không tồn tại!" };
   if (coupon.isActive === false) return { valid: false, message: "Mã giảm giá này đang tạm khóa!" };
+  if (coupon.expiresAt) {
+    const expMs = new Date(coupon.expiresAt).getTime();
+    if (!Number.isNaN(expMs) && Date.now() > expMs) {
+      return { valid: false, message: "Mã giảm giá này đã hết hạn sử dụng!" };
+    }
+  }
   const maxUses = Number(coupon.maxUses) || 0;
   const usedCount = Number(coupon.usedCount) || 0;
   if (maxUses > 0 && usedCount >= maxUses) {
     return { valid: false, message: "Mã giảm giá này đã hết lượt sử dụng!" };
   }
 
-  const base = Math.max(0, Number(originalAmount) || 0);
+  const totalBase = Math.max(0, Number(originalAmount) || 0);
+  let discountBase = totalBase;
+
+  if (coupon.productId && String(coupon.productId).trim()) {
+    const targetId = String(coupon.productId).trim();
+    const itemsArr = Array.isArray(cartItems) ? cartItems : [];
+    const matchedItem = itemsArr.find(it => String(it.id || "") === targetId);
+    if (!matchedItem) {
+      return {
+        valid: false,
+        message: `Mã giảm giá này chỉ áp dụng cho: ${coupon.productName || targetId}!`
+      };
+    }
+    discountBase = Math.max(0, Number(matchedItem.price) || 0);
+  }
+
   let discountAmount = 0;
   if (coupon.type === "percent") {
     const pct = Math.min(100, Math.max(0, Number(coupon.value) || 0));
-    discountAmount = Math.round((base * pct) / 100);
+    discountAmount = Math.round((discountBase * pct) / 100);
   } else {
-    discountAmount = Math.min(base, Math.max(0, Number(coupon.value) || 0));
+    discountAmount = Math.min(discountBase, Math.max(0, Number(coupon.value) || 0));
   }
-  const finalAmount = Math.max(0, base - discountAmount);
+  const finalAmount = Math.max(0, totalBase - discountAmount);
   const label = coupon.type === "percent"
     ? `Giảm ${Number(coupon.value)}%`
     : `Giảm ${Number(coupon.value).toLocaleString()}đ`;
@@ -510,9 +531,19 @@ function evaluateCoupon(db, rawCode, originalAmount) {
 }
 
 app.post("/api/public/validate-coupon", (req, res) => {
-  const { code, amount } = req.body;
+  const { code, amount, items } = req.body;
   const db = readDb();
-  const result = evaluateCoupon(db, code, amount);
+  const allAvailable = [...(db.products || []), ...(db.documents || [])];
+  const resolvedItems = Array.isArray(items)
+    ? items.map(it => {
+        const found = allAvailable.find(p => String(p.id) === String(it.id));
+        return {
+          id: it.id,
+          price: found ? (Number(found.price) || 0) : (Number(it.price) || 0)
+        };
+      })
+    : [];
+  const result = evaluateCoupon(db, code, amount, resolvedItems);
   if (!result.valid) {
     return res.status(400).json({ valid: false, message: result.message });
   }
@@ -581,7 +612,7 @@ app.post("/api/public/create-order", (req, res) => {
   let appliedCouponCode = "";
   let discountAmount = 0;
   if (couponCode && String(couponCode).trim()) {
-    const check = evaluateCoupon(db, couponCode, totalAmount);
+    const check = evaluateCoupon(db, couponCode, totalAmount, orderItems);
     if (!check.valid) {
       return res.status(400).json({ error: check.message });
     }
@@ -906,7 +937,7 @@ app.get("/api/admin/data", requireAdmin, (req, res) => {
 
 // Tạo / Cập nhật Mã Giảm Giá
 app.post("/api/admin/coupon", requireAdmin, (req, res) => {
-  const { code, type, value, maxUses, note } = req.body;
+  const { code, type, value, maxUses, note, productId, productName, durationValue, durationUnit } = req.body;
   const cleanCode = String(code || "").trim().toUpperCase().replace(/\s+/g, "");
   if (!cleanCode) return res.status(400).json({ error: "Vui lòng nhập mã giảm giá!" });
 
@@ -926,6 +957,19 @@ app.post("/api/admin/coupon", requireAdmin, (req, res) => {
   coupon.value = Math.max(0, Number(value) || 0);
   coupon.maxUses = Math.max(0, parseInt(maxUses) || 0);
   coupon.note = note || "";
+  coupon.productId = productId ? String(productId).trim() : "";
+  coupon.productName = productName ? String(productName).trim() : "";
+
+  const durVal = Number(durationValue) || 0;
+  if (durVal > 0) {
+    const unit = durationUnit === "days" ? "days" : "hours";
+    const ms = unit === "days" ? durVal * 86400000 : durVal * 3600000;
+    coupon.expiresAt = new Date(Date.now() + ms).toISOString();
+    coupon.durationLabel = `${durVal} ${unit === "days" ? "ngày" : "giờ"}`;
+  } else {
+    coupon.expiresAt = null;
+    coupon.durationLabel = "Vĩnh viễn";
+  }
 
   writeDb(db);
   res.json({ success: true, coupon });

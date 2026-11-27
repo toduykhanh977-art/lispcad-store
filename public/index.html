@@ -1831,7 +1831,7 @@
         const res = await fetch('/api/public/validate-coupon', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code, amount: checkoutOriginalTotal })
+          body: JSON.stringify({ code, amount: checkoutOriginalTotal, items: checkoutItems })
         });
         const data = await res.json();
         if (data.valid) {

@@ -566,6 +566,22 @@
                 <input type="number" id="coupon-max-uses" min="0" value="1" placeholder="VD: 1">
               </div>
               <div class="form-group" style="margin: 0;">
+                <label for="coupon-product-id">Áp dụng cho Lisp / Sản phẩm</label>
+                <select id="coupon-product-id" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600;">
+                  <option value="">-- Tất cả sản phẩm --</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label for="coupon-duration-value">Thời hạn (0 = Vĩnh viễn)</label>
+                <div style="display: flex; gap: 6px;">
+                  <input type="number" id="coupon-duration-value" min="0" value="24" placeholder="VD: 24" style="flex: 1;">
+                  <select id="coupon-duration-unit" style="width: 90px; padding: 10px 6px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600;">
+                    <option value="hours">Giờ</option>
+                    <option value="days">Ngày</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group" style="margin: 0;">
                 <label for="coupon-note">Ghi Chú</label>
                 <input type="text" id="coupon-note" placeholder="VD: Bù cho anh Nam đã CK">
               </div>
@@ -578,8 +594,10 @@
               <thead>
                 <tr>
                   <th>Mã Code</th>
+                  <th>Áp dụng cho</th>
                   <th>Mức Giảm</th>
                   <th>Lượt Dùng</th>
+                  <th>Thời Hạn</th>
                   <th>Ghi Chú</th>
                   <th>Trạng Thái</th>
                   <th>Thao Tác</th>
@@ -2102,25 +2120,71 @@
       if (data.success) loadDashboardData();
     }
 
+    function populateCouponProductOptions() {
+      const sel = document.getElementById('coupon-product-id');
+      if (!sel) return;
+      const currentVal = sel.value;
+      sel.innerHTML = '<option value="">-- Tất cả sản phẩm (Không giới hạn) --</option>';
+      const prods = (globalData && globalData.products) ? globalData.products : [];
+      const docs = (globalData && globalData.documents) ? globalData.documents : [];
+      prods.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = `[Lisp/SP] ${p.name}`;
+        opt.dataset.name = p.name;
+        sel.appendChild(opt);
+      });
+      docs.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.id;
+        opt.textContent = `[Tài liệu/CAD] ${d.title}`;
+        opt.dataset.name = d.title;
+        sel.appendChild(opt);
+      });
+      if (currentVal) sel.value = currentVal;
+    }
+
     function renderAdminCoupons(coupons) {
+      populateCouponProductOptions();
       const tbody = document.getElementById('coupons-table-body');
       if (!tbody) return;
       tbody.innerHTML = '';
       if (!coupons || coupons.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Chưa có mã giảm giá nào. Hãy tạo mã ở khung phía trên!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Chưa có mã giảm giá nào. Hãy tạo mã ở khung phía trên!</td></tr>';
         return;
       }
       coupons.forEach(c => {
         const discountLabel = c.type === 'percent' ? `<strong>-${Number(c.value)}%</strong>` : `<strong>-${Number(c.value).toLocaleString()}đ</strong>`;
         const usesLabel = Number(c.maxUses) > 0 ? `${Number(c.usedCount || 0)} / ${c.maxUses}` : `${Number(c.usedCount || 0)} / ∞`;
         const isActive = c.isActive !== false;
+        const productLabel = c.productName
+          ? `<span style="background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; display: inline-block; max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${c.productName}">${c.productName}</span>`
+          : '<span style="color: #64748b; font-size: 0.8rem;">Tất cả sản phẩm</span>';
+
+        let expiryHtml = '<span style="color: #16a34a; font-size: 0.8rem; font-weight: 600;">Vĩnh viễn</span>';
+        let isExpired = false;
+        if (c.expiresAt) {
+          const expTime = new Date(c.expiresAt).getTime();
+          isExpired = !Number.isNaN(expTime) && Date.now() > expTime;
+          const expStr = new Date(c.expiresAt).toLocaleString('vi-VN', { hour12: false });
+          expiryHtml = isExpired
+            ? `<span style="color: #dc2626; font-weight: 700; font-size: 0.78rem;">⌛ Đã hết hạn<br><small style="font-weight: 400;">(${expStr})</small></span>`
+            : `<span style="color: #0284c7; font-weight: 600; font-size: 0.78rem;">⏱ ${c.durationLabel || ''}<br><small style="color: #64748b; font-weight: 400;">Đến: ${expStr}</small></span>`;
+        }
+
+        let statusBadge = '<span class="status-badge status-paid">Đang bật</span>';
+        if (!isActive) statusBadge = '<span class="status-badge status-pending">Tạm khóa</span>';
+        else if (isExpired) statusBadge = '<span class="status-badge" style="background: #fee2e2; color: #b91c1c;">Hết hạn</span>';
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><code style="background: #0f172a; color: #fbbf24; padding: 4px 10px; border-radius: 6px; font-weight: 900; font-size: 0.92rem;">${c.code}</code></td>
+          <td>${productLabel}</td>
           <td style="color: #16a34a;">${discountLabel}</td>
           <td><strong>${usesLabel}</strong></td>
+          <td>${expiryHtml}</td>
           <td style="color: #475569; font-size: 0.85rem;">${c.note || ''}</td>
-          <td>${isActive ? '<span class="status-badge status-paid">Đang bật</span>' : '<span class="status-badge status-pending">Tạm khóa</span>'}</td>
+          <td>${statusBadge}</td>
           <td>
             <button class="btn-sm" style="background: #0284c7; color: #fff;" onclick="navigator.clipboard && navigator.clipboard.writeText('${c.code}').then(() => alert('✅ Đã copy mã: ${c.code}'))">📋 Copy</button>
             <button class="btn-sm btn-secondary" onclick="toggleCouponAdmin('${c.code}')">${isActive ? 'Khóa' : 'Mở'}</button>
@@ -2133,11 +2197,20 @@
 
     async function saveCouponAdmin(e) {
       e.preventDefault();
+      const prodSel = document.getElementById('coupon-product-id');
+      const selectedOpt = prodSel && prodSel.options[prodSel.selectedIndex];
+      const productId = prodSel ? prodSel.value : '';
+      const productName = (productId && selectedOpt && selectedOpt.dataset.name) ? selectedOpt.dataset.name : '';
+
       const payload = {
         code: document.getElementById('coupon-code').value.trim().toUpperCase(),
         type: document.getElementById('coupon-type').value,
         value: Number(document.getElementById('coupon-value').value) || 0,
         maxUses: Number(document.getElementById('coupon-max-uses').value) || 0,
+        productId: productId,
+        productName: productName,
+        durationValue: Number(document.getElementById('coupon-duration-value').value) || 0,
+        durationUnit: document.getElementById('coupon-duration-unit').value,
         note: document.getElementById('coupon-note').value.trim()
       };
       const res = await fetch('/api/admin/coupon', {
