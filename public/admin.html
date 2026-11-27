@@ -666,26 +666,39 @@
           <small style="color: var(--text-muted); display: block; margin-top: 4px;">Video sẽ được nhúng phát trực tiếp trên trang chủ để khách xem trước khi bấm mua.</small>
         </div>
 
-        <!-- ẢNH MINH HỌA / GIF MÔ PHỎNG SẢN PHẨM -->
-        <div class="form-group" style="background: rgba(14, 165, 233, 0.06); padding: 14px; border-radius: 8px; border: 1px dashed var(--accent-cyan);">
-          <label style="color: var(--accent-cyan); font-weight: 700; display: block; margin-bottom: 8px;">
-            🖼️ Ảnh Minh Họa / GIF Mô Phỏng Cho Lisp (Hiển thị ở đầu card Lisp)
-          </label>
-          <div style="display: flex; gap: 14px; align-items: center;">
-            <div id="prod-img-preview-box" style="width: 110px; height: 75px; background: #091422; border: 1px solid var(--card-border); border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
-              <span id="prod-img-placeholder" style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 4px;">Chưa có ảnh</span>
-              <img id="prod-img-preview" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;">
-            </div>
-            <div style="flex-grow: 1;">
-              <label for="prod-image-file" style="font-size: 0.82rem; color: #94a3b8; display: block; margin-bottom: 4px;">1. Tải ảnh hoặc ảnh động GIF từ máy tính:</label>
-              <input type="file" id="prod-image-file" accept="image/*" onchange="previewProductImage(this)">
-              <div style="margin-top: 6px;">
-                <input type="text" id="prod-image-url" placeholder="2. Hoặc dán link ảnh/GIF trực tiếp (VD: https://...)" style="width: 100%; font-size: 0.85rem; padding: 7px 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 6px;" oninput="previewProductImageUrl(this.value)">
-              </div>
+        <!-- ẢNH MINH HỌA / GIF MÔ PHỎNG SẢN PHẨM (HỖ TRỢ NHIỀU ẢNH) -->
+        <div class="form-group" style="background: rgba(14, 165, 233, 0.06); padding: 14px 16px; border-radius: 10px; border: 1px dashed var(--accent-cyan); margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label style="color: var(--accent-cyan); font-weight: 700; margin: 0; font-size: 0.95rem;">
+              🖼️ Ảnh Minh Họa / GIF Mô Phỏng Cho Lisp (Có thể tải lên nhiều ảnh)
+            </label>
+            <span style="font-size: 0.8rem; color: #38bdf8; font-weight: 700;" id="prod-images-count-label">0 ảnh</span>
+          </div>
+          <p style="font-size: 0.8rem; color: #94a3b8; margin: 0 0 10px 0;">
+            Bạn có thể chọn 1 lúc nhiều ảnh/GIF từ máy tính (giữ phím <strong>Ctrl</strong> hoặc <strong>Shift</strong> để chọn nhiều ảnh cùng lúc) hoặc dán link ảnh trực tiếp.
+          </p>
+
+          <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
+            <input type="file" id="prod-images-file" accept="image/*" multiple onchange="handleProdImagesFileChange(this)" style="display: none;">
+            <button type="button" class="btn-sm btn-secondary" onclick="document.getElementById('prod-images-file').click()" style="display: flex; align-items: center; gap: 6px; padding: 7px 14px; cursor: pointer;">
+              <span>📁</span> Chọn nhiều ảnh từ máy tính
+            </button>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">(.png, .jpg, .gif, .webp)</span>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="prod-image-url-input" placeholder="Hoặc dán link ảnh/GIF (VD: https://... hoặc /uploads/...)" style="flex-grow: 1; font-size: 0.85rem; padding: 7px 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 6px;">
+              <button type="button" class="btn-sm btn-secondary" onclick="addProdImageUrlFromInput()" style="padding: 7px 12px; white-space: nowrap;">+ Thêm link</button>
             </div>
           </div>
+
+          <!-- Preview danh sách ảnh -->
+          <div id="prod-images-preview-grid" style="display: flex; gap: 12px; flex-wrap: wrap; min-height: 75px; align-items: center; background: #091422; padding: 10px; border-radius: 8px; border: 1px solid var(--card-border);">
+            <span style="color: var(--text-muted); font-size: 0.82rem; padding: 10px;">Chưa có ảnh minh họa nào. Hãy bấm nút chọn nhiều ảnh ở trên.</span>
+          </div>
           <small style="color: var(--text-muted); display: block; margin-top: 6px;">
-            💡 Khuyên dùng: Ảnh động GIF ghi lại thao tác vẽ CAD hoặc ảnh chụp màn hình bản vẽ (.png, .jpg, .gif, .webp).
+            💡 Ảnh đầu tiên (Ảnh 1) sẽ là ảnh đại diện chính của thẻ Lisp. Khách bấm "Xem chi tiết" sẽ xem được đầy đủ tất cả các ảnh.
           </small>
         </div>
 
@@ -1299,10 +1312,18 @@
       }
       lispOnly.forEach(p => {
         const tr = document.createElement('tr');
+        const hasImgs = p.images && p.images.length > 0;
+        const mainImgUrl = hasImgs ? p.images[0] : (p.imageUrl || '');
+        const imgCount = hasImgs ? p.images.length : (p.imageUrl ? 1 : 0);
+        const thumbHtml = mainImgUrl ? `
+          <div style="position: relative; width: 56px; height: 38px; border-radius: 6px; overflow: hidden; border: 1px solid #cbd5e1; background: #091422;">
+            <img src="${mainImgUrl}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500';">
+            ${imgCount > 1 ? `<span style="position: absolute; bottom: 1px; right: 1px; background: rgba(0,0,0,0.8); color: #38bdf8; font-size: 0.6rem; font-weight: 700; padding: 1px 3px; border-radius: 3px;">${imgCount} ảnh</span>` : ''}
+          </div>
+        ` : `<div style="width: 56px; height: 38px; background: #f1f5f9; border-radius: 6px; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #64748b;">Mặc định</div>`;
+
         tr.innerHTML = `
-          <td>
-            ${p.imageUrl ? `<img src="${p.imageUrl}" style="width: 48px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid #cbd5e1; display: block;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500';">` : `<div style="width: 48px; height: 32px; background: #f1f5f9; border-radius: 4px; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; color: #64748b;">Mặc định</div>`}
-          </td>
+          <td>${thumbHtml}</td>
           <td><strong>${p.name}</strong></td>
           <td style="color: #00e676; font-weight: 700;">${Number(p.price).toLocaleString()} đ</td>
           <td>
@@ -1329,7 +1350,76 @@
       if (p) editProduct(p);
     }
 
-    // Modal Sản phẩm
+    // Modal Sản phẩm (Hỗ trợ quản lý nhiều ảnh minh họa/GIF)
+    let prodCurrentImages = [];
+
+    function handleProdImagesFileChange(input) {
+      if (!input.files || input.files.length === 0) return;
+      const files = Array.from(input.files);
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          prodCurrentImages.push({
+            type: 'new',
+            file: file,
+            previewUrl: e.target.result,
+            name: file.name
+          });
+          renderProdImagesPreviews();
+        };
+        reader.readAsDataURL(file);
+      });
+      input.value = '';
+    }
+
+    function addProdImageUrlFromInput() {
+      const input = document.getElementById('prod-image-url-input');
+      const url = (input.value || '').trim();
+      if (!url) return;
+      prodCurrentImages.push({
+        type: 'existing',
+        url: url
+      });
+      input.value = '';
+      renderProdImagesPreviews();
+    }
+
+    function renderProdImagesPreviews() {
+      const container = document.getElementById('prod-images-preview-grid');
+      const countLabel = document.getElementById('prod-images-count-label');
+      if (!container || !countLabel) return;
+      container.innerHTML = '';
+      countLabel.innerText = `${prodCurrentImages.length} ảnh`;
+
+      if (prodCurrentImages.length === 0) {
+        container.innerHTML = '<span style="color: var(--text-muted); font-size: 0.82rem; padding: 10px;">Chưa có ảnh minh họa nào. Hãy bấm nút chọn nhiều ảnh ở trên.</span>';
+        return;
+      }
+
+      prodCurrentImages.forEach((imgItem, idx) => {
+        const box = document.createElement('div');
+        box.style.cssText = 'position: relative; width: 110px; height: 80px; border-radius: 8px; overflow: hidden; border: 1px solid var(--accent-cyan); background: #0b192c; flex-shrink: 0;';
+
+        const src = imgItem.type === 'existing' ? imgItem.url : imgItem.previewUrl;
+        const isPrimary = idx === 0;
+        box.innerHTML = `
+          <img src="${src}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500';">
+          <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); display: flex; justify-content: space-between; align-items: center; padding: 2px 6px;">
+            <span style="font-size: 0.65rem; color: ${isPrimary ? '#38bdf8' : '#cbd5e1'}; font-weight: ${isPrimary ? '700' : '400'};">
+              ${isPrimary ? '★ Ảnh chính' : 'Ảnh ' + (idx + 1)}
+            </span>
+            <button type="button" onclick="removeProdImage(${idx})" style="background: none; border: none; color: #ef4444; font-size: 0.85rem; font-weight: 900; cursor: pointer; padding: 0;" title="Xóa ảnh này">&times;</button>
+          </div>
+        `;
+        container.appendChild(box);
+      });
+    }
+
+    function removeProdImage(index) {
+      prodCurrentImages.splice(index, 1);
+      renderProdImagesPreviews();
+    }
+
     function openProductModal() {
       document.getElementById('modal-title').innerText = 'Thêm Sản Phẩm LispCAD Mới';
       document.getElementById('prod-id').value = '';
@@ -1349,11 +1439,10 @@
       document.querySelector('input[name="prodRequireLicense"][value="false"]').checked = true;
 
       // Reset ảnh minh họa
-      document.getElementById('prod-image-file').value = '';
-      document.getElementById('prod-image-url').value = '';
-      document.getElementById('prod-img-preview').src = '';
-      document.getElementById('prod-img-preview').style.display = 'none';
-      document.getElementById('prod-img-placeholder').style.display = 'block';
+      prodCurrentImages = [];
+      const prodUrlInput = document.getElementById('prod-image-url-input');
+      if (prodUrlInput) prodUrlInput.value = '';
+      renderProdImagesPreviews();
 
       document.querySelector('input[name="downloadType"][value="local"]').checked = true;
       toggleDownloadType();
@@ -1376,18 +1465,17 @@
       const reqLicVal = p.requireLicense ? 'true' : 'false';
       document.querySelector(`input[name="prodRequireLicense"][value="${reqLicVal}"]`).checked = true;
 
-      // Nạp ảnh minh họa hiện tại
-      document.getElementById('prod-image-file').value = '';
-      document.getElementById('prod-image-url').value = p.imageUrl || '';
-      if (p.imageUrl) {
-        document.getElementById('prod-img-preview').src = p.imageUrl;
-        document.getElementById('prod-img-preview').style.display = 'block';
-        document.getElementById('prod-img-placeholder').style.display = 'none';
+      // Nạp danh sách ảnh minh họa hiện tại
+      if (p.images && Array.isArray(p.images) && p.images.length > 0) {
+        prodCurrentImages = p.images.map(url => ({ type: 'existing', url }));
+      } else if (p.imageUrl) {
+        prodCurrentImages = [{ type: 'existing', url: p.imageUrl }];
       } else {
-        document.getElementById('prod-img-preview').src = '';
-        document.getElementById('prod-img-preview').style.display = 'none';
-        document.getElementById('prod-img-placeholder').style.display = 'block';
+        prodCurrentImages = [];
       }
+      const prodUrlInput = document.getElementById('prod-image-url-input');
+      if (prodUrlInput) prodUrlInput.value = '';
+      renderProdImagesPreviews();
 
       if (p.downloadType === 'link') {
         document.querySelector('input[name="downloadType"][value="link"]').checked = true;
@@ -1398,31 +1486,6 @@
       }
       toggleDownloadType();
       document.getElementById('product-modal').style.display = 'block';
-    }
-
-    function previewProductImage(input) {
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('prod-img-preview').src = e.target.result;
-          document.getElementById('prod-img-preview').style.display = 'block';
-          document.getElementById('prod-img-placeholder').style.display = 'none';
-        };
-        reader.readAsDataURL(input.files[0]);
-      }
-    }
-
-    function previewProductImageUrl(url) {
-      const trimmed = (url || '').trim();
-      if (trimmed.length > 5) {
-        document.getElementById('prod-img-preview').src = trimmed;
-        document.getElementById('prod-img-preview').style.display = 'block';
-        document.getElementById('prod-img-placeholder').style.display = 'none';
-      } else {
-        document.getElementById('prod-img-preview').src = '';
-        document.getElementById('prod-img-preview').style.display = 'none';
-        document.getElementById('prod-img-placeholder').style.display = 'block';
-      }
     }
 
     function closeProductModal() {
@@ -1457,12 +1520,19 @@
       const reqLicChecked = document.querySelector('input[name="prodRequireLicense"]:checked');
       form.append('requireLicense', reqLicChecked ? reqLicChecked.value : 'false');
 
-      // Ảnh minh họa / GIF
-      const imgFileInput = document.getElementById('prod-image-file');
-      if (imgFileInput.files && imgFileInput.files[0]) {
-        form.append('imageFile', imgFileInput.files[0]);
+      // Gửi danh sách ảnh minh họa (giữ ảnh cũ + gửi các file mới tải lên)
+      const existingImages = prodCurrentImages.filter(i => i.type === 'existing').map(i => i.url);
+      form.append('existingImages', JSON.stringify(existingImages));
+
+      prodCurrentImages.filter(i => i.type === 'new').forEach(imgItem => {
+        form.append('prodImages', imgItem.file);
+      });
+
+      if (existingImages.length > 0) {
+        form.append('imageUrl', existingImages[0]);
+      } else if (prodCurrentImages.length === 0) {
+        form.append('imageUrl', '');
       }
-      form.append('imageUrl', document.getElementById('prod-image-url').value);
 
       const downloadType = document.querySelector('input[name="downloadType"]:checked').value;
       form.append('downloadType', downloadType);

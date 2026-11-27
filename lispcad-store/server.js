@@ -1044,10 +1044,15 @@ app.post("/api/admin/password", requireAdmin, (req, res) => {
   res.json({ success: true, message: "Đã đổi mật khẩu thành công!" });
 });
 
-// Thêm / Cập nhật sản phẩm LispCAD (hỗ trợ file Lisp và ảnh minh họa/GIF)
-app.post("/api/admin/product", requireAdmin, upload.fields([{ name: "lispFile", maxCount: 1 }, { name: "imageFile", maxCount: 1 }]), (req, res) => {
+// Thêm / Cập nhật sản phẩm LispCAD (hỗ trợ file Lisp và nhiều ảnh minh họa/GIF)
+app.post("/api/admin/product", requireAdmin, upload.fields([
+  { name: "lispFile", maxCount: 1 },
+  { name: "imageFile", maxCount: 20 },
+  { name: "imageFiles", maxCount: 20 },
+  { name: "prodImages", maxCount: 20 }
+]), (req, res) => {
   const db = readDb();
-  const { id, name, category, price, oldPrice, description, commands, instructions, videoUrl, downloadType, downloadUrl, isActive, imageUrl } = req.body;
+  const { id, name, category, price, oldPrice, description, commands, instructions, videoUrl, downloadType, downloadUrl, isActive, imageUrl, existingImages } = req.body;
 
   let product = db.products.find(p => p.id === id);
 
@@ -1076,13 +1081,42 @@ app.post("/api/admin/product", requireAdmin, upload.fields([{ name: "lispFile", 
     product.downloadCount = 0;
   }
 
-  // Xử lý ảnh minh họa / GIF
-  if (req.files && req.files['imageFile'] && req.files['imageFile'][0]) {
-    const imgFile = req.files['imageFile'][0];
-    product.imageUrl = `/uploads/${imgFile.filename}`;
-    persistFileToMongo(imgFile);
+  // Xử lý ảnh minh họa / GIF (Hỗ trợ nhiều ảnh + giữ ảnh cũ)
+  let parsedExistingImages = [];
+  try {
+    if (existingImages) parsedExistingImages = JSON.parse(existingImages);
+  } catch (e) {
+    parsedExistingImages = [];
+  }
+  if (!Array.isArray(parsedExistingImages)) parsedExistingImages = [];
+
+  const newUploadedImages = [];
+  const imageFieldNames = ['imageFile', 'imageFiles', 'prodImages'];
+  imageFieldNames.forEach(field => {
+    if (req.files && req.files[field]) {
+      const fls = Array.isArray(req.files[field]) ? req.files[field] : [req.files[field]];
+      fls.forEach(f => {
+        newUploadedImages.push(`/uploads/${f.filename}`);
+        persistFileToMongo(f);
+      });
+    }
+  });
+
+  const combinedImages = [...parsedExistingImages, ...newUploadedImages];
+  const manualImageUrl = (imageUrl || "").trim();
+  if (manualImageUrl && !combinedImages.includes(manualImageUrl)) {
+    combinedImages.push(manualImageUrl);
+  }
+
+  // Cập nhật danh sách ảnh images và ảnh đại diện chính imageUrl
+  if (combinedImages.length > 0) {
+    product.images = combinedImages;
+    product.imageUrl = combinedImages[0];
   } else if (imageUrl !== undefined) {
-    product.imageUrl = (imageUrl || "").trim();
+    product.imageUrl = manualImageUrl;
+    product.images = manualImageUrl ? [manualImageUrl] : [];
+  } else if (!product.images) {
+    product.images = product.imageUrl ? [product.imageUrl] : [];
   }
 
   // Xử lý file tải về cho khách hàng

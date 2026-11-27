@@ -320,10 +320,16 @@
         Bước 1: Nạp lisp vào AutoCAD bằng lệnh APPLOAD...
       </div>
 
-      <!-- ẢNH MINH HỌA / GIF MÔ PHỎNG SẢN PHẨM -->
-      <div id="modal-image-section" style="display: none; margin-top: 16px; text-align: center;">
-        <h4 style="color: #0f172a; font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; text-align: left;">🖼️ Ảnh Minh Họa / GIF Mô Phỏng:</h4>
-        <img id="modal-image-display" src="" alt="Minh họa Lisp" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500';" style="max-width: 100%; max-height: 280px; border-radius: 8px; border: 1px solid #e2e8f0; object-fit: contain; background: #091422; display: block; margin: 0 auto;">
+      <!-- ẢNH MINH HỌA / GIF MÔ PHỎNG SẢN PHẨM (HỖ TRỢ NHIỀU ẢNH) -->
+      <div id="modal-image-section" style="display: none; margin-top: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h4 style="color: #0f172a; font-size: 1.05rem; font-weight: 700; margin: 0;">🖼️ Ảnh Minh Họa / GIF Mô Phỏng:</h4>
+          <span id="modal-image-count" style="font-size: 0.8rem; color: #0284c7; font-weight: 600; display: none;"></span>
+        </div>
+        <div style="background: #091422; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; padding: 6px; display: flex; align-items: center; justify-content: center;">
+          <img id="modal-image-display" src="" alt="Minh họa Lisp" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500';" style="max-width: 100%; max-height: 320px; object-fit: contain; display: block; margin: 0 auto; border-radius: 4px;">
+        </div>
+        <div id="modal-image-thumbs" style="display: none; gap: 8px; margin-top: 10px; overflow-x: auto; padding-bottom: 4px;"></div>
       </div>
 
       <!-- VIDEO HƯỚNG DẪN THAO TÁC -->
@@ -1471,8 +1477,15 @@
         const card = document.createElement('div');
         card.className = 'lisp-item-card';
 
-        const thumbHtml = p.imageUrl
-          ? `<img src="${p.imageUrl}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500';">`
+        const hasImgs = p.images && p.images.length > 0;
+        const mainImgUrl = hasImgs ? p.images[0] : (p.imageUrl || '');
+        const imgCount = hasImgs ? p.images.length : (p.imageUrl ? 1 : 0);
+        const imgBadgeHtml = imgCount > 1 
+          ? `<span style="position: absolute; top: 8px; right: 8px; background: rgba(15, 23, 42, 0.85); color: #38bdf8; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.4); backdrop-filter: blur(4px);">🖼️ ${imgCount} ảnh</span>`
+          : '';
+
+        const thumbHtml = mainImgUrl
+          ? `<img src="${mainImgUrl}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500';">`
           : `<svg width="100%" height="100%" viewBox="0 0 180 100" fill="none">
               <rect width="180" height="100" fill="#091422"/>
               <line x1="20" y1="50" x2="160" y2="50" stroke="#00d2ff" stroke-width="1.5" stroke-dasharray="4 2"/>
@@ -1482,8 +1495,9 @@
             </svg>`;
 
         card.innerHTML = `
-          <div class="lisp-thumb-area">
+          <div class="lisp-thumb-area" style="position: relative;">
             ${thumbHtml}
+            ${imgBadgeHtml}
             <div class="lisp-cube-badge">
               L
               <span>LISP</span>
@@ -1637,15 +1651,50 @@
         videoSection.style.display = 'none';
       }
 
-      // Hiển thị ảnh minh họa / GIF
+      // Hiển thị ảnh minh họa / GIF (Hỗ trợ nhiều ảnh & chuyển đổi qua lại)
       const imgSection = document.getElementById('modal-image-section');
       const imgDisplay = document.getElementById('modal-image-display');
-      if (selectedProduct.imageUrl) {
-        imgDisplay.src = selectedProduct.imageUrl;
+      const imgCountEl = document.getElementById('modal-image-count');
+      const imgThumbs = document.getElementById('modal-image-thumbs');
+
+      const images = (selectedProduct.images && Array.isArray(selectedProduct.images) && selectedProduct.images.length > 0)
+        ? selectedProduct.images
+        : (selectedProduct.imageUrl ? [selectedProduct.imageUrl] : []);
+
+      if (images.length > 0) {
+        imgDisplay.src = images[0];
         imgSection.style.display = 'block';
+
+        if (images.length > 1) {
+          if (imgCountEl) {
+            imgCountEl.innerText = `${images.length} ảnh minh họa`;
+            imgCountEl.style.display = 'inline';
+          }
+          if (imgThumbs) {
+            imgThumbs.innerHTML = '';
+            imgThumbs.style.display = 'flex';
+
+            images.forEach((imgUrl, i) => {
+              const thumb = document.createElement('div');
+              thumb.style.cssText = 'width: 64px; height: 44px; border-radius: 6px; overflow: hidden; cursor: pointer; border: 2px solid ' + (i === 0 ? '#0284c7' : '#cbd5e1') + '; flex-shrink: 0; background: #091422; transition: all 0.2s;';
+              thumb.innerHTML = `<img src="${imgUrl}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500';">`;
+              thumb.onclick = () => {
+                imgDisplay.src = imgUrl;
+                imgThumbs.querySelectorAll('div').forEach(el => el.style.borderColor = '#cbd5e1');
+                thumb.style.borderColor = '#0284c7';
+              };
+              imgThumbs.appendChild(thumb);
+            });
+          }
+        } else {
+          if (imgCountEl) imgCountEl.style.display = 'none';
+          if (imgThumbs) imgThumbs.style.display = 'none';
+        }
       } else {
         imgDisplay.src = '';
         imgSection.style.display = 'none';
+        if (imgCountEl) imgCountEl.style.display = 'none';
+        if (imgThumbs) imgThumbs.style.display = 'none';
       }
 
       document.getElementById('detail-modal').style.display = 'flex';

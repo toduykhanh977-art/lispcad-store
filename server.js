@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
 const cookieParser = require("cookie-parser");
+const nodemailer = require("nodemailer");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -203,9 +204,180 @@ function requireAdmin(req, res, next) {
   return res.status(401).json({ error: "Chưa đăng nhập quyền Admin" });
 }
 
+// ==========================================
+// HỆ THỐNG GỬI EMAIL THÔNG BÁO TỰ ĐỘNG (GMAIL)
+// ==========================================
+function getEmailConfig(db) {
+  const saved = (db && db.emailSettings) ? db.emailSettings : {};
+  const notifyEmail = (saved.notifyEmail || process.env.NOTIFY_EMAIL || "khanhksxd30@gmail.com").trim();
+  const smtpUser = (saved.smtpUser || process.env.SMTP_USER || notifyEmail).trim();
+  const smtpAppPassword = (saved.smtpAppPassword || process.env.SMTP_PASS || "").replace(/\s+/g, "");
+  const webhookEmailUrl = (saved.webhookEmailUrl || process.env.EMAIL_WEBHOOK_URL || "").trim();
+  return {
+    enabled: saved.enabled !== false,
+    notifyEmail,
+    smtpUser,
+    smtpAppPassword,
+    webhookEmailUrl,
+    notifyOnPaid: saved.notifyOnPaid !== false,
+    notifyOnDownload: saved.notifyOnDownload !== false
+  };
+}
+
+function getOrderItemNames(order) {
+  if (order && Array.isArray(order.items) && order.items.length > 0) {
+    return order.items.map(it => it.name || it.title || it.id).filter(Boolean).join(", ");
+  }
+  return (order && order.productName) ? order.productName : "Sản phẩm CAD";
+}
+
+function formatVietnamTime(dateInput) {
+  try {
+    return new Date(dateInput || Date.now()).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
+  } catch (e) {
+    return new Date().toLocaleString("vi-VN");
+  }
+}
+
+async function sendAdminNotificationEmail(db, { subject, html }) {
+  const cfg = getEmailConfig(db);
+  if (!cfg.enabled) {
+    return { sent: false, reason: "Thông báo Email đang tắt" };
+  }
+
+  // Ưu tiên 1: Gửi qua Google Apps Script Webhook (HTTPS cổng 443 - không bao giờ bị Render Free chặn)
+  if (cfg.webhookEmailUrl) {
+    try {
+      const resp = await fetch(cfg.webhookEmailUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: cfg.notifyEmail,
+          subject,
+          html
+        })
+      });
+      const text = await resp.text();
+      if (resp.ok) {
+        console.log(`📧 [Email Webhook] Đã gửi thông báo tới ${cfg.notifyEmail}: ${subject}`);
+        return { sent: true };
+      }
+      console.error("❌ [Email Webhook] Lỗi HTTP:", resp.status, text);
+      return { sent: false, reason: `Webhook lỗi ${resp.status}: ${text}` };
+    } catch (err) {
+      console.error("❌ [Email Webhook] Lỗi kết nối:", err.message);
+      return { sent: false, reason: err.message };
+    }
+  }
+
+  // Ưu tiên 2: Gửi qua SMTP Gmail (dành cho localhost hoặc Render gói trả phí)
+  if (!cfg.notifyEmail || !cfg.smtpUser || !cfg.smtpAppPassword) {
+    console.log("⚠️ [Email] Chưa cấu hình Link Google Apps Script hoặc Mật khẩu ứng dụng Gmail:", subject);
+    return { sent: false, reason: "Chưa cấu hình Link Google Apps Script (khuyên dùng trên Render Free)" };
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      family: 4,
+      connectionTimeout: 10000,
+      auth: {
+        user: cfg.smtpUser,
+        pass: cfg.smtpAppPassword
+      }
+    });
+
+    await transporter.sendMail({
+      from: `"AutoCAD Tin Học Click" <${cfg.smtpUser}>`,
+      to: cfg.notifyEmail,
+      subject,
+      html
+    });
+    console.log(`📧 [Email] Đã gửi thông báo tới ${cfg.notifyEmail}: ${subject}`);
+    return { sent: true };
+  } catch (err) {
+    console.error("❌ [Email] Lỗi gửi Gmail:", err.message);
+    return { sent: false, reason: err.message };
+  }
+}
+
+function notifyOrderPaid(order, db) {
+  const cfg = getEmailConfig(db);
+  if (!cfg.notifyOnPaid) return;
+  const itemNames = getOrderItemNames(order);
+  const itemsListHtml = (order.items && order.items.length > 0)
+    ? order.items.map(it => `<li><strong>${it.name || it.title}</strong> — ${Number(it.price || 0).toLocaleString()}đ</li>`).join("")
+    : `<li><strong>${order.productName}</strong> — ${Number(order.amount || 0).toLocaleString()}đ</li>`;
+
+  const subject = `[Đã Thanh Toán] ${itemNames} - Đơn #${order.orderCode}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;">
+      <div style="background: #0284c7; color: #ffffff; padding: 16px 20px;">
+        <h2 style="margin: 0; font-size: 18px;">💰 KHÁCH HÀNG ĐÃ CHUYỂN TIỀN THÀNH CÔNG</h2>
+      </div>
+      <div style="padding: 20px; color: #0f172a; line-height: 1.6;">
+        <p style="margin-top: 0;">Hệ thống vừa ghi nhận thanh toán thành công cho đơn hàng <strong>#${order.orderCode}</strong>:</p>
+        <div style="background: #f0f9ff; border-left: 4px solid #0284c7; padding: 12px 15px; margin: 14px 0; border-radius: 4px;">
+          <div style="font-size: 13px; color: #0369a1; font-weight: bold; margin-bottom: 4px;">SẢN PHẨM / FILE CAD / TÀI LIỆU KHÁCH MUA:</div>
+          <ul style="margin: 4px 0 0 18px; padding: 0;">${itemsListHtml}</ul>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+          <tr><td style="padding: 6px 0; color: #64748b; width: 150px;">Tổng số tiền:</td><td style="padding: 6px 0; font-weight: bold; color: #dc2626;">${Number(order.amount || 0).toLocaleString()}đ</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Tên khách hàng:</td><td style="padding: 6px 0; font-weight: bold;">${order.customerName || "Khách hàng"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Số điện thoại:</td><td style="padding: 6px 0;">${order.customerPhone || "Không có"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Email khách:</td><td style="padding: 6px 0;">${order.customerEmail || "Không có"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Hình thức nhận:</td><td style="padding: 6px 0;">${order.deliveryMethod === "zalo" ? "Nhận qua Zalo" : "Tải trực tiếp trên Web"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Thời gian:</td><td style="padding: 6px 0;">${formatVietnamTime()}</td></tr>
+        </table>
+      </div>
+    </div>
+  `;
+  sendAdminNotificationEmail(db, { subject, html });
+}
+
+function notifyOrderDownloaded(order, product, db) {
+  const cfg = getEmailConfig(db);
+  if (!cfg.notifyOnDownload) return;
+  const itemNames = getOrderItemNames(order);
+  const downloadedTitle = (product && (product.name || product.title)) ? (product.name || product.title) : itemNames;
+  const totalDl = product ? (Number(product.downloadCount) || 1) : 1;
+
+  const subject = `[Khách Đã Tải File] ${downloadedTitle} - Đơn #${order.orderCode}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;">
+      <div style="background: #16a34a; color: #ffffff; padding: 16px 20px;">
+        <h2 style="margin: 0; font-size: 18px;">📥 KHÁCH HÀNG VỪA TẢI FILE ĐÃ MUA VỀ</h2>
+      </div>
+      <div style="padding: 20px; color: #0f172a; line-height: 1.6;">
+        <p style="margin-top: 0;">Khách hàng của đơn <strong>#${order.orderCode}</strong> vừa bấm tải file về máy:</p>
+        <div style="background: #f0fdf4; border-left: 4px solid #16a34a; padding: 12px 15px; margin: 14px 0; border-radius: 4px;">
+          <div style="font-size: 13px; color: #15803d; font-weight: bold; margin-bottom: 4px;">TÊN FILE CAD / LISP / TÀI LIỆU VỪA TẢI:</div>
+          <div style="font-size: 16px; font-weight: bold; color: #0f172a;">${downloadedTitle}</div>
+          ${order.items && order.items.length > 1 ? `<div style="font-size: 13px; color: #475569; margin-top: 6px;">Đơn gồm: ${itemNames}</div>` : ""}
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+          <tr><td style="padding: 6px 0; color: #64748b; width: 150px;">Mã đơn hàng:</td><td style="padding: 6px 0; font-weight: bold;">#${order.orderCode}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Tên khách hàng:</td><td style="padding: 6px 0; font-weight: bold;">${order.customerName || "Khách hàng"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Số điện thoại:</td><td style="padding: 6px 0;">${order.customerPhone || "Không có"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Email khách:</td><td style="padding: 6px 0;">${order.customerEmail || "Không có"}</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Tổng lượt tải SP:</td><td style="padding: 6px 0; font-weight: bold; color: #0284c7;">${totalDl.toLocaleString()} lượt</td></tr>
+          <tr><td style="padding: 6px 0; color: #64748b;">Thời gian tải:</td><td style="padding: 6px 0;">${formatVietnamTime()}</td></tr>
+        </table>
+      </div>
+    </div>
+  `;
+  sendAdminNotificationEmail(db, { subject, html });
+}
+
 // Helper tự động kích hoạt Khóa học khi đơn hàng được thanh toán (PAID)
 function completeOrderPaid(order, db) {
+  const wasPaid = order.status === "PAID";
   order.status = "PAID";
+  if (!wasPaid) {
+    notifyOrderPaid(order, db);
+  }
   const hasCourse = (order.items && order.items.some(it => it.id === "prod_course_2d")) || order.productId === "prod_course_2d";
   if (hasCourse) {
     if (!db.users) db.users = [];
@@ -247,6 +419,44 @@ function completeOrderPaid(order, db) {
 // 1. API DÀNH CHO KHÁCH HÀNG (PUBLIC)
 // ==========================================
 
+// ==========================================
+// API CLOUD FONT SERVER CHO FONTFIX / FONTSYNC (LỆNH CF)
+// ==========================================
+let cachedFontIndex = null;
+function getFontIndex() {
+  if (cachedFontIndex) return cachedFontIndex;
+  const idxPath = path.join(__dirname, "data", "font-index.json");
+  if (fs.existsSync(idxPath)) {
+    try {
+      cachedFontIndex = JSON.parse(fs.readFileSync(idxPath, "utf8"));
+      return cachedFontIndex;
+    } catch (e) {
+      console.error("❌ Lỗi đọc font-index.json:", e.message);
+    }
+  }
+  return {};
+}
+
+app.get("/api/fonts", (req, res) => {
+  const fontIndex = getFontIndex();
+  const rawName = String(req.query.name || "").trim();
+  if (!rawName) {
+    return res.json({ ok: true, totalKeys: Object.keys(fontIndex).length });
+  }
+
+  const keyExact = rawName.toLowerCase();
+  const keyBase = keyExact.replace(/\.(shx|ttf|ttc|otf)$/i, "");
+  const relPath = fontIndex[keyExact] || fontIndex[keyBase];
+
+  if (!relPath) {
+    return res.status(404).send("Font not found: " + rawName);
+  }
+
+  const cdnUrl = "https://raw.githubusercontent.com/toduykhanh977-art/autocad-fonts-cloud/main/" +
+    relPath.split("/").map(encodeURIComponent).join("/");
+  return res.redirect(302, cdnUrl);
+});
+
 // Lấy thông tin cửa hàng & danh sách LispCAD đang bán
 app.get("/api/public/store", (req, res) => {
   const db = readDb();
@@ -269,9 +479,56 @@ app.get("/api/public/store", (req, res) => {
   });
 });
 
+// ==========================================
+// HỆ THỐNG MÃ GIẢM GIÁ (COUPON / VOUCHER)
+// ==========================================
+function evaluateCoupon(db, rawCode, originalAmount) {
+  const code = String(rawCode || "").trim().toUpperCase();
+  if (!code) return { valid: false, message: "Vui lòng nhập mã giảm giá!" };
+  const coupon = (db.coupons || []).find(c => String(c.code || "").toUpperCase() === code);
+  if (!coupon) return { valid: false, message: "Mã giảm giá không tồn tại!" };
+  if (coupon.isActive === false) return { valid: false, message: "Mã giảm giá này đang tạm khóa!" };
+  const maxUses = Number(coupon.maxUses) || 0;
+  const usedCount = Number(coupon.usedCount) || 0;
+  if (maxUses > 0 && usedCount >= maxUses) {
+    return { valid: false, message: "Mã giảm giá này đã hết lượt sử dụng!" };
+  }
+
+  const base = Math.max(0, Number(originalAmount) || 0);
+  let discountAmount = 0;
+  if (coupon.type === "percent") {
+    const pct = Math.min(100, Math.max(0, Number(coupon.value) || 0));
+    discountAmount = Math.round((base * pct) / 100);
+  } else {
+    discountAmount = Math.min(base, Math.max(0, Number(coupon.value) || 0));
+  }
+  const finalAmount = Math.max(0, base - discountAmount);
+  const label = coupon.type === "percent"
+    ? `Giảm ${Number(coupon.value)}%`
+    : `Giảm ${Number(coupon.value).toLocaleString()}đ`;
+  return { valid: true, coupon, discountAmount, finalAmount, label };
+}
+
+app.post("/api/public/validate-coupon", (req, res) => {
+  const { code, amount } = req.body;
+  const db = readDb();
+  const result = evaluateCoupon(db, code, amount);
+  if (!result.valid) {
+    return res.status(400).json({ valid: false, message: result.message });
+  }
+  res.json({
+    valid: true,
+    code: result.coupon.code,
+    label: result.label,
+    discountAmount: result.discountAmount,
+    finalAmount: result.finalAmount,
+    message: `Áp dụng thành công (${result.label})!`
+  });
+});
+
 // Khách chọn mua sản phẩm hoặc mua giỏ hàng -> Tạo đơn hàng
 app.post("/api/public/create-order", (req, res) => {
-  const { productId, cartItems, customerName, customerPhone, customerEmail, userId, deliveryMethod } = req.body;
+  const { productId, cartItems, customerName, customerPhone, customerEmail, userId, deliveryMethod, couponCode } = req.body;
   const db = readDb();
 
   let orderItems = [];
@@ -320,14 +577,49 @@ app.post("/api/public/create-order", (req, res) => {
     orderTitle = product.name || product.title;
   }
 
-  // Sinh mã đơn 6 số ngẫu nhiên
-  const orderCode = "CAD" + Math.floor(100000 + Math.random() * 900000);
+  // Áp dụng mã giảm giá nếu khách có nhập
+  let appliedCouponCode = "";
+  let discountAmount = 0;
+  if (couponCode && String(couponCode).trim()) {
+    const check = evaluateCoupon(db, couponCode, totalAmount);
+    if (!check.valid) {
+      return res.status(400).json({ error: check.message });
+    }
+    appliedCouponCode = check.coupon.code;
+    discountAmount = check.discountAmount;
+    totalAmount = check.finalAmount;
+    check.coupon.usedCount = (Number(check.coupon.usedCount) || 0) + 1;
+  }
+
+  // Sinh mã đơn theo Tên khách (không dấu) + 4 số cuối SĐT (VD: TO DUY KHANH + 0329778016 => KHANH8016)
+  const cleanNameParts = String(customerName || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .toUpperCase()
+    .trim()
+    .split(/\s+/)
+    .map(w => w.replace(/[^A-Z0-9]/g, ""))
+    .filter(Boolean);
+  const firstName = cleanNameParts.length > 0 ? cleanNameParts[cleanNameParts.length - 1] : "CAD";
+  const digits = String(customerPhone || "").replace(/\D/g, "");
+  const last4 = digits.length >= 4 ? digits.slice(-4) : String(Math.floor(1000 + Math.random() * 9000));
+  const baseCode = `${firstName}${last4}`;
+  let orderCode = baseCode;
+  let suffix = 2;
+  while ((db.orders || []).some(o => String(o.orderCode || "").toUpperCase() === orderCode)) {
+    orderCode = `${baseCode}${suffix}`;
+    suffix++;
+  }
   const order = {
     orderCode: orderCode,
     productId: orderItems[0].id,
     productName: orderTitle,
     items: orderItems,
     amount: totalAmount,
+    discountAmount: discountAmount,
+    couponCode: appliedCouponCode || null,
     userId: userId || null,
     customerName: customerName || "Khách hàng",
     customerPhone: customerPhone || "",
@@ -336,6 +628,20 @@ app.post("/api/public/create-order", (req, res) => {
     status: "PENDING", // PENDING hoặc PAID
     createdAt: new Date().toISOString()
   };
+
+  // Nếu sau khi áp mã giảm giá tổng tiền = 0đ -> tự động duyệt PAID và mở file ngay lập tức!
+  if (totalAmount <= 0) {
+    completeOrderPaid(order, db);
+    db.orders.unshift(order);
+    writeDb(db);
+    return res.json({
+      success: true,
+      isPaid: true,
+      orderCode: order.orderCode,
+      amount: 0,
+      productName: order.productName
+    });
+  }
 
   db.orders.unshift(order);
   writeDb(db);
@@ -428,6 +734,18 @@ app.get("/api/public/check-order/:orderCode", (req, res) => {
   }
 
   const isPaid = order.status === "PAID";
+  let requireLicense = false;
+  const allItems = [...(db.products || []), ...(db.documents || [])];
+  if (order.items && Array.isArray(order.items) && order.items.length > 0) {
+    requireLicense = order.items.some(it => {
+      const dbIt = allItems.find(x => x.id === it.id);
+      return dbIt && dbIt.requireLicense === true;
+    });
+  } else {
+    const prod = allItems.find(x => x.id === order.productId);
+    requireLicense = !!(prod && prod.requireLicense === true);
+  }
+
   if (isPaid) {
     const hasCourse = (order.items && order.items.some(it => it.id === "prod_course_2d")) || order.productId === "prod_course_2d";
     if (hasCourse && !req.session.user) {
@@ -435,6 +753,19 @@ app.get("/api/public/check-order/:orderCode", (req, res) => {
       if (user) {
         req.session.user = { id: user.id, name: user.name, phone: user.phone, email: user.email, role: user.role, enrolledCourses: user.enrolledCourses };
       }
+    }
+  }
+
+  let downloadFiles = [];
+  if (isPaid) {
+    const prod = allItems.find(p => p.id === order.productId);
+    if (prod && Array.isArray(prod.files) && prod.files.length > 0) {
+      downloadFiles = prod.files.map((f, idx) => ({
+        name: f.name || `File ${idx + 1}`,
+        url: `/download/${order.orderCode}?fileIndex=${idx}`
+      }));
+    } else if (prod) {
+      downloadFiles = [{ name: prod.name || prod.title || order.productName, url: `/download/${order.orderCode}` }];
     }
   }
 
@@ -447,7 +778,9 @@ app.get("/api/public/check-order/:orderCode", (req, res) => {
     customerName: order.customerName,
     customerPhone: order.customerPhone,
     deliveryMethod: order.deliveryMethod || "download",
+    requireLicense: requireLicense,
     downloadUrl: isPaid ? `/download/${order.orderCode}` : null,
+    downloadFiles,
     adminZalo: (db.paymentSettings && db.paymentSettings.zaloLink) || "https://zalo.me/0329778016"
   });
 });
@@ -479,10 +812,15 @@ app.get("/download/:orderCode", (req, res) => {
     });
   }
   writeDb(db);
+  notifyOrderDownloaded(order, product, db);
 
-  // Lấy link tải từ downloadUrl hoặc file đầu tiên trong files
-  const dlUrl = product.downloadUrl || (product.files && product.files[0] ? product.files[0].url : "");
-  const dlType = product.downloadType || (product.files && product.files[0] ? product.files[0].type : "link");
+  // Lấy link tải từ fileIndex (nếu có nhiều file như PDF + RAR) hoặc file đầu tiên
+  const fileIndex = req.query.fileIndex !== undefined ? parseInt(req.query.fileIndex) : 0;
+  const chosenFile = (product.files && product.files.length > 0)
+    ? (product.files[fileIndex] || product.files[0])
+    : null;
+  const dlUrl = (chosenFile && chosenFile.url) ? chosenFile.url : (product.downloadUrl || "");
+  const dlType = (chosenFile && chosenFile.type) ? chosenFile.type : (product.downloadType || "link");
 
   // Nếu là link ngoài (Google Drive, OneDrive, v.v.)
   if (dlType === "link" && dlUrl) {
@@ -556,12 +894,114 @@ app.get("/api/admin/data", requireAdmin, (req, res) => {
   const db = readDb();
   res.json({
     paymentSettings: db.paymentSettings,
+    emailSettings: getEmailConfig(db),
     products: db.products || [],
     documents: db.documents || [],
     orders: db.orders || [],
     lessons: db.lessons || [],
-    users: db.users || []
+    users: db.users || [],
+    coupons: db.coupons || []
   });
+});
+
+// Tạo / Cập nhật Mã Giảm Giá
+app.post("/api/admin/coupon", requireAdmin, (req, res) => {
+  const { code, type, value, maxUses, note } = req.body;
+  const cleanCode = String(code || "").trim().toUpperCase().replace(/\s+/g, "");
+  if (!cleanCode) return res.status(400).json({ error: "Vui lòng nhập mã giảm giá!" });
+
+  const db = readDb();
+  if (!db.coupons) db.coupons = [];
+  let coupon = db.coupons.find(c => c.code === cleanCode);
+  if (!coupon) {
+    coupon = {
+      code: cleanCode,
+      usedCount: 0,
+      isActive: true,
+      createdAt: new Date().toISOString()
+    };
+    db.coupons.unshift(coupon);
+  }
+  coupon.type = type === "fixed" ? "fixed" : "percent";
+  coupon.value = Math.max(0, Number(value) || 0);
+  coupon.maxUses = Math.max(0, parseInt(maxUses) || 0);
+  coupon.note = note || "";
+
+  writeDb(db);
+  res.json({ success: true, coupon });
+});
+
+// Bật / Tắt Mã Giảm Giá
+app.post("/api/admin/coupon/:code/toggle", requireAdmin, (req, res) => {
+  const code = String(req.params.code || "").toUpperCase();
+  const db = readDb();
+  const coupon = (db.coupons || []).find(c => c.code === code);
+  if (!coupon) return res.status(404).json({ error: "Không tìm thấy mã" });
+  coupon.isActive = coupon.isActive === false ? true : false;
+  writeDb(db);
+  res.json({ success: true, isActive: coupon.isActive });
+});
+
+// Xóa Mã Giảm Giá
+app.delete("/api/admin/coupon/:code", requireAdmin, (req, res) => {
+  const code = String(req.params.code || "").toUpperCase();
+  const db = readDb();
+  db.coupons = (db.coupons || []).filter(c => c.code !== code);
+  writeDb(db);
+  res.json({ success: true });
+});
+
+// Cập nhật cấu hình Email thông báo Gmail
+app.post("/api/admin/email-settings", requireAdmin, (req, res) => {
+  const db = readDb();
+  const { enabled, notifyEmail, smtpUser, smtpAppPassword, webhookEmailUrl, notifyOnPaid, notifyOnDownload } = req.body;
+  if (!db.emailSettings) db.emailSettings = {};
+
+  db.emailSettings.enabled = enabled !== false && enabled !== "false";
+  db.emailSettings.notifyEmail = (notifyEmail || "khanhksxd30@gmail.com").trim();
+  db.emailSettings.smtpUser = (smtpUser || db.emailSettings.notifyEmail).trim();
+  if (webhookEmailUrl !== undefined) {
+    db.emailSettings.webhookEmailUrl = String(webhookEmailUrl).trim();
+  }
+  if (smtpAppPassword !== undefined && smtpAppPassword !== "") {
+    db.emailSettings.smtpAppPassword = String(smtpAppPassword).replace(/\s+/g, "");
+  }
+  db.emailSettings.notifyOnPaid = notifyOnPaid !== false && notifyOnPaid !== "false";
+  db.emailSettings.notifyOnDownload = notifyOnDownload !== false && notifyOnDownload !== "false";
+
+  writeDb(db);
+  res.json({ success: true, emailSettings: getEmailConfig(db) });
+});
+
+// Gửi Email Test thử nghiệm từ Admin
+app.post("/api/admin/email-test", requireAdmin, async (req, res) => {
+  const db = readDb();
+  const cfg = getEmailConfig(db);
+  if (!cfg.webhookEmailUrl && !cfg.smtpAppPassword) {
+    return res.status(400).json({
+      success: false,
+      error: "Chưa dán Link Google Apps Script (hoặc Mật khẩu ứng dụng Gmail). Vui lòng nhập và bấm Lưu cấu hình trước khi test!"
+    });
+  }
+  const result = await sendAdminNotificationEmail(db, {
+    subject: "[Kiểm Tra Kết Nối] Hệ thống thông báo đơn hàng & lượt tải đã hoạt động!",
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #cbd5e1; border-radius: 8px; max-width: 560px;">
+        <h2 style="color: #0284c7; margin-top: 0;">✅ Kết nối Gmail thành công!</h2>
+        <p>Từ bây giờ, mỗi khi có khách hàng:</p>
+        <ul>
+          <li><strong>Chuyển tiền thành công</strong> (tự động hoặc duyệt tay)</li>
+          <li><strong>Bấm tải file đã mua</strong> về máy</li>
+        </ul>
+        <p>Hệ thống sẽ tự động gửi thông báo kèm <strong>tên chính xác sản phẩm / File CAD / Tài liệu</strong> về địa chỉ <strong>${cfg.notifyEmail}</strong>.</p>
+        <p style="color: #64748b; font-size: 12px;">Thời gian test: ${formatVietnamTime()}</p>
+      </div>
+    `
+  });
+  if (result.sent) {
+    return res.json({ success: true, message: `Đã gửi email test thành công tới ${cfg.notifyEmail}!` });
+  }
+  return res.status(500).json({ success: false, error: `Không gửi được email: ${result.reason}` });
 });
 
 // Cập nhật cấu hình thanh toán & Upload ảnh QR
@@ -604,10 +1044,15 @@ app.post("/api/admin/password", requireAdmin, (req, res) => {
   res.json({ success: true, message: "Đã đổi mật khẩu thành công!" });
 });
 
-// Thêm / Cập nhật sản phẩm LispCAD (hỗ trợ file Lisp và ảnh minh họa/GIF)
-app.post("/api/admin/product", requireAdmin, upload.fields([{ name: "lispFile", maxCount: 1 }, { name: "imageFile", maxCount: 1 }]), (req, res) => {
+// Thêm / Cập nhật sản phẩm LispCAD (hỗ trợ file Lisp và nhiều ảnh minh họa/GIF)
+app.post("/api/admin/product", requireAdmin, upload.fields([
+  { name: "lispFile", maxCount: 1 },
+  { name: "imageFile", maxCount: 20 },
+  { name: "imageFiles", maxCount: 20 },
+  { name: "prodImages", maxCount: 20 }
+]), (req, res) => {
   const db = readDb();
-  const { id, name, category, price, oldPrice, description, commands, instructions, videoUrl, downloadType, downloadUrl, isActive, imageUrl } = req.body;
+  const { id, name, category, price, oldPrice, description, commands, instructions, videoUrl, downloadType, downloadUrl, isActive, imageUrl, existingImages } = req.body;
 
   let product = db.products.find(p => p.id === id);
 
@@ -628,6 +1073,7 @@ app.post("/api/admin/product", requireAdmin, upload.fields([{ name: "lispFile", 
   product.instructions = instructions || "";
   product.videoUrl = videoUrl || "";
   product.downloadType = downloadType || "local";
+  product.requireLicense = (req.body.requireLicense === "true" || req.body.requireLicense === true);
   product.isActive = isActive === "true" || isActive === true;
   if (req.body.downloadCount !== undefined && req.body.downloadCount !== "") {
     product.downloadCount = parseInt(req.body.downloadCount) || 0;
@@ -635,13 +1081,42 @@ app.post("/api/admin/product", requireAdmin, upload.fields([{ name: "lispFile", 
     product.downloadCount = 0;
   }
 
-  // Xử lý ảnh minh họa / GIF
-  if (req.files && req.files['imageFile'] && req.files['imageFile'][0]) {
-    const imgFile = req.files['imageFile'][0];
-    product.imageUrl = `/uploads/${imgFile.filename}`;
-    persistFileToMongo(imgFile);
+  // Xử lý ảnh minh họa / GIF (Hỗ trợ nhiều ảnh + giữ ảnh cũ)
+  let parsedExistingImages = [];
+  try {
+    if (existingImages) parsedExistingImages = JSON.parse(existingImages);
+  } catch (e) {
+    parsedExistingImages = [];
+  }
+  if (!Array.isArray(parsedExistingImages)) parsedExistingImages = [];
+
+  const newUploadedImages = [];
+  const imageFieldNames = ['imageFile', 'imageFiles', 'prodImages'];
+  imageFieldNames.forEach(field => {
+    if (req.files && req.files[field]) {
+      const fls = Array.isArray(req.files[field]) ? req.files[field] : [req.files[field]];
+      fls.forEach(f => {
+        newUploadedImages.push(`/uploads/${f.filename}`);
+        persistFileToMongo(f);
+      });
+    }
+  });
+
+  const combinedImages = [...parsedExistingImages, ...newUploadedImages];
+  const manualImageUrl = (imageUrl || "").trim();
+  if (manualImageUrl && !combinedImages.includes(manualImageUrl)) {
+    combinedImages.push(manualImageUrl);
+  }
+
+  // Cập nhật danh sách ảnh images và ảnh đại diện chính imageUrl
+  if (combinedImages.length > 0) {
+    product.images = combinedImages;
+    product.imageUrl = combinedImages[0];
   } else if (imageUrl !== undefined) {
-    product.imageUrl = (imageUrl || "").trim();
+    product.imageUrl = manualImageUrl;
+    product.images = manualImageUrl ? [manualImageUrl] : [];
+  } else if (!product.images) {
+    product.images = product.imageUrl ? [product.imageUrl] : [];
   }
 
   // Xử lý file tải về cho khách hàng
@@ -672,7 +1147,7 @@ app.delete("/api/admin/product/:id", requireAdmin, (req, res) => {
 app.post("/api/admin/document", requireAdmin, upload.any(), (req, res) => {
   const db = readDb();
   if (!db.documents) db.documents = [];
-  const { id, title, category, format, size, author, description, isFree, price, oldPrice, previewPages, existingImages, filesJson } = req.body;
+  const { id, title, itemType, category, format, size, author, description, isFree, price, oldPrice, previewPages, previewAll, existingImages, filesJson } = req.body;
 
   let doc = db.documents.find(d => d.id === id);
   if (!doc) {
@@ -684,7 +1159,8 @@ app.post("/api/admin/document", requireAdmin, upload.any(), (req, res) => {
   }
 
   doc.title = title || "Tài liệu AutoCAD";
-  doc.category = category || "Giáo trình";
+  doc.itemType = (itemType === "filecad" || category === "File CAD") ? "filecad" : "document";
+  doc.category = category || (doc.itemType === "filecad" ? "File CAD" : "Giáo trình");
   doc.format = format || "PDF";
   doc.size = size || "10 MB";
   doc.author = author || "Tin Học Click";
@@ -695,8 +1171,13 @@ app.post("/api/admin/document", requireAdmin, upload.any(), (req, res) => {
     doc.downloadCount = 0;
   }
 
-  // Giới hạn số trang đọc thử (Mặc định 10 trang)
-  doc.previewPages = req.body.previewPages ? Math.max(1, parseInt(req.body.previewPages)) : 10;
+  // Giới hạn số trang đọc thử (-1 = xem hết toàn bộ trang, mặc định 10 trang)
+  const rawPreview = parseInt(req.body.previewPages);
+  if (previewAll === "true" || previewAll === true || rawPreview === -1) {
+    doc.previewPages = -1;
+  } else {
+    doc.previewPages = rawPreview > 0 ? rawPreview : 10;
+  }
 
   // Giá bán & Thiết lập có phí / miễn phí
   const isFreeFlag = (isFree === 'true' || isFree === true || Number(price) === 0);
@@ -756,9 +1237,33 @@ app.post("/api/admin/document", requireAdmin, upload.any(), (req, res) => {
   res.json({ success: true, document: doc });
 });
 
+// Helper tìm URL Google Drive của file PDF (ưu tiên file PDF, bỏ qua file RAR/ZIP)
+function findPdfDriveUrl(doc) {
+  if (doc.files && doc.files.length > 0) {
+    const driveFiles = doc.files.filter(f => f.url && f.url.includes("drive.google.com"));
+    if (driveFiles.length > 0) {
+      const explicitPdf = driveFiles.find(f =>
+        (f.name && f.name.toLowerCase().includes("pdf")) ||
+        (f.url && f.url.toLowerCase().includes(".pdf"))
+      );
+      if (explicitPdf) return explicitPdf.url;
+      const nonArchive = driveFiles.find(f => {
+        const n = (f.name || "").toLowerCase();
+        return !n.includes(".rar") && !n.includes(".zip") && !n.includes("rar") && !n.includes(".dwg");
+      });
+      if (nonArchive) return nonArchive.url;
+      return driveFiles[0].url;
+    }
+  }
+  if (doc.downloadUrl && doc.downloadUrl.includes("drive.google.com")) {
+    return doc.downloadUrl;
+  }
+  return null;
+}
+
 // ==============================================================
 // API CẮT & XEM TRƯỚC GIỚI HẠN SỐ TRANG CHO FILE PDF (PREVIEW LIMIT)
-// Khách chỉ được xem N trang đầu, không cho tải file gốc
+// Khách chỉ được xem N trang đầu (hoặc xem hết nếu previewPages === -1)
 // ==============================================================
 app.get("/api/public/pdf-preview-slice/:docId", async (req, res) => {
   try {
@@ -770,7 +1275,8 @@ app.get("/api/public/pdf-preview-slice/:docId", async (req, res) => {
     }
 
     const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
-    const previewPagesLimit = Math.max(1, parseInt(doc.previewPages) || 10);
+    const isFullPreview = Number(doc.previewPages) === -1;
+    const previewPagesLimit = isFullPreview ? 99999 : Math.max(1, parseInt(doc.previewPages) || 10);
 
     // Tìm file PDF nguồn
     let sourceBuffer = null;
@@ -792,14 +1298,7 @@ app.get("/api/public/pdf-preview-slice/:docId", async (req, res) => {
 
     // Nếu có link Google Drive, tự động tải và cache file PDF thật từ Google Drive
     if (!sourceBuffer) {
-      let gdriveUrl = null;
-      if (doc.files && doc.files.length > 0) {
-        const driveItem = doc.files.find(f => f.url && f.url.includes('drive.google.com'));
-        if (driveItem) gdriveUrl = driveItem.url;
-      }
-      if (!gdriveUrl && doc.downloadUrl && doc.downloadUrl.includes('drive.google.com')) {
-        gdriveUrl = doc.downloadUrl;
-      }
+      const gdriveUrl = findPdfDriveUrl(doc);
 
       if (gdriveUrl) {
         const match = gdriveUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || gdriveUrl.match(/id=([a-zA-Z0-9_-]+)/);
@@ -896,14 +1395,7 @@ app.get("/api/public/pdf-doc-info/:docId", async (req, res) => {
     try {
       const { PDFDocument } = require("pdf-lib");
       let buf = null;
-      let gdriveUrl = null;
-      if (doc.files && doc.files.length > 0) {
-        const driveItem = doc.files.find(f => f.url && f.url.includes('drive.google.com'));
-        if (driveItem) gdriveUrl = driveItem.url;
-      }
-      if (!gdriveUrl && doc.downloadUrl && doc.downloadUrl.includes('drive.google.com')) {
-        gdriveUrl = doc.downloadUrl;
-      }
+      const gdriveUrl = findPdfDriveUrl(doc);
       if (gdriveUrl) {
         const match = gdriveUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || gdriveUrl.match(/id=([a-zA-Z0-9_-]+)/);
         if (match && match[1]) {
@@ -923,10 +1415,12 @@ app.get("/api/public/pdf-doc-info/:docId", async (req, res) => {
       }
     } catch (e) {}
 
+    const isFullPreview = Number(doc.previewPages) === -1;
     res.json({
       id: doc.id,
       title: doc.title,
-      previewPages: doc.previewPages || 10,
+      previewPages: isFullPreview ? -1 : (doc.previewPages || 10),
+      previewAll: isFullPreview,
       totalPages: totalPages,
       price: doc.price || 0,
       isFree: doc.isFree
@@ -946,6 +1440,56 @@ app.delete("/api/admin/document/:id", requireAdmin, (req, res) => {
   res.json({ success: true });
 });
 
+// ==============================================================
+// API KÍCH HOẠT & KHÓA BẢN QUYỀN LISPCAD THEO 1 MÁY DUY NHẤT (MACHINE ID)
+// ==============================================================
+function handleActivateLisp(req, res) {
+  const orderCodeRaw = (req.body && req.body.orderCode) || (req.query && req.query.orderCode) || "";
+  const machineIdRaw = (req.body && req.body.machineId) || (req.query && req.query.machineId) || "";
+  const format = (req.query && req.query.format) || (req.body && req.body.format) || "json";
+
+  const orderCode = String(orderCodeRaw).trim().toUpperCase();
+  const machineId = String(machineIdRaw).trim();
+
+  const reply = (ok, statusCode, status, message, extra = {}) => {
+    if (format === "text") {
+      return res.status(statusCode).type("text/plain; charset=utf-8").send(ok ? "OK" : `DENIED:${message}`);
+    }
+    return res.status(statusCode).json({ ok, status, message, ...extra });
+  };
+
+  if (!orderCode || !machineId) {
+    return reply(false, 400, "MISSING_PARAMS", "Thieu ma don hang hoac ma may tinh!");
+  }
+
+  const db = readDb();
+  const order = (db.orders || []).find(o => String(o.orderCode || "").toUpperCase() === orderCode);
+  if (!order) {
+    return reply(false, 404, "NOT_FOUND", "Ma don hang khong ton tai tren he thong!");
+  }
+  if (order.status !== "PAID") {
+    return reply(false, 403, "UNPAID", "Don hang nay chua thanh toan thanh cong!");
+  }
+
+  if (!order.activatedMachineId) {
+    order.activatedMachineId = machineId;
+    order.activatedAt = new Date().toISOString();
+    writeDb(db);
+    console.log(`🔐 [License] Kích hoạt lần đầu đơn #${order.orderCode} cho máy: ${machineId}`);
+    return reply(true, 200, "ACTIVATED", "Kich hoat ban quyen 1 may thanh cong!", { machineId });
+  }
+
+  if (order.activatedMachineId === machineId) {
+    return reply(true, 200, "VERIFIED", "Ban quyen hop le!", { machineId });
+  }
+
+  console.log(`⛔ [License] Từ chối đơn #${order.orderCode}: đã khóa máy ${order.activatedMachineId}, thử chạy trên ${machineId}`);
+  return reply(false, 403, "MACHINE_MISMATCH", "Ma don hang nay da duoc kich hoat tren 1 may tinh khac!");
+}
+
+app.get("/api/public/activate-lisp", handleActivateLisp);
+app.post("/api/public/activate-lisp", handleActivateLisp);
+
 // Admin bấm duyệt đơn thủ công
 app.post("/api/admin/order/approve", requireAdmin, (req, res) => {
   const { orderCode } = req.body;
@@ -959,6 +1503,20 @@ app.post("/api/admin/order/approve", requireAdmin, (req, res) => {
   completeOrderPaid(order, db);
   writeDb(db);
   res.json({ success: true, message: "Đã duyệt đơn hàng thành công!" });
+});
+
+// Admin reset khóa mã máy (cho phép khách kích hoạt lại trên máy mới)
+app.post("/api/admin/order/reset-machine", requireAdmin, (req, res) => {
+  const { orderCode } = req.body;
+  const db = readDb();
+  const order = (db.orders || []).find(o => o.orderCode === orderCode);
+  if (!order) {
+    return res.status(404).json({ error: "Không tìm thấy đơn hàng" });
+  }
+  order.activatedMachineId = null;
+  order.activatedAt = null;
+  writeDb(db);
+  res.json({ success: true, message: `Đã reset mã máy cho đơn #${order.orderCode}!` });
 });
 
 // Xóa đơn hàng
