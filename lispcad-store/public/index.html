@@ -326,8 +326,9 @@
           <h4 style="color: #0f172a; font-size: 1.05rem; font-weight: 700; margin: 0;">🖼️ Ảnh Minh Họa / GIF Mô Phỏng:</h4>
           <span id="modal-image-count" style="font-size: 0.8rem; color: #0284c7; font-weight: 600; display: none;"></span>
         </div>
-        <div style="background: #091422; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; padding: 6px; display: flex; align-items: center; justify-content: center;">
+        <div style="background: #091422; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; padding: 6px; display: flex; align-items: center; justify-content: center; position: relative; cursor: zoom-in;" onclick="openImageLightbox(document.getElementById('modal-image-display').src)" title="Bấm để phóng to ảnh toàn màn hình">
           <img id="modal-image-display" src="" alt="Minh họa Lisp" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=500';" style="max-width: 100%; max-height: 320px; object-fit: contain; display: block; margin: 0 auto; border-radius: 4px;">
+          <span style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.75); color: #fff; font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; pointer-events: none; backdrop-filter: blur(4px);">🔍 Bấm để phóng to</span>
         </div>
         <div id="modal-image-thumbs" style="display: none; gap: 8px; margin-top: 10px; overflow-x: auto; padding-bottom: 4px;"></div>
       </div>
@@ -570,8 +571,9 @@
           </h4>
           <span style="font-size: 0.78rem; color: #94a3b8;" id="doc-detail-gallery-count">3 ảnh mẫu</span>
         </div>
-        <div class="doc-gallery-main">
+        <div class="doc-gallery-main" style="cursor: zoom-in; position: relative;" onclick="openImageLightbox(document.getElementById('doc-detail-main-img').src)" title="Bấm để phóng to ảnh toàn màn hình">
           <img id="doc-detail-main-img" src="" alt="Bản vẽ mẫu">
+          <span style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.75); color: #fff; font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; pointer-events: none; backdrop-filter: blur(4px);">🔍 Bấm để phóng to</span>
         </div>
         <div class="doc-gallery-thumbs" id="doc-detail-thumbs-container">
           <!-- Render thumbnails -->
@@ -730,6 +732,17 @@
     </div>
   </div>
 
+  <!-- MODAL PHÓNG TO ẢNH / LIGHTBOX TOÀN MÀN HÌNH -->
+  <div id="image-lightbox-modal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.94); z-index: 100000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(6px); cursor: zoom-out;" onclick="closeImageLightbox()">
+    <button type="button" onclick="closeImageLightbox()" style="position: absolute; top: 16px; right: 24px; background: rgba(15, 23, 42, 0.75); color: #ffffff; border: 1px solid rgba(255,255,255,0.25); border-radius: 50%; width: 44px; height: 44px; font-size: 2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; transition: all 0.2s;" title="Đóng">&times;</button>
+    <div style="position: relative; max-width: 95vw; max-height: 92vh; display: flex; align-items: center; justify-content: center;" onclick="event.stopPropagation()">
+      <img id="image-lightbox-img" src="" alt="Ảnh phóng to" style="max-width: 95vw; max-height: 92vh; object-fit: contain; border-radius: 8px; box-shadow: 0 15px 45px rgba(0,0,0,0.85); cursor: zoom-out;" onclick="closeImageLightbox()">
+      <div style="position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%); color: #94a3b8; font-size: 0.8rem; white-space: nowrap; pointer-events: none;">
+        Bấm bất kỳ đâu hoặc bấm ESC để đóng
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST THÔNG BÁO -->
   <div class="toast-notice" id="toast-notice">
     <span>✓</span> <span id="toast-msg">Đã thêm vào giỏ hàng!</span>
@@ -831,6 +844,11 @@
       filtered.forEach(doc => {
         const card = document.createElement('div');
         card.className = 'doc-item-card';
+        card.style.cursor = 'pointer';
+        card.onclick = (e) => {
+          if (e.target.closest('button') || e.target.closest('a')) return;
+          openDocDetailUser(doc.id);
+        };
 
         const formatClass = (doc.format || 'pdf').toLowerCase().includes('dwg') ? 'dwg' : 'pdf';
         const formatIcon = formatClass === 'dwg' ? '📐' : '📄';
@@ -884,11 +902,11 @@
             <button class="btn-detail-outline" onclick="openDocDetailUser('${doc.id}')" style="flex: 1;">
               👁 Xem chi tiết
             </button>
-            <button class="btn-add-cart-solid" onclick="addDocToCart('${doc.id}')" title="Thêm vào giỏ hàng" style="flex: 1;">
+            <button class="btn-add-cart-solid" onclick="event.stopPropagation(); addDocToCart('${doc.id}')" title="Thêm vào giỏ hàng" style="flex: 1;">
               🛒 Thêm vào giỏ
             </button>
           </div>
-          <button type="button" onclick="openShareModal('doc', '${doc.id}', ${JSON.stringify(doc.title || '')})" title="Chia sẻ link lên Facebook / Zalo" style="width: 100%; margin-top: 8px; padding: 7px 12px; border-radius: 8px; border: 1px solid #bae6fd; background: #f0f9ff; color: #0284c7; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <button type="button" onclick="event.stopPropagation(); openShareModal('doc', '${doc.id}')" title="Chia sẻ link lên Facebook / Zalo" style="width: 100%; margin-top: 8px; padding: 7px 12px; border-radius: 8px; border: 1px solid #bae6fd; background: #f0f9ff; color: #0284c7; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
             🔗 Chia sẻ &amp; Lấy link tải
           </button>
         `;
@@ -1476,6 +1494,11 @@
       lispItems.forEach(p => {
         const card = document.createElement('div');
         card.className = 'lisp-item-card';
+        card.style.cursor = 'pointer';
+        card.onclick = (e) => {
+          if (e.target.closest('button') || e.target.closest('a')) return;
+          openDetailModal(p.id);
+        };
 
         const hasImgs = p.images && p.images.length > 0;
         const mainImgUrl = hasImgs ? p.images[0] : (p.imageUrl || '');
@@ -1518,11 +1541,11 @@
               <button class="btn-detail-outline" onclick="openDetailModal('${p.id}')" style="flex: 1;">
                 👁 Xem chi tiết
               </button>
-              <button class="btn-add-cart-solid" onclick="addToCart('${p.id}')" style="flex: 1;">
+              <button class="btn-add-cart-solid" onclick="event.stopPropagation(); addToCart('${p.id}')" style="flex: 1;">
                 🛒 Thêm vào giỏ
               </button>
             </div>
-            <button type="button" onclick="openShareModal('lisp', '${p.id}', ${JSON.stringify(p.name || '')})" title="Chia sẻ link lên Facebook / Zalo" style="width: 100%; margin-top: 8px; padding: 7px 12px; border-radius: 8px; border: 1px solid #bae6fd; background: #f0f9ff; color: #0284c7; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <button type="button" onclick="event.stopPropagation(); openShareModal('lisp', '${p.id}')" title="Chia sẻ link lên Facebook / Zalo" style="width: 100%; margin-top: 8px; padding: 7px 12px; border-radius: 8px; border: 1px solid #bae6fd; background: #f0f9ff; color: #0284c7; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
               🔗 Chia sẻ &amp; Lấy link tải
             </button>
           </div>
@@ -2128,10 +2151,19 @@
     function openShareModal(type, id, title) {
       if (type === 'course') {
         currentShareUrl = `${window.location.origin}/course.html`;
+        currentShareTitle = title || 'Khóa học AutoCAD 2D Từ Cơ Bản Đến Nâng Cao';
+      } else if (type === 'lisp') {
+        currentShareUrl = `${window.location.origin}/?lisp=${encodeURIComponent(id)}`;
+        const p = (allProducts || []).find(x => String(x.id) === String(id));
+        currentShareTitle = (p && p.name) ? p.name : (title || 'Tiện ích LispCAD');
+      } else if (type === 'doc') {
+        currentShareUrl = `${window.location.origin}/?doc=${encodeURIComponent(id)}`;
+        const d = (allDocuments || []).find(x => String(x.id) === String(id));
+        currentShareTitle = (d && d.title) ? d.title : (title || 'Tài liệu / File CAD');
       } else {
         currentShareUrl = `${window.location.origin}/?${type}=${encodeURIComponent(id)}`;
+        currentShareTitle = title || 'AutoCAD Tin Học Click';
       }
-      currentShareTitle = title || 'AutoCAD Tin Học Click';
 
       let modal = document.getElementById('share-popup-modal');
       if (!modal) {
@@ -2228,6 +2260,33 @@
       if (!currentViewingDoc) return;
       openShareModal('doc', currentViewingDoc.id, currentViewingDoc.title);
     }
+
+    // ==========================================
+    // LIGHTBOX PHÓNG TO ẢNH TOÀN MÀN HÌNH
+    // ==========================================
+    function openImageLightbox(src) {
+      if (!src) return;
+      const modal = document.getElementById('image-lightbox-modal');
+      const img = document.getElementById('image-lightbox-img');
+      if (modal && img) {
+        img.src = src;
+        modal.style.display = 'flex';
+      }
+    }
+
+    function closeImageLightbox() {
+      const modal = document.getElementById('image-lightbox-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeImageLightbox();
+        closeDetailModal();
+        closeDocDetailUser();
+        closeShareModal();
+      }
+    });
 
     // Khởi động
     loadStore();
