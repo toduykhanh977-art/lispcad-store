@@ -242,6 +242,7 @@
         <button class="tab-btn" onclick="switchTab('tab-lessons')">🎓 Quản Lý Khóa Học 2D</button>
         <button class="tab-btn" onclick="switchTab('tab-students')">👥 Quản Lý Học Viên</button>
         <button class="tab-btn" onclick="switchTab('tab-orders')">📑 Danh Sách Đơn Hàng</button>
+        <button class="tab-btn" onclick="switchTab('tab-coupons')">🎟️ Mã Giảm Giá</button>
         <button class="tab-btn" onclick="switchTab('tab-password')">🔒 Đổi Mật Khẩu</button>
       </div>
 
@@ -314,15 +315,74 @@
 
             <button type="submit" class="btn-buy" style="max-width: 250px; margin-top: 20px;">Lưu Cài Đặt</button>
           </form>
+
+          <!-- CÀI ĐẶT THÔNG BÁO GMAIL TỰ ĐỘNG -->
+          <div style="margin-top: 32px; padding-top: 24px; border-top: 2px dashed #e2e8f0;">
+            <h3 style="margin-top: 0; color: #0f172a; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+              📩 Thông Báo Đơn Hàng &amp; Lượt Tải Về Gmail Tự Động
+            </h3>
+            <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 16px;">
+              Hệ thống tự động gửi email kèm <strong>tên chính xác sản phẩm / File CAD / Tài liệu</strong> về Gmail của bạn khi có khách chuyển tiền thành công hoặc bấm tải file đã mua.
+            </p>
+            <form id="form-email-settings" onsubmit="saveEmailSettings(event)" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 18px;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+                <div class="form-group">
+                  <label for="notifyEmail">Gmail nhận thông báo</label>
+                  <input type="email" id="notifyEmail" value="khanhksxd30@gmail.com" placeholder="khanhksxd30@gmail.com" required>
+                </div>
+                <div class="form-group">
+                  <label for="smtpUser">Gmail dùng để gửi (thường giống mail nhận)</label>
+                  <input type="email" id="smtpUser" value="khanhksxd30@gmail.com" placeholder="khanhksxd30@gmail.com" required>
+                </div>
+                <div class="form-group">
+                  <label for="smtpAppPassword">Mật khẩu ứng dụng Gmail (16 ký tự)</label>
+                  <input type="password" id="smtpAppPassword" placeholder="VD: abcd efgh ijkl mnop (để trống nếu giữ nguyên)">
+                  <small style="display: block; color: #64748b; margin-top: 4px; font-size: 0.78rem;">
+                    Lấy tại: Google Tài khoản → Bảo mật → Xác minh 2 bước → Mật khẩu ứng dụng.
+                  </small>
+                </div>
+              </div>
+
+              <div style="margin-top: 12px;">
+                <div class="form-group">
+                  <label for="webhookEmailUrl">Link Google Apps Script gửi Gmail (Khuyên dùng — không bị Render Free chặn)</label>
+                  <input type="url" id="webhookEmailUrl" placeholder="https://script.google.com/macros/s/.../exec">
+                  <small style="display: block; color: #64748b; margin-top: 4px; font-size: 0.78rem;">
+                    Render gói Free chặn cổng gửi mail SMTP thông thường, nên dùng link Apps Script miễn phí của chính Gmail bạn để gửi qua HTTPS 100% thành công.
+                  </small>
+                </div>
+              </div>
+
+              <div style="display: flex; flex-wrap: wrap; gap: 18px; margin-top: 12px; color: #0f172a; font-size: 0.9rem;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" id="emailEnabled" checked style="width: auto;"> Bật thông báo Gmail tự động
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" id="notifyOnPaid" checked style="width: auto;"> Báo khi khách chuyển tiền thành công
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" id="notifyOnDownload" checked style="width: auto;"> Báo khi khách tải file đã mua về
+                </label>
+              </div>
+
+              <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px;">
+                <button type="submit" class="btn-buy" style="max-width: 230px; margin: 0;">Lưu Cấu Hình Email</button>
+                <button type="button" class="btn-sm" onclick="testEmailSettings()" style="background: #0284c7; color: #fff; padding: 10px 18px;">📧 Gửi Email Test Thử</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
 
       <!-- TAB 2: QUẢN LÝ LISPCAD & GIÁ BÁN -->
       <div id="tab-products" class="panel">
         <div class="admin-card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="color: var(--accent-cyan);">2. Danh Sách Các Bộ LispCAD Đang Bán</h3>
-            <button class="btn-sm btn-primary" onclick="openProductModal()">+ Thêm Sản Phẩm Mới</button>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+            <h3 style="color: var(--accent-cyan); margin: 0;">2. Danh Sách Các Bộ LispCAD Đang Bán</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="btn-sm" style="background: #0f172a; color: #38bdf8; border: 1px solid #0284c7;" onclick="openLispLicenseModal()">🔐 Code Khóa 1 Máy (.VLX)</button>
+              <button class="btn-sm btn-primary" onclick="openProductModal()">+ Thêm Sản Phẩm Mới</button>
+            </div>
           </div>
 
           <div class="table-responsive">
@@ -355,7 +415,10 @@
               <h3 style="color: var(--accent-cyan); font-size: 1.25rem;">3. Tổng Hợp File CAD &amp; Tài Liệu</h3>
               <p style="color: var(--text-muted); font-size: 0.85rem;" id="admin-docs-count-text">Quản lý các bộ file CAD, thư viện DWG và tài liệu cho học viên tải về</p>
             </div>
-            <button class="btn-sm btn-primary" onclick="openDocModal()">+ Thêm File CAD / Tài Liệu Mới</button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="btn-sm btn-primary" onclick="openDocModal('filecad')" style="background: #0284c7;">+ Thêm File CAD Mới (PDF/RAR)</button>
+              <button class="btn-sm btn-primary" onclick="openDocModal('document')">+ Thêm Tài Liệu Mới</button>
+            </div>
           </div>
 
           <div class="table-responsive">
@@ -461,12 +524,68 @@
                   <th>Nhận File</th>
                   <th>Thời Gian</th>
                   <th>Trạng Thái</th>
+                  <th>Bản Quyền (1 Máy)</th>
                   <th>Thao Tác</th>
                 </tr>
               </thead>
               <tbody id="orders-table-body">
                 <!-- Danh sách đơn hàng -->
               </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB MÃ GIẢM GIÁ (COUPON / VOUCHER) -->
+      <div id="tab-coupons" class="panel">
+        <div class="admin-card">
+          <h3 style="margin-bottom: 8px; color: var(--accent-cyan);">🎟️ Tạo &amp; Quản Lý Mã Giảm Giá</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 18px;">
+            Tạo mã giảm giá <strong>100% (0đ)</strong> để cấp cho khách cũ đã chuyển khoản trước đây, hoặc mã giảm theo % / số tiền VNĐ tùy ý bạn quyết định.
+          </p>
+
+          <form onsubmit="saveCouponAdmin(event)" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; margin-bottom: 22px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px;">
+              <div class="form-group" style="margin: 0;">
+                <label for="coupon-code">Mã Code (Viết liền, in hoa)</label>
+                <input type="text" id="coupon-code" required placeholder="VD: KHACHCU100" style="text-transform: uppercase; font-weight: 800;">
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label for="coupon-type">Loại Giảm Giá</label>
+                <select id="coupon-type" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1;">
+                  <option value="percent">Giảm theo Phần trăm (%)</option>
+                  <option value="fixed">Giảm theo Số tiền (VNĐ)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label for="coupon-value">Mức Giảm (% hoặc VNĐ)</label>
+                <input type="number" id="coupon-value" required min="1" value="100" placeholder="VD: 100">
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label for="coupon-max-uses">Số Lượt Dùng (0 = Không giới hạn)</label>
+                <input type="number" id="coupon-max-uses" min="0" value="1" placeholder="VD: 1">
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label for="coupon-note">Ghi Chú</label>
+                <input type="text" id="coupon-note" placeholder="VD: Bù cho anh Nam đã CK">
+              </div>
+            </div>
+            <button type="submit" class="btn-buy" style="max-width: 240px; margin-top: 14px;">+ Lưu / Tạo Mã Giảm Giá</button>
+          </form>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Mã Code</th>
+                  <th>Mức Giảm</th>
+                  <th>Lượt Dùng</th>
+                  <th>Ghi Chú</th>
+                  <th>Trạng Thái</th>
+                  <th>Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="coupons-table-body"></tbody>
             </table>
           </div>
         </div>
@@ -561,7 +680,7 @@
               <label for="prod-image-file" style="font-size: 0.82rem; color: #94a3b8; display: block; margin-bottom: 4px;">1. Tải ảnh hoặc ảnh động GIF từ máy tính:</label>
               <input type="file" id="prod-image-file" accept="image/*" onchange="previewProductImage(this)">
               <div style="margin-top: 6px;">
-                <input type="url" id="prod-image-url" placeholder="2. Hoặc dán link ảnh/GIF trực tiếp (VD: https://...)" style="width: 100%; font-size: 0.85rem; padding: 7px 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 6px;" oninput="previewProductImageUrl(this.value)">
+                <input type="text" id="prod-image-url" placeholder="2. Hoặc dán link ảnh/GIF trực tiếp (VD: https://...)" style="width: 100%; font-size: 0.85rem; padding: 7px 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 6px;" oninput="previewProductImageUrl(this.value)">
               </div>
             </div>
           </div>
@@ -597,6 +716,20 @@
           <label for="prod-downloads">📥 Số Lượt Tải Hiển Thị (Download Count)</label>
           <input type="number" id="prod-downloads" min="0" placeholder="VD: 150" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 8px;">
           <small style="color: var(--text-muted); font-size: 0.78rem;">Số lượt tải sẽ tự động tăng mỗi khi khách hàng thanh toán/tải file, bạn cũng có thể tùy chỉnh tại đây.</small>
+        </div>
+
+        <div class="form-group" style="background: rgba(56, 189, 248, 0.08); border: 1px dashed #0284c7; border-radius: 10px; padding: 12px 14px; margin-top: 15px;">
+          <label style="color: var(--accent-cyan); font-weight: 700; display: block; margin-bottom: 8px;">🔐 Yêu Cầu Bản Quyền (Khóa 1 Máy):</label>
+          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              <input type="radio" name="prodRequireLicense" value="false" checked style="width: auto;">
+              <span>Không yêu cầu (Tải file bình thường)</span>
+            </label>
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              <input type="radio" name="prodRequireLicense" value="true" style="width: auto;">
+              <strong style="color: #fbbf24;">Có yêu cầu bản quyền (Hiện Mã kích hoạt &amp; hướng dẫn APPLOAD sau thanh toán)</strong>
+            </label>
+          </div>
         </div>
 
         <div class="form-group" style="margin-top: 15px;">
@@ -692,6 +825,14 @@
         <input type="hidden" id="doc-id">
 
         <div class="form-group">
+          <label for="doc-item-type">Phân Nhóm Hiển Thị Trên Web</label>
+          <select id="doc-item-type" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 8px; font-weight: 700;">
+            <option value="filecad">📐 File CAD (Hiển thị riêng ở mục File CAD — hỗ trợ PDF + RAR Google Drive)</option>
+            <option value="document">📚 Tài liệu (Hiển thị ở mục Tài liệu &amp; Giáo trình)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
           <label for="doc-title">Tên File CAD / Tài Liệu</label>
           <input type="text" id="doc-title" required placeholder="VD: Bộ Thư Viện 1000+ Block CAD Kiến Trúc & Nội Thất">
         </div>
@@ -700,6 +841,7 @@
           <div class="form-group">
             <label for="doc-category">Chuyên Mục</label>
             <select id="doc-category" style="width: 100%; padding: 10px; background: #0d1117; border: 1px solid var(--card-border); color: #fff; border-radius: 8px;">
+              <option value="File CAD">File CAD</option>
               <option value="Giáo trình">Giáo trình</option>
               <option value="Thư viện DWG">Thư viện DWG</option>
               <option value="Sổ tay phím tắt">Sổ tay phím tắt</option>
@@ -765,13 +907,19 @@
 
         <!-- THIẾT LẬP GIỚI HẠN SỐ TRANG CHO KHÁCH ĐỌC THỬ (XEM TRƯỚC) -->
         <div class="form-group" style="background: rgba(56, 189, 248, 0.06); padding: 14px 16px; border-radius: 10px; border: 1px dashed var(--accent-cyan); margin-bottom: 20px;">
-          <label style="color: var(--accent-cyan); font-weight: 700; display: block; margin-bottom: 6px; font-size: 0.95rem;">
-            📖 Giới Hạn Số Trang Cho Khách Đọc Thử (Xem Trước):
+          <label style="color: var(--accent-cyan); font-weight: 700; display: block; margin-bottom: 8px; font-size: 0.95rem;">
+            📖 Tùy Chỉnh Số Trang Preview (Xem Trước PDF):
           </label>
-          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <div style="margin-bottom: 10px;">
+            <label style="cursor: pointer; display: inline-flex; align-items: center; gap: 8px; color: #34d399; font-weight: 700; font-size: 0.92rem;">
+              <input type="checkbox" id="doc-preview-all" onchange="toggleDocPreviewAll()" style="width: auto;">
+              ✅ Cho phép xem hết toàn bộ trang PDF (Không giới hạn)
+            </label>
+          </div>
+          <div id="doc-preview-pages-row" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
             <input type="number" id="doc-preview-pages" min="1" max="500" value="10" placeholder="10" style="width: 120px; padding: 9px 12px; background: #0d1117; border: 1px solid var(--card-border); color: #00e676; border-radius: 8px; font-weight: 800; font-size: 1.1rem; text-align: center;">
             <span style="font-size: 0.85rem; color: #cbd5e1; font-weight: 500;">
-              trang đầu tiên. <span style="color: var(--text-muted);">(Ví dụ: File có 20 trang, nhập <strong>10</strong> thì khách chỉ đọc được 10 trang đầu, không cho tải về; xem hết phải mua mới tải và xem trọn bộ).</span>
+              trang đầu tiên. <span style="color: var(--text-muted);">(Ví dụ: nhập <strong>5</strong> hoặc <strong>10</strong> thì khách chỉ xem được từng đó trang đầu; nếu muốn xem hết thì tích vào ô bên trên).</span>
             </span>
           </div>
         </div>
@@ -970,11 +1118,13 @@
         }
         globalData = await res.json();
         renderPaymentSettings(globalData.paymentSettings);
+        renderEmailSettings(globalData.emailSettings);
         renderProducts(globalData.products);
         renderAdminDocuments(globalData.documents);
         renderAdminLessons(globalData.lessons);
         renderStudents(globalData.users);
         renderOrders(globalData.orders);
+        renderAdminCoupons(globalData.coupons || []);
 
         // Hiển thị học phí khóa học 2D
         const courseProd = (globalData.products || []).find(p => p.id === 'prod_course_2d' || p.category === 'Khóa học' || (p.name && p.name.includes('Khóa học')));
@@ -1056,6 +1206,65 @@
       }
     }
 
+    function renderEmailSettings(settings) {
+      if (!settings) return;
+      if (document.getElementById('notifyEmail')) document.getElementById('notifyEmail').value = settings.notifyEmail || 'khanhksxd30@gmail.com';
+      if (document.getElementById('smtpUser')) document.getElementById('smtpUser').value = settings.smtpUser || settings.notifyEmail || 'khanhksxd30@gmail.com';
+      if (document.getElementById('webhookEmailUrl')) document.getElementById('webhookEmailUrl').value = settings.webhookEmailUrl || '';
+      if (document.getElementById('smtpAppPassword')) {
+        document.getElementById('smtpAppPassword').value = '';
+        document.getElementById('smtpAppPassword').placeholder = settings.smtpAppPassword
+          ? 'Đã lưu mật khẩu ứng dụng (nhập mới nếu muốn đổi)'
+          : 'VD: abcd efgh ijkl mnop';
+      }
+      if (document.getElementById('emailEnabled')) document.getElementById('emailEnabled').checked = settings.enabled !== false;
+      if (document.getElementById('notifyOnPaid')) document.getElementById('notifyOnPaid').checked = settings.notifyOnPaid !== false;
+      if (document.getElementById('notifyOnDownload')) document.getElementById('notifyOnDownload').checked = settings.notifyOnDownload !== false;
+    }
+
+    async function saveEmailSettings(e) {
+      e.preventDefault();
+      const payload = {
+        notifyEmail: document.getElementById('notifyEmail').value.trim(),
+        smtpUser: document.getElementById('smtpUser').value.trim(),
+        webhookEmailUrl: document.getElementById('webhookEmailUrl') ? document.getElementById('webhookEmailUrl').value.trim() : '',
+        smtpAppPassword: document.getElementById('smtpAppPassword').value.trim(),
+        enabled: document.getElementById('emailEnabled').checked,
+        notifyOnPaid: document.getElementById('notifyOnPaid').checked,
+        notifyOnDownload: document.getElementById('notifyOnDownload').checked
+      };
+      try {
+        const res = await fetch('/api/admin/email-settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Đã lưu cấu hình thông báo Gmail thành công!');
+          loadDashboardData();
+        } else {
+          alert(data.error || 'Không thể lưu cấu hình Email');
+        }
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
+    async function testEmailSettings() {
+      try {
+        const res = await fetch('/api/admin/email-test', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ ' + data.message);
+        } else {
+          alert('❌ ' + (data.error || 'Gửi email test thất bại'));
+        }
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+      }
+    }
+
     // Lưu học phí Khóa học AutoCAD 2D
     async function saveCoursePriceSettings() {
       const price = document.getElementById('admin-course-price').value;
@@ -1105,6 +1314,7 @@
           <td>${p.downloadType === 'link' ? '<a href="' + p.downloadUrl + '" target="_blank" style="color: var(--accent-cyan);">Đường link</a>' : 'File nội bộ'}</td>
           <td>${p.isActive ? '<span class="status-badge status-paid">Đang bán</span>' : '<span class="status-badge status-pending">Đã ẩn</span>'}</td>
           <td>
+            <button class="btn-sm" style="background: #0ea5e9; color: #fff;" onclick="copyShareLinkAdmin('lisp', '${p.id}')" title="Copy link chia sẻ">🔗 Link</button>
             <button class="btn-sm btn-secondary" onclick="editProductById('${p.id}')">Sửa</button>
             <button class="btn-sm btn-danger" onclick="deleteProduct('${p.id}')">Xóa</button>
           </td>
@@ -1136,6 +1346,7 @@
       document.getElementById('current-file-label').innerText = '';
       document.getElementById('prod-downloads').value = 120;
       document.getElementById('prod-active').checked = true;
+      document.querySelector('input[name="prodRequireLicense"][value="false"]').checked = true;
 
       // Reset ảnh minh họa
       document.getElementById('prod-image-file').value = '';
@@ -1162,6 +1373,8 @@
       document.getElementById('prod-videourl').value = p.videoUrl || '';
       document.getElementById('prod-downloads').value = p.downloadCount !== undefined ? p.downloadCount : 0;
       document.getElementById('prod-active').checked = p.isActive;
+      const reqLicVal = p.requireLicense ? 'true' : 'false';
+      document.querySelector(`input[name="prodRequireLicense"][value="${reqLicVal}"]`).checked = true;
 
       // Nạp ảnh minh họa hiện tại
       document.getElementById('prod-image-file').value = '';
@@ -1241,6 +1454,8 @@
       form.append('videoUrl', document.getElementById('prod-videourl').value);
       form.append('downloadCount', document.getElementById('prod-downloads').value || 0);
       form.append('isActive', document.getElementById('prod-active').checked);
+      const reqLicChecked = document.querySelector('input[name="prodRequireLicense"]:checked');
+      form.append('requireLicense', reqLicChecked ? reqLicChecked.value : 'false');
 
       // Ảnh minh họa / GIF
       const imgFileInput = document.getElementById('prod-image-file');
@@ -1372,6 +1587,7 @@
           </td>
           <td>${filesSummaryHtml}</td>
           <td>
+            <button class="btn-sm" style="background: #0ea5e9; color: #fff;" onclick="event.stopPropagation(); copyShareLinkAdmin('doc', '${d.id}')" title="Copy link chia sẻ">🔗 Link</button>
             <button class="btn-sm btn-secondary" onclick="event.stopPropagation(); editDocById('${d.id}')">Sửa</button>
             <button class="btn-sm btn-danger" onclick="event.stopPropagation(); deleteDoc('${d.id}')">Xóa</button>
           </td>
@@ -1380,6 +1596,20 @@
         tr.onclick = () => editDocById(d.id);
         tbody.appendChild(tr);
       });
+    }
+
+    async function copyShareLinkAdmin(type, id) {
+      const url = `${window.location.origin}/?${type}=${encodeURIComponent(id)}`;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url);
+          alert('✅ Đã copy link chia sẻ:\n' + url + '\n\nBạn chỉ cần dán (Ctrl+V) gửi cho mọi người tải!');
+        } else {
+          window.prompt('Copy link chia sẻ bên dưới:', url);
+        }
+      } catch (e) {
+        window.prompt('Copy link chia sẻ bên dưới:', url);
+      }
     }
 
     // --- QUẢN LÝ 2-3 ẢNH MINH HỌA ---
@@ -1536,18 +1766,30 @@
       }
     }
 
-    // Mở modal thêm mới
-    function openDocModal() {
-      document.getElementById('doc-modal-title').innerText = 'Thêm File CAD & Tài Liệu Mới';
+    function toggleDocPreviewAll() {
+      const isAll = document.getElementById('doc-preview-all').checked;
+      const row = document.getElementById('doc-preview-pages-row');
+      if (row) row.style.opacity = isAll ? '0.4' : '1';
+      const input = document.getElementById('doc-preview-pages');
+      if (input) input.disabled = isAll;
+    }
+
+    // Mở modal thêm mới (hỗ trợ mở sẵn chế độ File CAD hoặc Tài liệu)
+    function openDocModal(mode = 'document') {
+      const isFileCad = mode === 'filecad';
+      document.getElementById('doc-modal-title').innerText = isFileCad ? 'Thêm File CAD Mới (PDF & RAR Google Drive)' : 'Thêm Tài Liệu Mới';
       document.getElementById('doc-id').value = '';
+      document.getElementById('doc-item-type').value = isFileCad ? 'filecad' : 'document';
       document.getElementById('doc-title').value = '';
-      document.getElementById('doc-category').value = 'Thư viện DWG';
-      document.getElementById('doc-format').value = 'DWG / ZIP';
-      document.getElementById('doc-size').value = '45.2 MB';
+      document.getElementById('doc-category').value = isFileCad ? 'File CAD' : 'Thư viện DWG';
+      document.getElementById('doc-format').value = isFileCad ? 'PDF + RAR' : 'DWG / ZIP';
+      document.getElementById('doc-size').value = isFileCad ? '25 MB' : '45.2 MB';
       document.getElementById('doc-author').value = 'Tin Học Click';
       document.getElementById('doc-desc').value = '';
-      document.getElementById('doc-downloads').value = 250;
-      document.getElementById('doc-preview-pages').value = '10';
+      document.getElementById('doc-downloads').value = isFileCad ? 0 : 250;
+      document.getElementById('doc-preview-all').checked = false;
+      document.getElementById('doc-preview-pages').value = isFileCad ? '5' : '10';
+      toggleDocPreviewAll();
 
       // Reset giá bán
       document.querySelector('input[name="docPricingType"][value="free"]').checked = true;
@@ -1561,8 +1803,13 @@
 
       // Reset file list
       document.getElementById('doc-files-container').innerHTML = '';
-      addDocFileRow({ name: 'Phần 1 - Thư viện Block Bản vẽ DWG', type: 'link', url: '', size: '20 MB' });
-      addDocFileRow({ name: 'Phần 2 - Tài liệu hướng dẫn sử dụng (PDF)', type: 'link', url: '', size: '5 MB' });
+      if (isFileCad) {
+        addDocFileRow({ name: 'File PDF Xem Trước Bản Vẽ (Link Google Drive)', type: 'link', url: '', size: '10 MB' });
+        addDocFileRow({ name: 'File RAR Bản Vẽ Gốc Đầy Đủ (Link Google Drive)', type: 'link', url: '', size: '25 MB' });
+      } else {
+        addDocFileRow({ name: 'Phần 1 - Thư viện Block Bản vẽ DWG', type: 'link', url: '', size: '20 MB' });
+        addDocFileRow({ name: 'Phần 2 - Tài liệu hướng dẫn sử dụng (PDF)', type: 'link', url: '', size: '5 MB' });
+      }
 
       document.getElementById('doc-modal').style.display = 'block';
     }
@@ -1571,22 +1818,28 @@
       document.getElementById('doc-modal').style.display = 'none';
     }
 
-    // Mở modal sửa tài liệu
+    // Mở modal sửa tài liệu / File CAD
     function editDocById(id) {
       if (!globalData || !globalData.documents) return;
       const d = globalData.documents.find(x => x.id === id);
       if (!d) return;
 
-      document.getElementById('doc-modal-title').innerText = 'Chỉnh Sửa File CAD & Tài Liệu';
+      const isFileCad = d.itemType === 'filecad' || d.category === 'File CAD';
+      document.getElementById('doc-modal-title').innerText = isFileCad ? 'Chỉnh Sửa File CAD' : 'Chỉnh Sửa Tài Liệu';
       document.getElementById('doc-id').value = d.id;
+      document.getElementById('doc-item-type').value = isFileCad ? 'filecad' : 'document';
       document.getElementById('doc-title').value = d.title || '';
-      document.getElementById('doc-category').value = d.category || 'Thư viện DWG';
+      document.getElementById('doc-category').value = d.category || (isFileCad ? 'File CAD' : 'Thư viện DWG');
       document.getElementById('doc-format').value = d.format || 'DWG / ZIP';
       document.getElementById('doc-size').value = d.size || '';
       document.getElementById('doc-author').value = d.author || 'Tin Học Click';
       document.getElementById('doc-desc').value = d.description || '';
       document.getElementById('doc-downloads').value = d.downloadCount !== undefined ? d.downloadCount : 0;
-      document.getElementById('doc-preview-pages').value = d.previewPages || 10;
+
+      const isFull = Number(d.previewPages) === -1;
+      document.getElementById('doc-preview-all').checked = isFull;
+      document.getElementById('doc-preview-pages').value = isFull ? '10' : (d.previewPages || 10);
+      toggleDocPreviewAll();
 
       // Nạp giá bán
       const isPaid = Number(d.price) > 0;
@@ -1633,6 +1886,7 @@
       e.preventDefault();
       const form = new FormData();
       form.append('id', document.getElementById('doc-id').value);
+      form.append('itemType', document.getElementById('doc-item-type').value);
       form.append('title', document.getElementById('doc-title').value);
       form.append('category', document.getElementById('doc-category').value);
       form.append('format', document.getElementById('doc-format').value);
@@ -1640,7 +1894,9 @@
       form.append('author', document.getElementById('doc-author').value);
       form.append('description', document.getElementById('doc-desc').value);
       form.append('downloadCount', document.getElementById('doc-downloads').value || 0);
-      form.append('previewPages', document.getElementById('doc-preview-pages').value || '10');
+      const isPreviewAll = document.getElementById('doc-preview-all').checked;
+      form.append('previewAll', isPreviewAll ? 'true' : 'false');
+      form.append('previewPages', isPreviewAll ? '-1' : (document.getElementById('doc-preview-pages').value || '10'));
 
       // Giá bán
       const isPaidType = document.querySelector('input[name="docPricingType"]:checked').value === 'paid';
@@ -1737,6 +1993,13 @@
           ? `<span style="background: rgba(0, 104, 255, 0.12); color: #0068ff; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; border: 1px solid rgba(0, 104, 255, 0.3); display: inline-flex; align-items: center; gap: 4px;">💬 Gửi Zalo</span>`
           : `<span style="background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; border: 1px solid #cbd5e1;">📥 Tải về máy</span>`;
 
+        const machineBadge = o.activatedMachineId
+          ? `<div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+               <span title="${o.activatedMachineId}" style="background: rgba(2, 132, 199, 0.12); color: #0284c7; padding: 3px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(2, 132, 199, 0.3);">💻 ${o.activatedMachineId.slice(0, 12)}${o.activatedMachineId.length > 12 ? '...' : ''}</span>
+               <button class="btn-sm" style="background: #f59e0b; color: #fff; padding: 3px 8px; font-size: 0.72rem;" onclick="resetOrderMachine('${o.orderCode}')">🔄 Reset Máy</button>
+             </div>`
+          : `<span style="color: #94a3b8; font-size: 0.8rem;">Chưa kích hoạt</span>`;
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><strong>#${o.orderCode}</strong></td>
@@ -1747,6 +2010,7 @@
           <td>${deliveryBadge}</td>
           <td style="font-size: 0.85rem; color: var(--text-muted);">${dateStr}</td>
           <td>${isPaid ? '<span class="status-badge status-paid">Đã thanh toán</span>' : '<span class="status-badge status-pending">Chờ xác nhận</span>'}</td>
+          <td>${machineBadge}</td>
           <td>
             ${o.customerPhone ? `<a href="https://zalo.me/${o.customerPhone.replace(/[^0-9]/g, '')}" target="_blank" class="btn-sm" style="background: #0068ff; color: #fff; text-decoration: none; padding: 6px 10px; font-size: 0.78rem; font-weight: 700;" title="Mở Zalo nhắn cho khách">💬 Zalo</a>` : ''}
             ${!isPaid ? `<button class="btn-sm btn-success" onclick="approveOrder('${o.orderCode}')">Duyệt Đơn</button>` : ''}
@@ -1766,6 +2030,147 @@
       });
       const data = await res.json();
       if (data.success) loadDashboardData();
+    }
+
+    function renderAdminCoupons(coupons) {
+      const tbody = document.getElementById('coupons-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      if (!coupons || coupons.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Chưa có mã giảm giá nào. Hãy tạo mã ở khung phía trên!</td></tr>';
+        return;
+      }
+      coupons.forEach(c => {
+        const discountLabel = c.type === 'percent' ? `<strong>-${Number(c.value)}%</strong>` : `<strong>-${Number(c.value).toLocaleString()}đ</strong>`;
+        const usesLabel = Number(c.maxUses) > 0 ? `${Number(c.usedCount || 0)} / ${c.maxUses}` : `${Number(c.usedCount || 0)} / ∞`;
+        const isActive = c.isActive !== false;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><code style="background: #0f172a; color: #fbbf24; padding: 4px 10px; border-radius: 6px; font-weight: 900; font-size: 0.92rem;">${c.code}</code></td>
+          <td style="color: #16a34a;">${discountLabel}</td>
+          <td><strong>${usesLabel}</strong></td>
+          <td style="color: #475569; font-size: 0.85rem;">${c.note || ''}</td>
+          <td>${isActive ? '<span class="status-badge status-paid">Đang bật</span>' : '<span class="status-badge status-pending">Tạm khóa</span>'}</td>
+          <td>
+            <button class="btn-sm" style="background: #0284c7; color: #fff;" onclick="navigator.clipboard && navigator.clipboard.writeText('${c.code}').then(() => alert('✅ Đã copy mã: ${c.code}'))">📋 Copy</button>
+            <button class="btn-sm btn-secondary" onclick="toggleCouponAdmin('${c.code}')">${isActive ? 'Khóa' : 'Mở'}</button>
+            <button class="btn-sm btn-danger" onclick="deleteCouponAdmin('${c.code}')">Xóa</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function saveCouponAdmin(e) {
+      e.preventDefault();
+      const payload = {
+        code: document.getElementById('coupon-code').value.trim().toUpperCase(),
+        type: document.getElementById('coupon-type').value,
+        value: Number(document.getElementById('coupon-value').value) || 0,
+        maxUses: Number(document.getElementById('coupon-max-uses').value) || 0,
+        note: document.getElementById('coupon-note').value.trim()
+      };
+      const res = await fetch('/api/admin/coupon', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('✅ Đã lưu mã giảm giá: ' + data.coupon.code);
+        document.getElementById('coupon-code').value = '';
+        document.getElementById('coupon-note').value = '';
+        loadDashboardData();
+      } else {
+        alert(data.error || 'Lỗi lưu mã giảm giá');
+      }
+    }
+
+    async function toggleCouponAdmin(code) {
+      const res = await fetch('/api/admin/coupon/' + encodeURIComponent(code) + '/toggle', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) loadDashboardData();
+    }
+
+    async function deleteCouponAdmin(code) {
+      if (!confirm('Xóa mã giảm giá ' + code + '?')) return;
+      const res = await fetch('/api/admin/coupon/' + encodeURIComponent(code), { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) loadDashboardData();
+    }
+
+    async function resetOrderMachine(orderCode) {
+      if (!confirm('Reset mã máy cho đơn #' + orderCode + ' để khách kích hoạt lại trên máy mới?')) return;
+      const res = await fetch('/api/admin/order/reset-machine', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderCode })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('✅ ' + data.message);
+        loadDashboardData();
+      } else {
+        alert(data.error || 'Lỗi reset mã máy');
+      }
+    }
+
+    function openLispLicenseModal() {
+      let modal = document.getElementById('lisp-license-modal');
+      if (!modal) {
+        const snippet = [
+          ';; === KHOA BAN QUYEN 1 MAY - TINHOCCLICK.COM ===',
+          '(defun THC:GetMachineID (/ fso drv serial)',
+          '  (setq fso (vlax-create-object "Scripting.FileSystemObject"))',
+          '  (setq drv (vlax-invoke fso "GetDrive" "C:"))',
+          '  (setq serial (vlax-get drv "SerialNumber"))',
+          '  (vlax-release-object drv)',
+          '  (vlax-release-object fso)',
+          '  (strcat "PC-" (itoa (abs serial)))',
+          ')',
+          '(defun THC:CheckLicense (/ mid regPath savedCode code http url res)',
+          '  (vl-load-com)',
+          '  (setq mid (THC:GetMachineID))',
+          '  (setq regPath "HKEY_CURRENT_USER\\\\Software\\\\TinHocClickLisp")',
+          '  (setq savedCode (vl-registry-read regPath "OrderCode"))',
+          '  (setq code (if (and savedCode (/= savedCode "")) savedCode (getstring "\\nNhap Ma Don Hang (VD: CAD123456): ")))',
+          '  (if (or (null code) (= code "")) (progn (alert "Ban chua nhap Ma Don Hang!") (exit)))',
+          '  (setq url (strcat "https://tinhocclick.com/api/public/activate-lisp?format=text&orderCode=" (strcase code) "&machineId=" mid))',
+          '  (setq http (vlax-create-object "WinHttp.WinHttpRequest.5.1"))',
+          '  (vlax-invoke http "Open" "GET" url :vlax-false)',
+          '  (vlax-invoke http "Send")',
+          '  (setq res (vlax-get http "ResponseText"))',
+          '  (vlax-release-object http)',
+          '  (if (= res "OK")',
+          '    (progn (vl-registry-write regPath "OrderCode" (strcase code)) T)',
+          '    (progn (vl-registry-write regPath "OrderCode" "") (alert (strcat "LOI BAN QUYEN!\\n" res)) (exit))',
+          '  )',
+          ')',
+          '(THC:CheckLicense)',
+          ';; === DAN CODE LISP CUA BAN O BEN DUOI DONG NAY ==='
+        ].join('\\n');
+
+        modal = document.createElement('div');
+        modal.id = 'lisp-license-modal';
+        modal.style.cssText = 'position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); z-index: 100000; display: none; align-items: center; justify-content: center; padding: 16px;';
+        modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+        modal.innerHTML = `
+          <div style="background: #ffffff; color: #0f172a; width: 100%; max-width: 720px; max-height: 90vh; overflow-y: auto; border-radius: 14px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); position: relative;">
+            <span onclick="document.getElementById('lisp-license-modal').style.display='none'" style="position: absolute; top: 14px; right: 18px; font-size: 1.6rem; color: #64748b; cursor: pointer;">&times;</span>
+            <h3 style="margin: 0 0 8px 0; color: #0f172a;">🔐 Code Khóa Bản Quyền 1 Máy Cho File Lisp (.VLX)</h3>
+            <p style="font-size: 0.88rem; color: #475569; margin-bottom: 12px;">
+              Dán đoạn code AutoLISP này vào <strong>trên cùng</strong> file <code>.lsp</code> của bạn, sau đó trong AutoCAD gõ lệnh <code>VLIDE</code> → <strong>File → Make Application → New Application Wizard</strong> để đóng gói thành file <strong><code>.VLX</code></strong> (khách không thể mở xem/sửa code).
+            </p>
+            <textarea id="lisp-license-code-box" readonly rows="14" style="width: 100%; font-family: Consolas, monospace; font-size: 0.8rem; background: #0f172a; color: #38bdf8; padding: 12px; border-radius: 8px; border: 1px solid #334155;"></textarea>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px;">
+              <button type="button" class="btn-sm" style="background: #0284c7; color: #fff; padding: 10px 18px;" onclick="navigator.clipboard && navigator.clipboard.writeText(document.getElementById('lisp-license-code-box').value).then(() => alert('✅ Đã copy đoạn code khóa 1 máy!'))">📋 Copy Đoạn Code Này</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+        document.getElementById('lisp-license-code-box').value = snippet;
+      }
+      modal.style.display = 'flex';
     }
 
     async function deleteOrder(orderCode) {
