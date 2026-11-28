@@ -155,6 +155,10 @@
         <input type="text" id="search-input" placeholder="Tìm kiếm..." oninput="handleSearch(this.value)">
       </div>
 
+      <button type="button" onclick="openOrderLookupModal()" style="background: #f0fdfa; color: #0f766e; border: 1px solid #5eead4; border-radius: 20px; padding: 6px 12px; font-size: 0.8rem; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 5px;" title="Nhập SĐT để lấy lại link tải các đơn đã mua">
+        📥 Lấy lại link đã mua
+      </button>
+
       <!-- Nút Giỏ Hàng góc trên bên phải -->
       <div class="cart-btn-wrapper" onclick="openCartDrawer()" title="Xem giỏ hàng">
         <span class="cart-icon-svg">🛒</span>
@@ -412,18 +416,9 @@
             <div id="checkout-coupon-msg" style="font-size: 0.8rem; margin-top: 5px;"></div>
           </div>
           <div class="form-group" style="margin-top: 14px;">
-            <label style="font-weight: 700; color: #38bdf8; margin-bottom: 8px; display: block; font-size: 0.92rem;">
-              📦 Phương thức nhận file sau khi thanh toán:
-            </label>
-            <div style="display: flex; flex-direction: column; gap: 10px; background: #1e293b; padding: 12px 14px; border-radius: 10px; border: 1px solid #334155;">
-              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #fff; font-size: 0.92rem;">
-                <input type="radio" name="orderDeliveryMethod" value="download" checked style="width: 18px; height: 18px; accent-color: #0284c7;">
-                <span><strong>📥 Tự động tải xuống về máy ngay</strong></span>
-              </label>
-              <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #fff; font-size: 0.92rem;">
-                <input type="radio" name="orderDeliveryMethod" value="zalo" style="width: 18px; height: 18px; accent-color: #0284c7;">
-                <span><strong>💬 Gửi file / link tải về Zalo</strong> (Theo số điện thoại ở trên)</span>
-              </label>
+            <input type="radio" name="orderDeliveryMethod" value="download" checked style="display: none;">
+            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 10px; padding: 12px 14px; font-size: 0.85rem; color: #a7f3d0; line-height: 1.5;">
+              <strong>⚡ Giao hàng tự động 100%:</strong> Ngay sau khi chuyển khoản, hệ thống tự động mở link tải file &amp; mã kích hoạt ngay lập tức. Bạn cũng có thể bấm <em>"📥 Lấy lại link đã mua"</em> trên đầu trang bất cứ lúc nào bằng SĐT!
             </div>
           </div>
           <button type="submit" class="btn-add-cart-solid" id="btn-create-order" style="width: 100%; padding: 12px; margin-top: 14px; justify-content: center;">
@@ -2287,6 +2282,79 @@
         closeShareModal();
       }
     });
+
+    // ==========================================
+    // TRA CỨU / LẤY LẠI LINK ĐÃ MUA BẰNG SĐT
+    // ==========================================
+    function openOrderLookupModal() {
+      let modal = document.getElementById('order-lookup-modal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'order-lookup-modal';
+        modal.style.cssText = 'position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 100000; display: none; align-items: center; justify-content: center; padding: 16px;';
+        modal.onclick = (e) => { if (e.target === modal) closeOrderLookupModal(); };
+        modal.innerHTML = `
+          <div style="background: #ffffff; color: #0f172a; width: 100%; max-width: 520px; border-radius: 16px; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); position: relative; max-height: 85vh; display: flex; flex-direction: column;">
+            <span onclick="closeOrderLookupModal()" style="position: absolute; top: 14px; right: 18px; font-size: 1.6rem; color: #64748b; cursor: pointer; line-height: 1;">&times;</span>
+            <h3 style="margin: 0 0 6px 0; font-size: 1.15rem; color: #0f766e;">📥 Lấy Lại Link Tải &amp; Mã Kích Hoạt Đã Mua</h3>
+            <p style="margin: 0 0 14px 0; font-size: 0.85rem; color: #475569;">Nhập đúng <strong>Số điện thoại</strong> bạn đã điền khi đặt hàng để tải lại file tự động ngay lập tức:</p>
+            <form onsubmit="submitOrderLookup(event)" style="display: flex; gap: 8px; margin-bottom: 14px;">
+              <input type="tel" id="lookup-phone-input" required placeholder="Nhập SĐT của bạn (VD: 0912345678)" style="flex: 1; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.92rem; font-weight: 600;">
+              <button type="submit" style="padding: 10px 16px; border-radius: 8px; border: none; background: #0d9488; color: #fff; font-weight: 700; cursor: pointer; white-space: nowrap;">🔍 Tìm Đơn</button>
+            </form>
+            <div id="lookup-results-box" style="overflow-y: auto; flex: 1; max-height: 360px;"></div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+      modal.style.display = 'flex';
+      setTimeout(() => {
+        const inp = document.getElementById('lookup-phone-input');
+        if (inp) inp.focus();
+      }, 100);
+    }
+
+    function closeOrderLookupModal() {
+      const modal = document.getElementById('order-lookup-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function submitOrderLookup(e) {
+      e.preventDefault();
+      const phone = (document.getElementById('lookup-phone-input').value || '').trim();
+      const box = document.getElementById('lookup-results-box');
+      box.innerHTML = '<p style="color: #64748b; text-align: center; padding: 12px;">⏳ Đang tra cứu đơn hàng...</p>';
+      try {
+        const res = await fetch('/api/public/lookup-orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          box.innerHTML = `<p style="color: #dc2626; font-weight: 600;">❌ ${data.error || 'Lỗi tra cứu'}</p>`;
+          return;
+        }
+        if (!data.orders || data.orders.length === 0) {
+          box.innerHTML = '<p style="color: #64748b; background: #f8fafc; padding: 14px; border-radius: 8px; text-align: center;">Không tìm thấy đơn hàng đã thanh toán nào với SĐT này.</p>';
+          return;
+        }
+        box.innerHTML = data.orders.map(o => `
+          <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 8px;">
+              <strong style="color: #0f172a; font-size: 0.92rem;">${o.productName || 'Sản phẩm LispCAD'}</strong>
+              <code style="background: #0f172a; color: #fbbf24; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 0.82rem;">${o.orderCode}</code>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">
+              <a href="${o.downloadUrl}" style="flex: 1; text-align: center; background: #16a34a; color: #fff; text-decoration: none; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 0.84rem;">📥 Tải File Ngay</a>
+              <a href="${o.successUrl}" target="_blank" style="flex: 1; text-align: center; background: #0284c7; color: #fff; text-decoration: none; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 0.84rem;">🔑 Xem Mã &amp; Hướng Dẫn</a>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        box.innerHTML = '<p style="color: #dc2626;">Lỗi kết nối máy chủ.</p>';
+      }
+    }
 
     // Khởi động & Ghi nhận lượt truy cập trong ngày
     loadStore();

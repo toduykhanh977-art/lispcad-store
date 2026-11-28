@@ -81,45 +81,23 @@
           </div>
         </div>
 
-        <!-- 2 LỰA CHỌN NHẬN FILE -->
-        <div class="delivery-tab-container">
-          <button id="tab-btn-download" class="delivery-tab-btn active" onclick="switchDeliveryMode('download')">
-            📥 Tự Động Tải Về Máy
-          </button>
-          <button id="tab-btn-zalo" class="delivery-tab-btn" onclick="switchDeliveryMode('zalo')">
-            💬 Gửi File Qua Zalo
-          </button>
-        </div>
-
-        <!-- NỘI DUNG LỰA CHỌN 1: TẢI TRỰC TIẾP VỀ MÁY -->
+        <!-- NỘI DUNG TỰ ĐỘNG TẢI VỀ MÁY -->
         <div id="box-download-mode" style="background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center;">
           <a id="download-btn" href="#" class="btn-buy" style="display: block; text-decoration: none; max-width: 100%; margin: 0 auto 12px auto; background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%); color: #fff; font-weight: 800; font-size: 1.05rem; padding: 14px 20px; border-radius: 10px; box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);">
             📥 Bấm Vào Đây Để Tải File Ngay
           </a>
+          <button type="button" onclick="copyCurrentSuccessLink()" style="background: #1e293b; color: #38bdf8; border: 1px solid #334155; border-radius: 8px; padding: 8px 16px; font-size: 0.85rem; font-weight: 700; cursor: pointer; margin-bottom: 10px;">
+            📋 Copy Link Tải Dự Phòng (Lưu lại dùng sau)
+          </button>
           <p id="auto-download-note" style="font-size: 0.85rem; color: #4ade80;">
-            ⚡ Trình duyệt sẽ tự động bắt đầu tải file về máy bạn sau vài giây...
+            ⚡ Hệ thống đã tự động mở tải file về máy bạn. Nếu chưa thấy tải, hãy bấm nút màu xanh ở trên!
           </p>
         </div>
 
-        <!-- NỘI DUNG LỰA CHỌN 2: GỬI QUA ZALO -->
-        <div id="box-zalo-mode" style="display: none; background: rgba(0, 104, 255, 0.08); border: 1px solid rgba(0, 104, 255, 0.35); border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center;">
-          <div style="font-size: 2.2rem; margin-bottom: 8px;">📲</div>
-          <h3 style="color: #60a5fa; font-size: 1.15rem; margin-bottom: 6px;">Đã Ghi Nhận Yêu Cầu Gửi File Qua Zalo</h3>
-          <p style="color: #e2e8f0; font-size: 0.95rem; margin-bottom: 12px;">
-            Số điện thoại Zalo của bạn: <strong id="customer-phone-display" style="color: #fbbf24; font-size: 1.15rem;"></strong>
-          </p>
-          <p style="color: #94a3b8; font-size: 0.85rem; line-height: 1.5; margin-bottom: 16px;">
-            Shop sẽ gửi link tải trực tiếp vào Zalo số điện thoại trên của bạn.<br>
-            Bạn cũng có thể bấm nút bên dưới để <strong>mở Zalo chat với Shop nhận file ngay tức thì</strong>:
-          </p>
-          <a id="zalo-chat-btn" href="#" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #0068ff; color: #fff; text-decoration: none; font-weight: 800; font-size: 1rem; padding: 14px 28px; border-radius: 10px; box-shadow: 0 4px 14px rgba(0, 104, 255, 0.4);">
-            💬 Bấm Vào Đây Để Mở Zalo Nhận File Ngay
-          </a>
-          <div style="margin-top: 14px;">
-            <a id="secondary-download-btn" href="#" style="color: #94a3b8; font-size: 0.82rem; text-decoration: underline;">
-              Hoặc bấm vào đây nếu bạn muốn tải trực tiếp về máy luôn
-            </a>
-          </div>
+        <div id="box-zalo-mode" style="display: none;">
+          <span id="customer-phone-display"></span>
+          <a id="zalo-chat-btn" href="#"></a>
+          <a id="secondary-download-btn" href="#"></a>
         </div>
 
         <!-- HƯỚNG DẪN NẠP LISP (CHỈ HIỆN KHI SẢN PHẨM YÊU CẦU BẢN QUYỀN) -->
@@ -214,23 +192,20 @@
       }
     }
 
+    function copyCurrentSuccessLink() {
+      const url = window.location.origin + '/success.html?orderCode=' + encodeURIComponent(orderCode);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => alert('✅ Đã copy link tải dự phòng! Bạn có thể lưu lại để tải bất cứ lúc nào.'));
+      } else {
+        window.prompt('Copy link tải dự phòng:', url);
+      }
+    }
+
     function switchDeliveryMode(mode) {
-      const tabDownload = document.getElementById('tab-btn-download');
-      const tabZalo = document.getElementById('tab-btn-zalo');
       const boxDownload = document.getElementById('box-download-mode');
       const boxZalo = document.getElementById('box-zalo-mode');
-
-      if (mode === 'zalo') {
-        tabZalo.classList.add('active');
-        tabDownload.classList.remove('active');
-        boxZalo.style.display = 'block';
-        boxDownload.style.display = 'none';
-      } else {
-        tabDownload.classList.add('active');
-        tabZalo.classList.remove('active');
-        boxDownload.style.display = 'block';
-        boxZalo.style.display = 'none';
-      }
+      if (boxDownload) boxDownload.style.display = 'block';
+      if (boxZalo) boxZalo.style.display = 'none';
     }
 
     async function checkOrderStatus(code) {
@@ -287,16 +262,11 @@
           const prefillText = encodeURIComponent(`Chào shop Tin Học Click, tôi vừa thanh toán thành công đơn hàng #${code} (${data.productName}). SĐT của tôi: ${phone}. Gửi link tải qua Zalo giúp tôi nhé!`);
           zaloChatBtn.href = `https://zalo.me/${adminPhone}?text=${prefillText}`;
 
-          // Kiểm tra khách chọn hình thức nào (từ URL hoặc từ đơn hàng)
-          const chosenMode = paramDelivery || data.deliveryMethod || 'download';
-          switchDeliveryMode(chosenMode);
-
-          // Nếu là chế độ tải về máy: Tự động kích hoạt tải sau 1.5 giây
-          if (chosenMode === 'download') {
-            setTimeout(() => {
-              window.location.href = downloadUrl;
-            }, 1500);
-          }
+          // Luôn hiển thị nút tải & tự động kích hoạt tải sau 1.5 giây
+          switchDeliveryMode('download');
+          setTimeout(() => {
+            window.location.href = downloadUrl;
+          }, 1500);
         } else if (data.status === 'PENDING_CONFIRMATION' || data.status === 'PENDING') {
           pendingState.style.display = 'block';
           document.getElementById('pending-order-code').innerText = '#' + code;

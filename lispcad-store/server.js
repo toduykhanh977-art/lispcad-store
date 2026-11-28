@@ -816,6 +816,26 @@ app.get("/api/public/check-order/:orderCode", (req, res) => {
   });
 });
 
+// Tra cứu lại các đơn hàng đã thanh toán theo Số điện thoại
+app.post("/api/public/lookup-orders", (req, res) => {
+  const rawPhone = String(req.body.phone || "").replace(/\D/g, "");
+  if (rawPhone.length < 8) {
+    return res.status(400).json({ error: "Vui lòng nhập số điện thoại hợp lệ (ít nhất 8 chữ số)!" });
+  }
+  const db = readDb();
+  const matched = (db.orders || [])
+    .filter(o => o.status === "PAID" && String(o.customerPhone || "").replace(/\D/g, "") === rawPhone)
+    .map(o => ({
+      orderCode: o.orderCode,
+      productName: o.productName,
+      amount: o.amount,
+      paidAt: o.paidAt || o.createdAt,
+      downloadUrl: `/download/${o.orderCode}`,
+      successUrl: `/success.html?orderCode=${encodeURIComponent(o.orderCode)}`
+    }));
+  res.json({ success: true, orders: matched });
+});
+
 // Tải file an toàn: Bắt buộc đơn hàng phải là PAID
 app.get("/download/:orderCode", (req, res) => {
   const { orderCode } = req.params;
