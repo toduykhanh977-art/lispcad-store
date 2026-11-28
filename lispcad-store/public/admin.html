@@ -2208,7 +2208,7 @@
       const o = (globalData && globalData.orders) ? globalData.orders.find(x => x.orderCode === orderCode) : null;
       if (!o) return;
       const link = `${window.location.origin}/success.html?orderCode=${encodeURIComponent(o.orderCode)}`;
-      const msg = `Chào ${o.customerName || 'anh/chị'}, cảm ơn bạn đã đặt mua "${o.productName || 'LispCAD'}" tại Tin Học Click!\n🔑 Mã kích hoạt: ${o.orderCode}\n📥 Link tải file: ${link}`;
+      const msg = `Chào ${o.customerName || 'anh/chị'}, cảm ơn bạn đã đặt mua "${o.productName || 'LispCAD'}" tại Tin Học Click!\n🔑 Mã kích hoạt: ${o.orderCode}\n📥 Link tải file: ${link}\n🌐 Xem thêm các bộ LispCAD & File CAD hay tại: ${window.location.origin}`;
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(msg).catch(() => {});
       }
