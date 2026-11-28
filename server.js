@@ -220,7 +220,7 @@ function getEmailConfig(db) {
     smtpAppPassword,
     webhookEmailUrl,
     notifyOnPaid: saved.notifyOnPaid !== false,
-    notifyOnDownload: saved.notifyOnDownload !== false
+    notifyOnDownload: false
   };
 }
 
@@ -879,7 +879,7 @@ app.get("/download/:orderCode", (req, res) => {
     });
   }
   writeDb(db);
-  notifyOrderDownloaded(order, product, db);
+  // Chỉ gửi email khi thanh toán thành công (tắt thông báo mỗi lần khách tải file để tránh spam Gmail)
 
   // Lấy link tải từ fileIndex (nếu có nhiều file như PDF + RAR) hoặc file đầu tiên
   const fileIndex = req.query.fileIndex !== undefined ? parseInt(req.query.fileIndex) : 0;
