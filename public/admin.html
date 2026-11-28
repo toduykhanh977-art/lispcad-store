@@ -2195,13 +2195,23 @@
           <td>${isPaid ? '<span class="status-badge status-paid">Đã thanh toán</span>' : '<span class="status-badge status-pending">Chờ xác nhận</span>'}</td>
           <td>${machineBadge}</td>
           <td>
-            ${o.customerPhone ? `<a href="https://zalo.me/${o.customerPhone.replace(/[^0-9]/g, '')}" target="_blank" class="btn-sm" style="background: #0068ff; color: #fff; text-decoration: none; padding: 6px 10px; font-size: 0.78rem; font-weight: 700;" title="Mở Zalo nhắn cho khách">💬 Zalo</a>` : ''}
+            ${o.customerPhone ? `<a href="https://zalo.me/${o.customerPhone.replace(/[^0-9]/g, '')}" target="_blank" onclick="copyOrderZaloMsg('${o.orderCode}')" class="btn-sm" style="background: #0068ff; color: #fff; text-decoration: none; padding: 6px 10px; font-size: 0.78rem; font-weight: 700;" title="Tự copy link tải + mở Zalo nhắn cho khách">💬 Gửi Zalo</a>` : ''}
             ${!isPaid ? `<button class="btn-sm btn-success" onclick="approveOrder('${o.orderCode}')">Duyệt Đơn</button>` : ''}
             <button class="btn-sm btn-danger" onclick="deleteOrder('${o.orderCode}')">Xóa</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    function copyOrderZaloMsg(orderCode) {
+      const o = (globalData && globalData.orders) ? globalData.orders.find(x => x.orderCode === orderCode) : null;
+      if (!o) return;
+      const link = `${window.location.origin}/success.html?orderCode=${encodeURIComponent(o.orderCode)}`;
+      const msg = `Chào ${o.customerName || 'anh/chị'}, cảm ơn bạn đã đặt mua "${o.productName || 'LispCAD'}" tại Tin Học Click!\n🔑 Mã kích hoạt: ${o.orderCode}\n📥 Link tải file: ${link}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(msg).catch(() => {});
+      }
     }
 
     async function approveOrder(orderCode) {
