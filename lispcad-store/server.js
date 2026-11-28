@@ -836,6 +836,22 @@ app.post("/api/public/lookup-orders", (req, res) => {
   res.json({ success: true, orders: matched });
 });
 
+// Khách yêu cầu Shop gửi link qua Zalo (chỉ kích hoạt thông báo khi khách bấm)
+app.post("/api/public/request-zalo", (req, res) => {
+  const { orderCode } = req.body;
+  if (!orderCode) return res.status(400).json({ error: "Thiếu mã đơn hàng" });
+  const db = readDb();
+  const order = (db.orders || []).find(o => o.orderCode === orderCode);
+  if (!order) return res.status(404).json({ error: "Không tìm thấy đơn hàng" });
+
+  order.deliveryMethod = "zalo";
+  order.zaloRequested = true;
+  order.zaloSent = false;
+  order.zaloRequestedAt = new Date().toISOString();
+  writeDb(db);
+  res.json({ success: true });
+});
+
 // Tải file an toàn: Bắt buộc đơn hàng phải là PAID
 app.get("/download/:orderCode", (req, res) => {
   const { orderCode } = req.params;
@@ -1017,6 +1033,34 @@ app.get("/api/admin/data", requireAdmin, (req, res) => {
     todayKey: getVnDateKey(0),
     yesterdayKey: getVnDateKey(-1)
   });
+});
+
+// Lấy danh sách đơn hàng đã thanh toán đang chờ gửi Zalo (để App Admin báo chuông)
+app.get("/api/admin/zalo-alerts", requireAdmin, (req, res) => {
+  const db = readDb();
+  const alerts = (db.orders || [])
+    .filter(o => o.status === "PAID" && (o.deliveryMethod === "zalo" || o.zaloRequested === true) && !o.zaloSent)
+    .map(o => ({
+      orderCode: o.orderCode,
+      customerName: o.customerName,
+      customerPhone: o.customerPhone,
+      productName: o.productName,
+      amount: o.amount,
+      zaloRequestedAt: o.zaloRequestedAt || o.createdAt
+    }));
+  res.json({ success: true, alerts });
+});
+
+// Đánh dấu đã gửi link qua Zalo cho khách
+app.post("/api/admin/order/mark-zalo-sent", requireAdmin, (req, res) => {
+  const { orderCode } = req.body;
+  const db = readDb();
+  const order = (db.orders || []).find(o => o.orderCode === orderCode);
+  if (!order) return res.status(404).json({ error: "Không tìm thấy đơn" });
+  order.zaloSent = true;
+  order.zaloSentAt = new Date().toISOString();
+  writeDb(db);
+  res.json({ success: true });
 });
 
 // Tạo / Cập nhật Mã Giảm Giá

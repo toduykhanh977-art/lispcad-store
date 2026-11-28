@@ -230,6 +230,7 @@
           <p style="color: var(--text-muted); font-size: 0.9rem;">Tùy chỉnh mã QR ngân hàng, sản phẩm Lisp, giá bán và kiểm tra đơn hàng</p>
         </div>
         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button type="button" id="btn-enable-zalo-notify" class="btn-sm" onclick="enableZaloNotifications()" style="padding: 9px 13px; background: #f59e0b; color: #fff; border: none; font-weight: 700; cursor: pointer;" title="Bật chuông & thông báo đẩy khi có khách yêu cầu gửi qua Zalo">🔔 Bật Báo Zalo</button>
           <button type="button" id="btn-install-admin-pwa" class="btn-sm" onclick="installAdminPwa()" style="padding: 9px 13px; background: #0f766e; color: #fff; border: none; font-weight: 700; cursor: pointer;" title="Cài đặt App Quản Trị ra màn hình chính điện thoại / máy tính">📲 Cài App Quản Trị</button>
           <button type="button" class="btn-sm btn-secondary" onclick="exportBackupData()" style="padding: 9px 13px; background: #0284c7; color: #fff; border: none; font-weight: 600;" title="Tải toàn bộ dữ liệu web về máy">📥 Tải Dữ Liệu Về Máy</button>
           <label class="btn-sm btn-secondary" style="padding: 9px 13px; background: #16a34a; color: #fff; cursor: pointer; margin: 0; display: inline-flex; align-items: center; border: none; font-weight: 600;" title="Nạp file dữ liệu từ máy tính lên web">
@@ -239,6 +240,18 @@
           <a href="/" target="_blank" class="btn-sm btn-secondary" style="text-decoration: none; padding: 9px 13px;">🌐 Xem Trang Bán</a>
           <button class="btn-sm btn-danger" onclick="handleLogout()" style="padding: 9px 13px;">Đăng Xuất</button>
         </div>
+      </div>
+
+      <!-- Cảnh Báo Khách Yêu Cầu Gửi Qua Zalo -->
+      <div id="zalo-alert-banner" style="display: none; background: linear-gradient(135deg, #1d4ed8, #0284c7); color: #fff; padding: 14px 18px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 6px 18px rgba(2, 132, 199, 0.3); align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.5rem;">🔔</span>
+          <div>
+            <div style="font-weight: 800; font-size: 0.98rem;" id="zalo-alert-title">Có khách hàng yêu cầu gửi link qua Zalo!</div>
+            <div style="font-size: 0.84rem; color: #e0f2fe;" id="zalo-alert-sub"></div>
+          </div>
+        </div>
+        <div id="zalo-alert-actions" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
       </div>
 
       <!-- Thống Kê Lượt Truy Cập Theo Ngày -->
@@ -274,7 +287,7 @@
         <button class="tab-btn" onclick="switchTab('tab-documents')">📚 Tổng Hợp File CAD & Tài Liệu</button>
         <button class="tab-btn" onclick="switchTab('tab-lessons')">🎓 Quản Lý Khóa Học 2D</button>
         <button class="tab-btn" onclick="switchTab('tab-students')">👥 Quản Lý Học Viên</button>
-        <button class="tab-btn" onclick="switchTab('tab-orders')">📑 Danh Sách Đơn Hàng</button>
+        <button class="tab-btn" id="tab-btn-orders" onclick="switchTab('tab-orders')">📑 Danh Sách Đơn Hàng</button>
         <button class="tab-btn" onclick="switchTab('tab-coupons')">🎟️ Mã Giảm Giá</button>
         <button class="tab-btn" onclick="switchTab('tab-password')">🔒 Đổi Mật Khẩu</button>
       </div>
@@ -2236,6 +2249,11 @@
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(msg).catch(() => {});
       }
+      fetch('/api/admin/order/mark-zalo-sent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderCode })
+      }).then(() => checkZaloAlerts(true)).catch(() => {});
     }
 
     async function approveOrder(orderCode) {
@@ -2725,11 +2743,126 @@
       openAdminPdfPreview(encodeURIComponent(url), encodeURIComponent(name));
     }
 
+    // ==========================================
+    // THÔNG BÁO TỰ ĐỘNG KHI KHÁCH YÊU CẦU GỬI ZALO
+    // ==========================================
+    const notifiedZaloOrders = new Set();
+    let swRegistration = null;
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/admin-sw.js').then(reg => {
+        swRegistration = reg;
+      }).catch(() => {});
+    }
+
+    function updateZaloNotifyBtnState() {
+      const btn = document.getElementById('btn-enable-zalo-notify');
+      if (!btn || !('Notification' in window)) return;
+      if (Notification.permission === 'granted') {
+        btn.innerHTML = '🔔 Đang bật báo Zalo';
+        btn.style.background = '#16a34a';
+      } else if (Notification.permission === 'denied') {
+        btn.innerHTML = '🔕 Thông báo bị chặn';
+        btn.style.background = '#64748b';
+      }
+    }
+
+    async function enableZaloNotifications() {
+      if (!('Notification' in window)) {
+        alert('Trình duyệt này không hỗ trợ thông báo đẩy.');
+        return;
+      }
+      const perm = await Notification.requestPermission();
+      updateZaloNotifyBtnState();
+      if (perm === 'granted') {
+        playZaloChime();
+        try {
+          new Notification('Tin Học Click Admin', {
+            body: '✅ Đã bật thông báo tự động! Khi có khách yêu cầu gửi qua Zalo, App sẽ báo ngay.',
+            icon: '/admin-icon-192.png'
+          });
+        } catch (e) {}
+      }
+    }
+
+    function playZaloChime() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+        [880, 1174.66].forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + i * 0.14);
+          gain.gain.setValueAtTime(0.18, now + i * 0.14);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.14 + 0.35);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + i * 0.14);
+          osc.stop(now + i * 0.14 + 0.36);
+        });
+      } catch (e) {}
+    }
+
+    async function checkZaloAlerts(silent = false) {
+      try {
+        const res = await fetch('/api/admin/zalo-alerts');
+        if (!res.ok) return;
+        const data = await res.json();
+        const alerts = data.alerts || [];
+
+        const tabBtn = document.getElementById('tab-btn-orders');
+        if (tabBtn) {
+          tabBtn.innerHTML = alerts.length > 0
+            ? `📑 Danh Sách Đơn Hàng <span style="background:#ef4444;color:#fff;padding:1px 7px;border-radius:10px;font-size:0.75rem;margin-left:4px;">${alerts.length} Zalo</span>`
+            : '📑 Danh Sách Đơn Hàng';
+        }
+
+        const banner = document.getElementById('zalo-alert-banner');
+        const sub = document.getElementById('zalo-alert-sub');
+        const actions = document.getElementById('zalo-alert-actions');
+        if (banner && sub && actions) {
+          if (alerts.length > 0) {
+            const first = alerts[0];
+            document.getElementById('zalo-alert-title').innerText = `🔔 Có ${alerts.length} khách đang chờ gửi link qua Zalo!`;
+            sub.innerText = `Mới nhất: ${first.customerName || 'Khách'} (${first.customerPhone || ''}) — ${first.productName || ''}`;
+            const phoneDigits = String(first.customerPhone || '').replace(/[^0-9]/g, '');
+            actions.innerHTML = phoneDigits
+              ? `<a href="https://zalo.me/${phoneDigits}" target="_blank" onclick="copyOrderZaloMsg('${first.orderCode}')" style="background:#fff;color:#0284c7;text-decoration:none;padding:8px 14px;border-radius:8px;font-weight:800;font-size:0.85rem;">💬 Gửi Zalo Ngay (#${first.orderCode})</a>`
+              : '';
+            banner.style.display = 'flex';
+          } else {
+            banner.style.display = 'none';
+          }
+        }
+
+        const newAlerts = alerts.filter(a => !notifiedZaloOrders.has(a.orderCode));
+        newAlerts.forEach(a => notifiedZaloOrders.add(a.orderCode));
+
+        if (!silent && newAlerts.length > 0) {
+          playZaloChime();
+          const latest = newAlerts[0];
+          const title = `💬 Khách yêu cầu gửi Zalo (#${latest.orderCode})`;
+          const body = `${latest.customerName || 'Khách'} (${latest.customerPhone || ''}) - ${latest.productName || ''}`;
+          if ('Notification' in window && Notification.permission === 'granted') {
+            if (swRegistration && swRegistration.showNotification) {
+              swRegistration.showNotification(title, { body, icon: '/admin-icon-192.png', tag: 'zalo-' + latest.orderCode });
+            } else {
+              try {
+                const n = new Notification(title, { body, icon: '/admin-icon-192.png' });
+                n.onclick = () => { window.focus(); switchTab('tab-orders'); };
+              } catch (e) {}
+            }
+          }
+        }
+      } catch (e) {}
+    }
+
     // PWA - Cài đặt App Quản Trị 1 chạm
     let deferredAdminInstallPrompt = null;
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/admin-sw.js').catch(() => {});
-    }
+    updateZaloNotifyBtnState();
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredAdminInstallPrompt = e;
@@ -2753,8 +2886,9 @@
       }
     }
 
-    // Tự động kiểm tra phiên đăng nhập ban đầu
-    loadDashboardData();
+    // Tự động kiểm tra phiên đăng nhập ban đầu & bật theo dõi yêu cầu gửi Zalo mỗi 15 giây
+    loadDashboardData().then(() => checkZaloAlerts(true));
+    setInterval(() => checkZaloAlerts(false), 15000);
   </script>
 </body>
 </html>

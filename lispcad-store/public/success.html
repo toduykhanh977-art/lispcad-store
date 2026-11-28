@@ -97,6 +97,12 @@
           <p id="auto-download-note" style="font-size: 0.85rem; color: #4ade80;">
             ⚡ Hệ thống đã tự động mở tải file về máy bạn. Nếu chưa thấy tải, hãy bấm nút màu xanh ở trên!
           </p>
+          <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #334155;">
+            <button type="button" id="btn-request-shop-zalo" onclick="requestShopZaloDelivery()" style="background: transparent; color: #94a3b8; border: 1px solid #475569; border-radius: 8px; padding: 6px 14px; font-size: 0.8rem; cursor: pointer;">
+              📩 Không tải được? Yêu cầu Shop gửi qua Zalo giúp tôi
+            </button>
+            <div id="request-zalo-status" style="font-size: 0.8rem; color: #38bdf8; margin-top: 6px;"></div>
+          </div>
         </div>
 
         <div id="box-zalo-mode" style="display: none;">
@@ -215,6 +221,26 @@
       }
       alert('✅ Đã copy sẵn Link tải + Mã kích hoạt!\n\nTrên Zalo vừa mở, bạn chỉ cần chọn "Cloud của tôi" rồi Dán (Ctrl+V) để lưu giữ trọn đời.');
       window.open(`https://sp.zalo.me/share_inline?d=${encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify({ url })))))}`, '_blank', 'noopener');
+    }
+
+    async function requestShopZaloDelivery() {
+      const btn = document.getElementById('btn-request-shop-zalo');
+      const statusEl = document.getElementById('request-zalo-status');
+      if (btn) btn.disabled = true;
+      try {
+        const res = await fetch('/api/public/request-zalo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderCode })
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (statusEl) statusEl.innerHTML = '✅ Đã gửi yêu cầu! App Quản Trị của Shop đã nhận báo chuông và sẽ gửi link qua Zalo SĐT của bạn ngay.';
+          if (btn) btn.style.display = 'none';
+        }
+      } catch (e) {
+        if (btn) btn.disabled = false;
+      }
     }
 
     function switchDeliveryMode(mode) {
