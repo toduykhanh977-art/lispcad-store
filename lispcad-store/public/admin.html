@@ -234,6 +234,32 @@
         </div>
       </div>
 
+      <!-- Thống Kê Lượt Truy Cập Theo Ngày -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px;">
+        <div style="background: linear-gradient(135deg, #0f766e, #0d9488); color: #fff; padding: 14px 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(13,148,136,0.2);">
+          <div style="font-size: 0.78rem; opacity: 0.9; font-weight: 600;">👁️ TRUY CẬP HÔM NAY</div>
+          <div style="font-size: 1.55rem; font-weight: 800; margin: 4px 0;"><span id="stat-today-views">0</span> <small style="font-size: 0.85rem; font-weight: 600;">lượt</small></div>
+          <div style="font-size: 0.78rem; color: #ccfbf1;"><strong id="stat-today-unique">0</strong> khách truy cập riêng biệt</div>
+        </div>
+        <div style="background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; padding: 14px 16px; border-radius: 12px;">
+          <div style="font-size: 0.78rem; color: #64748b; font-weight: 700;">📅 HÔM QUA</div>
+          <div style="font-size: 1.55rem; font-weight: 800; margin: 4px 0; color: #0284c7;"><span id="stat-yesterday-views">0</span> <small style="font-size: 0.85rem; font-weight: 600; color: #64748b;">lượt</small></div>
+          <div style="font-size: 0.78rem; color: #64748b;"><strong id="stat-yesterday-unique">0</strong> khách riêng biệt</div>
+        </div>
+        <div style="background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; padding: 14px 16px; border-radius: 12px;">
+          <div style="font-size: 0.78rem; color: #64748b; font-weight: 700;">📊 7 NGÀY GẦN NHẤT</div>
+          <div style="font-size: 1.55rem; font-weight: 800; margin: 4px 0; color: #16a34a;"><span id="stat-7days-views">0</span> <small style="font-size: 0.85rem; font-weight: 600; color: #64748b;">lượt</small></div>
+          <div style="font-size: 0.78rem; color: #64748b;">Tính theo giờ Việt Nam (UTC+7)</div>
+        </div>
+        <div style="background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; padding: 14px 16px; border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="font-size: 0.78rem; color: #64748b; font-weight: 700;">🌐 TỔNG LƯỢT TRUY CẬP</div>
+            <div style="font-size: 1.55rem; font-weight: 800; margin: 4px 0; color: #0f172a;"><span id="stat-total-views">0</span> <small style="font-size: 0.85rem; font-weight: 600; color: #64748b;">lượt</small></div>
+          </div>
+          <button type="button" onclick="openVisitHistoryModal()" style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #0284c7; font-weight: 700; font-size: 0.78rem; padding: 5px 10px; border-radius: 6px; cursor: pointer; align-self: flex-start;">📈 Xem chi tiết từng ngày</button>
+        </div>
+      </div>
+
       <!-- Menu Tabs -->
       <div class="nav-tabs">
         <button class="tab-btn active" onclick="switchTab('tab-payment')">💳 Cài Đặt Mã QR & Ngân Hàng</button>
@@ -1156,6 +1182,7 @@
         renderStudents(globalData.users);
         renderOrders(globalData.orders);
         renderAdminCoupons(globalData.coupons || []);
+        renderVisitStats(globalData.visitStats, globalData.todayKey, globalData.yesterdayKey);
 
         // Hiển thị học phí khóa học 2D
         const courseProd = (globalData.products || []).find(p => p.id === 'prod_course_2d' || p.category === 'Khóa học' || (p.name && p.name.includes('Khóa học')));
@@ -1168,6 +1195,74 @@
       } catch (e) {
         console.error(e);
       }
+    }
+
+    function renderVisitStats(visitStats, todayKey, yesterdayKey) {
+      const stats = visitStats || { totalViews: 0, daily: {} };
+      const daily = stats.daily || {};
+      const t = daily[todayKey] || { views: 0, unique: 0 };
+      const y = daily[yesterdayKey] || { views: 0, unique: 0 };
+
+      const last7Keys = Object.keys(daily).sort().slice(-7);
+      const sum7 = last7Keys.reduce((acc, k) => acc + (Number(daily[k].views) || 0), 0);
+
+      if (document.getElementById('stat-today-views')) document.getElementById('stat-today-views').innerText = Number(t.views || 0).toLocaleString();
+      if (document.getElementById('stat-today-unique')) document.getElementById('stat-today-unique').innerText = Number(t.unique || 0).toLocaleString();
+      if (document.getElementById('stat-yesterday-views')) document.getElementById('stat-yesterday-views').innerText = Number(y.views || 0).toLocaleString();
+      if (document.getElementById('stat-yesterday-unique')) document.getElementById('stat-yesterday-unique').innerText = Number(y.unique || 0).toLocaleString();
+      if (document.getElementById('stat-7days-views')) document.getElementById('stat-7days-views').innerText = sum7.toLocaleString();
+      if (document.getElementById('stat-total-views')) document.getElementById('stat-total-views').innerText = Number(stats.totalViews || 0).toLocaleString();
+    }
+
+    function openVisitHistoryModal() {
+      const stats = (globalData && globalData.visitStats) ? globalData.visitStats : { totalViews: 0, daily: {} };
+      const daily = stats.daily || {};
+      const keys = Object.keys(daily).sort().reverse();
+
+      let modal = document.getElementById('visit-history-modal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'visit-history-modal';
+        modal.style.cssText = 'position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 16px;';
+        modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+        modal.innerHTML = `
+          <div style="background: #fff; color: #0f172a; width: 100%; max-width: 520px; border-radius: 14px; padding: 22px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); position: relative; max-height: 85vh; display: flex; flex-direction: column;">
+            <span onclick="document.getElementById('visit-history-modal').style.display='none'" style="position: absolute; top: 12px; right: 16px; font-size: 1.6rem; color: #64748b; cursor: pointer; line-height: 1;">&times;</span>
+            <h3 style="margin: 0 0 12px 0; color: #0f766e;">📈 Chi Tiết Lượt Truy Cập Theo Ngày</h3>
+            <div style="overflow-y: auto; flex: 1; border: 1px solid #e2e8f0; border-radius: 8px;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                <thead style="background: #f8fafc; position: sticky; top: 0;">
+                  <tr>
+                    <th style="padding: 10px; text-align: left; border-bottom: 1px solid #e2e8f0;">Ngày (UTC+7)</th>
+                    <th style="padding: 10px; text-align: right; border-bottom: 1px solid #e2e8f0;">Lượt xem trang</th>
+                    <th style="padding: 10px; text-align: right; border-bottom: 1px solid #e2e8f0;">Khách riêng biệt</th>
+                  </tr>
+                </thead>
+                <tbody id="visit-history-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+
+      const tbody = document.getElementById('visit-history-tbody');
+      if (keys.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="padding: 20px; text-align: center; color: #64748b;">Chưa có dữ liệu truy cập được ghi nhận.</td></tr>';
+      } else {
+        tbody.innerHTML = keys.map(k => {
+          const item = daily[k] || { views: 0, unique: 0 };
+          const isToday = globalData && k === globalData.todayKey;
+          return `
+            <tr style="${isToday ? 'background: #f0fdfa; font-weight: 700;' : ''}">
+              <td style="padding: 9px 10px; border-bottom: 1px solid #f1f5f9;">${k} ${isToday ? '<span style="color:#0d9488; font-size:0.75rem;">(Hôm nay)</span>' : ''}</td>
+              <td style="padding: 9px 10px; text-align: right; border-bottom: 1px solid #f1f5f9; color: #0284c7;"><strong>${Number(item.views || 0).toLocaleString()}</strong></td>
+              <td style="padding: 9px 10px; text-align: right; border-bottom: 1px solid #f1f5f9; color: #16a34a;"><strong>${Number(item.unique || 0).toLocaleString()}</strong></td>
+            </tr>
+          `;
+        }).join('');
+      }
+      modal.style.display = 'flex';
     }
 
     // Hiển thị Cài đặt Thanh toán

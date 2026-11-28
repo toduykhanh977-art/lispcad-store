@@ -2288,9 +2288,14 @@
       }
     });
 
-    // Khởi động
+    // Khởi động & Ghi nhận lượt truy cập trong ngày
     loadStore();
     window.addEventListener('focus', loadStore);
+    fetch('/api/public/track-visit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ page: window.location.pathname })
+    }).catch(() => {});
   </script>
 
   <footer style="background: #0f172a; color: #cbd5e1; padding: 26px 20px; margin-top: 40px; text-align: center; font-size: 0.88rem;">

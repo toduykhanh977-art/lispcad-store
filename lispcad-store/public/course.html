@@ -576,7 +576,14 @@
       modal.style.display = 'flex';
     }
 
-    window.onload = initPage;
+    window.onload = function () {
+      initPage();
+      fetch('/api/public/track-visit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ page: window.location.pathname })
+      }).catch(() => {});
+    };
   </script>
 </body>
 </html>

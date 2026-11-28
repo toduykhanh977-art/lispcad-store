@@ -920,6 +920,67 @@ app.post("/api/admin/logout", (req, res) => {
   res.json({ success: true });
 });
 
+// ==========================================
+// THỐNG KÊ LƯỢT TRUY CẬP THEO NGÀY (UTC+7)
+// ==========================================
+const dailyVisitorSet = new Set();
+let lastVisitorResetDay = "";
+
+function getVnDateKey(offsetDays = 0) {
+  const now = new Date(Date.now() + 7 * 3600 * 1000 + offsetDays * 86400 * 1000);
+  return now.toISOString().slice(0, 10);
+}
+
+app.post("/api/public/track-visit", (req, res) => {
+  try {
+    const todayKey = getVnDateKey(0);
+    if (lastVisitorResetDay !== todayKey) {
+      dailyVisitorSet.clear();
+      lastVisitorResetDay = todayKey;
+    }
+
+    const fwd = req.headers["x-forwarded-for"];
+    const clientIp = (typeof fwd === "string" ? fwd.split(",")[0].trim() : "") || req.ip || "unknown";
+    const visitorKey = `${todayKey}|${clientIp}`;
+    const isNewVisitor = !dailyVisitorSet.has(visitorKey);
+    if (isNewVisitor && dailyVisitorSet.size < 10000) {
+      dailyVisitorSet.add(visitorKey);
+    }
+
+    const db = readDb();
+    if (!db.visitStats || typeof db.visitStats !== "object") {
+      db.visitStats = { totalViews: 0, daily: {} };
+    }
+    if (!db.visitStats.daily || typeof db.visitStats.daily !== "object") {
+      db.visitStats.daily = {};
+    }
+    if (!db.visitStats.daily[todayKey]) {
+      db.visitStats.daily[todayKey] = { views: 0, unique: 0 };
+    }
+
+    db.visitStats.totalViews = (Number(db.visitStats.totalViews) || 0) + 1;
+    db.visitStats.daily[todayKey].views = (Number(db.visitStats.daily[todayKey].views) || 0) + 1;
+    if (isNewVisitor) {
+      db.visitStats.daily[todayKey].unique = (Number(db.visitStats.daily[todayKey].unique) || 0) + 1;
+    }
+
+    // Giữ tối đa 60 ngày gần nhất
+    const keys = Object.keys(db.visitStats.daily).sort();
+    if (keys.length > 60) {
+      keys.slice(0, keys.length - 60).forEach(k => delete db.visitStats.daily[k]);
+    }
+
+    writeDb(db);
+    res.json({
+      success: true,
+      today: db.visitStats.daily[todayKey],
+      totalViews: db.visitStats.totalViews
+    });
+  } catch (e) {
+    res.json({ success: false });
+  }
+});
+
 // Lấy toàn bộ dữ liệu quản trị
 app.get("/api/admin/data", requireAdmin, (req, res) => {
   const db = readDb();
@@ -931,7 +992,10 @@ app.get("/api/admin/data", requireAdmin, (req, res) => {
     orders: db.orders || [],
     lessons: db.lessons || [],
     users: db.users || [],
-    coupons: db.coupons || []
+    coupons: db.coupons || [],
+    visitStats: db.visitStats || { totalViews: 0, daily: {} },
+    todayKey: getVnDateKey(0),
+    yesterdayKey: getVnDateKey(-1)
   });
 });
 
