@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trang Quản Trị - Bán LispCAD</title>
+  <title>Tin Học Click Admin - Quản Trị Web</title>
+  <link rel="manifest" href="/admin-manifest.json">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="THC Admin">
+  <link rel="apple-touch-icon" href="/admin-icon-192.png">
   <link rel="stylesheet" href="style.css">
   <style>
     :root {
@@ -224,6 +230,7 @@
           <p style="color: var(--text-muted); font-size: 0.9rem;">Tùy chỉnh mã QR ngân hàng, sản phẩm Lisp, giá bán và kiểm tra đơn hàng</p>
         </div>
         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button type="button" id="btn-install-admin-pwa" class="btn-sm" onclick="installAdminPwa()" style="padding: 9px 13px; background: #0f766e; color: #fff; border: none; font-weight: 700; cursor: pointer;" title="Cài đặt App Quản Trị ra màn hình chính điện thoại / máy tính">📲 Cài App Quản Trị</button>
           <button type="button" class="btn-sm btn-secondary" onclick="exportBackupData()" style="padding: 9px 13px; background: #0284c7; color: #fff; border: none; font-weight: 600;" title="Tải toàn bộ dữ liệu web về máy">📥 Tải Dữ Liệu Về Máy</button>
           <label class="btn-sm btn-secondary" style="padding: 9px 13px; background: #16a34a; color: #fff; cursor: pointer; margin: 0; display: inline-flex; align-items: center; border: none; font-weight: 600;" title="Nạp file dữ liệu từ máy tính lên web">
             📤 Nạp Dữ Liệu Lên Web
@@ -533,9 +540,12 @@
       <!-- TAB 3: DANH SÁCH ĐƠN HÀNG -->
       <div id="tab-orders" class="panel">
         <div class="admin-card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="color: var(--accent-cyan);">3. Danh Sách Đơn Hàng Khách Mua</h3>
-            <button class="btn-sm btn-secondary" onclick="loadDashboardData()">🔄 Làm Mới</button>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+            <h3 style="color: var(--accent-cyan); margin: 0;">3. Danh Sách Đơn Hàng Khách Mua</h3>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <input type="text" id="order-search-input" oninput="filterOrdersAdmin()" placeholder="🔍 Tìm nhanh theo SĐT, Tên, Mã đơn..." style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; min-width: 250px; font-size: 0.88rem; font-weight: 600;">
+              <button class="btn-sm btn-secondary" onclick="loadDashboardData()">🔄 Làm Mới</button>
+            </div>
           </div>
 
           <div class="table-responsive">
@@ -2161,14 +2171,28 @@
     }
 
     // Hiển thị Đơn hàng
+    function filterOrdersAdmin() {
+      if (globalData && globalData.orders) {
+        renderOrders(globalData.orders);
+      }
+    }
+
     function renderOrders(orders) {
       const tbody = document.getElementById('orders-table-body');
       tbody.innerHTML = '';
-      if (!orders || orders.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Chưa có đơn hàng nào được tạo.</td></tr>';
+      const q = (document.getElementById('order-search-input') ? document.getElementById('order-search-input').value : '').trim().toLowerCase();
+      const filtered = (orders || []).filter(o => {
+        if (!q) return true;
+        return String(o.customerPhone || '').toLowerCase().includes(q)
+          || String(o.customerName || '').toLowerCase().includes(q)
+          || String(o.orderCode || '').toLowerCase().includes(q)
+          || String(o.productName || '').toLowerCase().includes(q);
+      });
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--text-muted);">${q ? 'Không tìm thấy đơn hàng nào khớp với "' + q + '"' : 'Chưa có đơn hàng nào được tạo.'}</td></tr>`;
         return;
       }
-      orders.forEach(o => {
+      filtered.forEach(o => {
         const isPaid = o.status === 'PAID';
         const dateStr = new Date(o.createdAt).toLocaleString('vi-VN');
         const isZalo = o.deliveryMethod === 'zalo';
@@ -2699,6 +2723,34 @@
         return;
       }
       openAdminPdfPreview(encodeURIComponent(url), encodeURIComponent(name));
+    }
+
+    // PWA - Cài đặt App Quản Trị 1 chạm
+    let deferredAdminInstallPrompt = null;
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/admin-sw.js').catch(() => {});
+    }
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredAdminInstallPrompt = e;
+      const btn = document.getElementById('btn-install-admin-pwa');
+      if (btn) btn.style.display = 'inline-flex';
+    });
+    async function installAdminPwa() {
+      if (deferredAdminInstallPrompt) {
+        deferredAdminInstallPrompt.prompt();
+        const choice = await deferredAdminInstallPrompt.userChoice;
+        if (choice && choice.outcome === 'accepted') {
+          deferredAdminInstallPrompt = null;
+        }
+        return;
+      }
+      const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      if (isIos) {
+        alert('📲 Trên iPhone / iPad (Safari):\n\n1. Bấm biểu tượng Chia sẻ (ô vuông có mũi tên lên ↑) ở thanh dưới cùng.\n2. Chọn "Thêm vào Màn hình chính" (Add to Home Screen).\n3. Bấm "Thêm" — App THC Admin sẽ xuất hiện ngay ngoài màn hình!');
+      } else {
+        alert('📲 Để cài App Quản Trị:\n\n• Trên Chrome / Edge máy tính: Bấm biểu tượng "Cài đặt (màn hình có mũi tên)" ở góc phải thanh địa chỉ.\n• Trên Android (Chrome): Bấm menu 3 chấm (⋮) góc trên phải -> chọn "Cài đặt ứng dụng" / "Thêm vào Màn hình chính".');
+      }
     }
 
     // Tự động kiểm tra phiên đăng nhập ban đầu
